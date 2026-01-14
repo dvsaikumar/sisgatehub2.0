@@ -788,7 +788,7 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                                 const styles = getTypeStyles(item.type);
                                 const IconComponent = styles.icon;
                                 return (
-                                    <Col xl={4} lg={4} md={4} sm={12} key={item.id} className="mb-4">
+                                    <Col xl={3} lg={3} md={6} sm={12} key={item.id} className="mb-4">
                                         <Card className="h-100 library-card shadow-sm border" onClick={() => handlePreview(item)} style={{ cursor: 'pointer' }}>
                                             <Card.Header className="bg-light border-bottom d-flex align-items-center py-2 px-4" style={{ minHeight: '50px' }}>
                                                 <div className="card-icon-wrap transition-all">
