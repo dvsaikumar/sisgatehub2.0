@@ -1,0 +1,385 @@
+/* ============================================
+   RESPONSIVE LAYOUT OVERRIDES
+   Mobile-First Strategy with Tailwind Integration
+   ============================================ */
+
+/* CSS Variables for consistent theming */
+:root {
+    --nav-height-mobile: 3.5rem;
+    --nav-height-desktop: 4rem;
+    --bottom-bar-height: 4rem;
+    --sidebar-width: 280px;
+    --sidebar-width-collapsed: 70px;
+    --touch-target-min: 44px;
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ============================================
+   MOBILE STYLES (Base - < 640px)
+   ============================================ */
+
+/* Remove fixed body constraints */
+html,
+body {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+/* Ensure proper spacing for mobile nav */
+body {
+    padding-bottom: calc(var(--bottom-bar-height) + var(--safe-area-bottom));
+}
+
+/* Touch target sizing */
+button,
+a,
+.btn,
+[role="button"] {
+    min-height: var(--touch-target-min);
+    min-width: var(--touch-target-min);
+}
+
+/* Fluid images */
+img {
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+/* Card styling - Bento box style */
+.card,
+.card-border {
+    border-radius: 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03);
+    transition: all 0.25s ease;
+}
+
+.card:hover,
+.card-border:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+}
+
+/* Container fluid improvements */
+.container,
+.container-fluid {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    max-width: 100%;
+}
+
+/* Table responsiveness */
+.table-responsive,
+.table-advance-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+/* Stack grids on mobile */
+.row {
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+}
+
+.row>* {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+/* Page headers mobile */
+.hk-pg-header {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+}
+
+.pg-title {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+/* ============================================
+   SMALL SCREENS (640px - 767px)
+   ============================================ */
+@media (min-width: 640px) {
+
+    .container,
+    .container-fluid {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    .row {
+        margin-left: -0.75rem;
+        margin-right: -0.75rem;
+    }
+
+    .row>* {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+}
+
+/* ============================================
+   TABLET SCREENS (768px - 1023px)
+   ============================================ */
+@media (min-width: 768px) {
+    body {
+        padding-bottom: calc(var(--bottom-bar-height) + var(--safe-area-bottom));
+    }
+
+    .container,
+    .container-fluid {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+
+    /* 2-column grids on tablet */
+    .col-md-6 {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+
+    /* Card sizing */
+    .card,
+    .card-border {
+        border-radius: 1.25rem;
+    }
+}
+
+/* ============================================
+   LAPTOP/DESKTOP (1024px+)
+   ============================================ */
+@media (min-width: 1024px) {
+
+    /* Remove bottom padding since using horizontal nav */
+    body {
+        padding-bottom: 0;
+    }
+
+    .container,
+    .container-fluid {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+
+    /* Enhanced card hover effects */
+    .card:hover,
+    .card-border:hover {
+        transform: translateY(-4px);
+    }
+}
+
+/* ============================================
+   EXTRA LARGE SCREENS (1440px+)
+   ============================================ */
+@media (min-width: 1440px) {
+    .container {
+        max-width: 1400px;
+    }
+
+    .container,
+    .container-fluid {
+        padding-left: 3rem;
+        padding-right: 3rem;
+    }
+}
+
+/* ============================================
+   CLASSIC LAYOUT OVERRIDES (When sidebar is used)
+   Only applies below 1024px when NOT using responsive nav
+   ============================================ */
+@media (max-width: 1023px) {
+    .hk-wrapper[data-layout="vertical"] {
+
+        /* Main content full width */
+        .hk-pg-wrapper {
+            margin-left: 0 !important;
+            width: 100% !important;
+            padding-top: calc(var(--nav-height-mobile) + 1rem);
+            padding-bottom: calc(var(--bottom-bar-height) + var(--safe-area-bottom) + 1rem);
+        }
+
+        /* Sidebar hidden by default */
+        .hk-menu {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: -var(--sidebar-width) !important;
+            width: var(--sidebar-width);
+            z-index: 1040;
+            transition: left 0.3s ease-in-out;
+            background-color: var(--bs-card-bg, #fff);
+            border-right: 1px solid var(--bs-border-color);
+        }
+
+        /* Sidebar open state */
+        &[data-layout-style="default"] {
+            .hk-menu {
+                left: 0 !important;
+                box-shadow: 0 0 25px rgba(0, 0, 0, 0.15);
+            }
+
+            .hk-menu-backdrop {
+                display: block !important;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.5);
+                backdrop-filter: blur(4px);
+                z-index: 1039;
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+
+        /* Sidebar closed state */
+        &[data-layout-style="collapsed"] {
+            .hk-menu {
+                left: -var(--sidebar-width) !important;
+            }
+
+            .hk-menu-backdrop {
+                display: none !important;
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+    }
+
+    /* Header adjustments */
+    .hk-navbar {
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: var(--nav-height-mobile);
+
+        .navbar-nav {
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .nav-end-wrap {
+            margin-left: auto;
+        }
+
+        /* Compact AI button */
+        .ai-btn-nav {
+            .ai-text {
+                display: none;
+            }
+
+            padding: 0.5rem !important;
+        }
+
+        .navbar-toggle {
+            display: inline-flex !important;
+        }
+    }
+
+    /* Page header stacking */
+    .hk-pg-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 1rem;
+
+        .d-flex {
+            width: 100%;
+            flex-wrap: wrap;
+        }
+    }
+}
+
+/* ============================================
+   DESKTOP SIDEBAR BEHAVIOR (1024px - 1199px)
+   ============================================ */
+@media (min-width: 1024px) and (max-width: 1199px) {
+    .hk-wrapper[data-layout="vertical"] {
+        .hk-pg-wrapper {
+            margin-left: var(--sidebar-width-collapsed) !important;
+        }
+
+        .hk-menu {
+            width: var(--sidebar-width-collapsed);
+
+            .nav-link-text,
+            .nav-header span {
+                display: none;
+            }
+        }
+
+        &:hover,
+        &[data-hover="active"] {
+            .hk-menu {
+                width: var(--sidebar-width);
+
+                .nav-link-text,
+                .nav-header span {
+                    display: inline;
+                }
+            }
+        }
+    }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Hide on mobile, show on desktop */
+.d-mobile-none {
+    display: none !important;
+
+    @media (min-width: 1024px) {
+        display: block !important;
+    }
+}
+
+/* Show on mobile, hide on desktop */
+.d-desktop-none {
+    display: block !important;
+
+    @media (min-width: 1024px) {
+        display: none !important;
+    }
+}
+
+/* Full width on mobile */
+.w-mobile-100 {
+    @media (max-width: 767px) {
+        width: 100% !important;
+    }
+}
+
+/* Stack on mobile */
+.flex-mobile-column {
+    @media (max-width: 767px) {
+        flex-direction: column !important;
+        gap: 1rem;
+    }
+}
+
+/* Glass morphism effect */
+.glass-effect {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* Dark mode glass */
+[data-bs-theme="dark"] .glass-effect,
+.dark .glass-effect {
+    background: rgba(30, 41, 59, 0.8);
+}
+
+/* Smooth transitions */
+* {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
