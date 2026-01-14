@@ -44,3 +44,4 @@ coverage/
 # Large files
 Archive.zip
 *.zip
+.vercel

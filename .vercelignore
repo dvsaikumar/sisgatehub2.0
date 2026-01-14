@@ -1,0 +1,27 @@
+# Large files
+Archive.zip
+*.zip
+
+# Dependencies (Vercel installs these)
+node_modules/
+
+# Development files
+.git/
+.gitignore
+.env.local
+.env.development.local
+
+# Build cache
+.cache/
+.eslintcache
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Supabase temp files
+supabase/.temp/
+
+# IDE files
+.idea/
+.vscode/
