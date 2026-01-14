@@ -362,12 +362,10 @@ Example format:
                     </Container>
                 </div>
 
-                {/* Standard Page Footer - Hide on mobile to prevent clutter */}
-                {!isMobile && (
-                    <div style={{ zIndex: 1200, position: 'relative' }}>
-                        <PageFooter style={{ left: 0, paddingLeft: 'var(--hk-sidebar-width, 270px)' }} />
-                    </div>
-                )}
+                {/* Standard Page Footer */}
+                <div style={{ zIndex: 1200, position: 'relative' }}>
+                    <PageFooter style={{ left: 0, paddingLeft: isMobile ? '0' : 'var(--hk-sidebar-width, 270px)' }} />
+                </div>
 
                 <TemplatesDrawer
                     show={showTemplates}
