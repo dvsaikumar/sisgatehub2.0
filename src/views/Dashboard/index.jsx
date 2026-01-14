@@ -80,8 +80,8 @@ const Dashboard = ({ navCollapsed, toggleCollapsedNav }) => {
         <Container>
             {/* Page Header */}
             <div className="hk-pg-header pt-7">
-                <Row>
-                    <Col sm>
+                <Row className="align-items-center flex-nowrap">
+                    <Col>
                         <div className="d-flex align-items-center">
                             <div className="d-flex">
                                 <div>
@@ -91,7 +91,7 @@ const Dashboard = ({ navCollapsed, toggleCollapsedNav }) => {
                             </div>
                         </div>
                     </Col>
-                    <Col sm="auto" className="d-flex align-items-center">
+                    <Col xs="auto" className="d-flex align-items-center">
                         <Link to="/apps/ai/create-doc" className="text-decoration-none">
                             <Button variant="primary" size="sm" className="btn-rounded">
                                 <Plus size={16} className="me-1" />
