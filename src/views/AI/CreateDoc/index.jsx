@@ -325,7 +325,7 @@ Example format:
                 <div
                     className="position-fixed bg-white border-top shadow-sm py-2 d-flex justify-content-between align-items-center"
                     style={{
-                        zIndex: 1020,
+                        zIndex: 1300, // Higher than PageFooter (1200)
                         left: 0,
                         right: 0,
                         bottom: isMobile ? '90px' : '42px', // Clears Mobile Nav
