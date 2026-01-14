@@ -6529,6 +6529,186 @@ header.contact-header {
 	}
 }
 
+/* ============================================
+   LIBRARY PAGE - MOBILE-FIRST STYLES
+   ============================================ */
+
+/* Mobile Search Overlay */
+.mobile-search-overlay {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0 0.5rem;
+	width: 100%;
+	background: var(--hk-bg-primary, #fff);
+
+	.mobile-search-input {
+		border-radius: 8px;
+		border: 1px solid var(--hk-border-primary, #e0e0e0);
+		padding: 0.5rem 1rem;
+		font-size: 0.875rem;
+
+		&:focus {
+			border-color: var(--bs-primary, #007D88);
+			box-shadow: 0 0 0 2px rgba(0, 125, 136, 0.1);
+		}
+	}
+
+	.mobile-search-close {
+		color: var(--hk-text-secondary, #666);
+		text-decoration: none;
+		flex-shrink: 0;
+
+		&:hover {
+			color: var(--bs-danger, #dc3545);
+		}
+	}
+}
+
+/* Filter Chips - Hide Scrollbar but Keep Scroll */
+.filter-chips-container,
+.file-list-view>.d-flex.overflow-auto {
+	scrollbar-width: none;
+	/* Firefox */
+	-ms-overflow-style: none;
+	/* IE/Edge */
+
+	&::-webkit-scrollbar {
+		display: none;
+		/* Chrome, Safari, Opera */
+	}
+}
+
+/* Library Drawer - Mobile Bottom Sheet */
+@media (max-width: 767.98px) {
+	.library-drawer {
+		width: 100% !important;
+		height: 90vh !important;
+		max-height: 90vh !important;
+		border-radius: 20px 20px 0 0 !important;
+		border: none !important;
+		box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15) !important;
+
+		/* Override placement to bottom */
+		&.offcanvas-end {
+			top: auto !important;
+			bottom: 0 !important;
+			right: 0 !important;
+			left: 0 !important;
+			transform: translateY(100%) !important;
+		}
+
+		&.show {
+			transform: translateY(0) !important;
+		}
+
+		/* Drag Handle Indicator */
+		&::before {
+			content: '';
+			position: absolute;
+			top: 8px;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 40px;
+			height: 4px;
+			background: var(--hk-border-primary, #d0d0d0);
+			border-radius: 2px;
+			z-index: 10;
+		}
+
+		.drawer-header {
+			padding: 1.5rem 1.25rem 1rem !important;
+			border-radius: 20px 20px 0 0;
+
+			.offcanvas-title {
+				font-size: 1.1rem !important;
+			}
+
+			.library-breadcrumb {
+				font-size: 10px;
+			}
+
+			.btn-close {
+				top: 1rem !important;
+				right: 1rem !important;
+			}
+		}
+
+		.drawer-body {
+			padding: 1rem 1.25rem !important;
+
+			.document-preview-container {
+				padding: 1.25rem !important;
+			}
+		}
+
+		.drawer-footer {
+			padding: 1rem 1.25rem !important;
+
+			.d-flex.gap-2 {
+				flex-wrap: wrap;
+
+				>* {
+					width: 100% !important;
+					margin-bottom: 0.5rem;
+
+					&:last-child {
+						margin-bottom: 0;
+					}
+				}
+
+				.dropdown {
+					width: 100% !important;
+
+					.dropdown-toggle {
+						width: 100% !important;
+					}
+				}
+			}
+		}
+	}
+
+	/* Mobile Header Adjustments */
+	.fm-header {
+		padding: 0.75rem 1rem !important;
+
+		.fmapp-title h1 {
+			font-size: 1rem !important;
+		}
+
+		.fm-options-wrap {
+			gap: 0.25rem;
+
+			.btn-icon {
+				width: 36px !important;
+				height: 36px !important;
+			}
+		}
+	}
+
+	/* Filter chips mobile spacing */
+	.file-list-view {
+		padding: 0.75rem !important;
+
+		.filter-btn {
+			font-size: 0.75rem !important;
+			padding: 0.35rem 0.75rem !important;
+		}
+	}
+
+	/* Cards spacing on mobile */
+	.library-card {
+		margin-bottom: 0.75rem !important;
+	}
+}
+
+/* Tablet adjustments */
+@media (min-width: 768px) and (max-width: 991.98px) {
+	.library-drawer {
+		width: 70% !important;
+	}
+}
+
 /*Gallery App*/
 .galleryapp-wrap {
 	position: relative;

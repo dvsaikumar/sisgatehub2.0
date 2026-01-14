@@ -1,7 +1,7 @@
 import classNames from 'classnames';
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Dropdown, Form } from 'react-bootstrap';
-import { CaretDown, CaretUp, File, FilePlus, FolderPlus, SquaresFour, Info, List, CloudArrowUp, UserPlus } from '@phosphor-icons/react';
+import { CaretDown, CaretUp, File, FilePlus, FolderPlus, SquaresFour, Info, List, CloudArrowUp, UserPlus, MagnifyingGlass, X } from '@phosphor-icons/react';
 import { connect } from 'react-redux';
 import { Link, NavLink, useRouteMatch } from 'react-router-dom';
 import HkTooltip from '../../components/@hk-tooltip/HkTooltip';
@@ -10,18 +10,62 @@ import { toggleTopNav } from '../../redux/action/Theme';
 const FmHeader = ({ topNavCollapsed, toggleTopNav, toggleSidebar, showSidebar, showInfo, toggleInfo, title, onSearch, searchValue, children }) => {
 
     const listViewRoute = useRouteMatch("/apps/file-manager/list-view");
+    const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
     return (
         <header className="fm-header">
-            <div className="d-flex align-items-center flex-grow-1">
+            {/* Mobile Search Overlay */}
+            {mobileSearchOpen && onSearch && (
+                <div className="mobile-search-overlay d-md-none">
+                    <Form className="flex-grow-1" role="search" onSubmit={e => e.preventDefault()}>
+                        <Form.Control
+                            type="text"
+                            placeholder="Search templates..."
+                            value={searchValue}
+                            onChange={(e) => onSearch(e.target.value)}
+                            autoFocus
+                            className="mobile-search-input"
+                        />
+                    </Form>
+                    <Button
+                        variant="link"
+                        className="mobile-search-close p-2"
+                        onClick={() => {
+                            setMobileSearchOpen(false);
+                            if (onSearch) onSearch('');
+                        }}
+                    >
+                        <X size={20} weight="bold" />
+                    </Button>
+                </div>
+            )}
+
+            <div className={classNames("d-flex align-items-center flex-grow-1", { "d-none d-md-flex": mobileSearchOpen })}>
                 <div className="fmapp-title link-dark">
                     <h1>{title ? title : "My Space"}</h1>
                 </div>
                 {children}
+
+                {/* Desktop Search - visible on md and up */}
                 {onSearch && (
-                    <Form className="mx-3 flex-grow-1 mw-400p" role="search" onSubmit={e => e.preventDefault()}>
+                    <Form className="mx-3 flex-grow-1 mw-400p d-none d-md-block" role="search" onSubmit={e => e.preventDefault()}>
                         <Form.Control type="text" placeholder="Search..." value={searchValue} onChange={(e) => onSearch(e.target.value)} />
                     </Form>
+                )}
+
+                {/* Mobile Search Icon - visible on mobile only */}
+                {onSearch && (
+                    <Button
+                        variant="flush-dark"
+                        className="btn-icon btn-rounded flush-soft-hover d-md-none ms-auto"
+                        onClick={() => setMobileSearchOpen(true)}
+                    >
+                        <span className="icon">
+                            <span className="feather-icon">
+                                <MagnifyingGlass size={20} />
+                            </span>
+                        </span>
+                    </Button>
                 )}
             </div>
             <div className="fm-options-wrap">
