@@ -85,14 +85,14 @@ const FieldInput = ({ label, value, onChange, placeholder, isShort }) => {
     );
 };
 
-const FrameworkPanel = ({ framework, data, onChange, onAutoExpand, isExpanding }) => {
+const FrameworkPanel = ({ framework, data, onChange, onAutoExpand, isExpanding, isMobile }) => {
 
     const fields = useMemo(() => {
         return FRAMEWORK_DEFINITIONS[framework] || FRAMEWORK_DEFINITIONS['CO-STAR'];
     }, [framework]);
 
     return (
-        <Card className="h-100 border-0 bg-transparent d-flex flex-column overflow-hidden">
+        <Card className={`border-0 bg-transparent d-flex flex-column ${isMobile ? '' : 'h-100 overflow-hidden'}`}>
             <div className="d-flex justify-content-between align-items-center mb-2 px-1 flex-shrink-0">
                 <div className="d-flex align-items-center gap-2">
                     <FileText size={18} className="text-primary" />
@@ -110,7 +110,7 @@ const FrameworkPanel = ({ framework, data, onChange, onAutoExpand, isExpanding }
                 </Button>
             </div>
 
-            <div className="flex-grow-1 overflow-y-auto pe-2 custom-scrollbar pb-5">
+            <div className={`flex-grow-1 ${isMobile ? '' : 'overflow-y-auto pe-2 custom-scrollbar pb-5'}`}>
                 {fields.map(field => (
                     <FieldInput
                         key={field.key}

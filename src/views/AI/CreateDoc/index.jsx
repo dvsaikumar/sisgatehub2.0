@@ -271,8 +271,19 @@ Example format:
         toast.success("Download started!");
     };
 
+    // Responsive hook
+    const [width, setWidth] = useState(window.innerWidth);
+
+    React.useEffect(() => {
+        const handleResize = () => setWidth(window.innerWidth);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const isMobile = width < 992; // lg breakpoint
+
     return (
-        <div className="hk-pg-body bg-white py-2 overflow-hidden" style={{ height: 'calc(100vh - 85px)' }}>
+        <div className={`hk-pg-body bg-white py-2 ${isMobile ? '' : 'overflow-hidden'}`} style={{ height: isMobile ? 'auto' : 'calc(100vh - 85px)' }}>
             <Container fluid className="px-xxl-5 h-100 d-flex flex-column">
                 <div className="flex-shrink-0">
 
@@ -287,23 +298,24 @@ Example format:
                     />
                 </div>
 
-                <div className="flex-grow-1" style={{ minHeight: 0, marginBottom: '115px' }}>
+                <div className="flex-grow-1" style={{ minHeight: 0, marginBottom: isMobile ? '120px' : '115px' }}>
                     {/* Row takes remaining height minus footer space */}
-                    <Row className="g-3 h-100">
-                        <Col lg={6} className="h-100">
+                    <Row className={`g-3 ${isMobile ? '' : 'h-100'}`}>
+                        <Col lg={6} className={isMobile ? 'mb-4' : 'h-100'}>
                             <GoalInput
                                 value={goal}
                                 onChange={setGoal}
                             />
                         </Col>
 
-                        <Col lg={6} className="h-100">
+                        <Col lg={6} className={isMobile ? '' : 'h-100'}>
                             <FrameworkPanel
                                 framework={config.framework}
                                 data={frameworkData}
                                 onChange={handleFrameworkDataChange}
                                 onAutoExpand={handleAutoExpand}
                                 isExpanding={isExpanding}
+                                isMobile={isMobile}
                             />
                         </Col>
                     </Row>
@@ -316,26 +328,28 @@ Example format:
                         zIndex: 1020,
                         left: 0,
                         right: 0,
-                        bottom: '42px',
-                        height: '70px',
-                        paddingLeft: 'var(--hk-sidebar-width, 270px)'
+                        bottom: isMobile ? '50px' : '42px', // Adjust for mobile nav if needed
+                        height: isMobile ? 'auto' : '70px',
+                        paddingLeft: isMobile ? '0' : 'var(--hk-sidebar-width, 270px)',
+                        paddingTop: '1rem',
+                        paddingBottom: '1rem'
                     }}
                 >
-                    <Container fluid className="px-xxl-5 h-100 d-flex justify-content-between align-items-center">
-                        <div className="text-muted fs-7">
+                    <Container fluid className="px-xxl-5 h-100 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                        <div className="text-muted fs-7 text-center text-md-start">
                             <span className="fw-bold text-dark">{goal ? goal.split(/\s+/).length : 0}</span> Words &bull; <span className="fw-bold text-dark">{config.tone}</span> Tone &bull; <span className="fw-bold text-dark">{config.framework}</span> Framework
                         </div>
-                        <div>
+                        <div className="d-flex w-100 w-md-auto justify-content-center gap-2">
                             <Button
                                 variant="ghost-secondary"
-                                className="me-2 rounded-pill px-4 fs-7 fw-bold"
+                                className="rounded-pill px-4 fs-7 fw-bold"
                                 onClick={() => setGoal('')}
                             >
                                 Clear
                             </Button>
                             <Button
                                 variant="gradient-primary"
-                                className="rounded-pill px-4 shadow-sm btn-animated fw-bold"
+                                className="rounded-pill px-4 shadow-sm btn-animated fw-bold flex-grow-1 flex-md-grow-0"
                                 onClick={handleCreateDocument}
                                 disabled={isGenerating}
                             >
@@ -350,7 +364,7 @@ Example format:
 
                 {/* Standard Page Footer */}
                 <div style={{ zIndex: 1200, position: 'relative' }}>
-                    <PageFooter style={{ left: 0, paddingLeft: 'var(--hk-sidebar-width, 270px)' }} />
+                    <PageFooter style={{ left: 0, paddingLeft: isMobile ? '0' : 'var(--hk-sidebar-width, 270px)' }} />
                 </div>
 
                 <TemplatesDrawer
