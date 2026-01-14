@@ -298,7 +298,7 @@ Example format:
                     />
                 </div>
 
-                <div className="flex-grow-1" style={{ minHeight: 0, marginBottom: isMobile ? '120px' : '115px' }}>
+                <div className="flex-grow-1" style={{ minHeight: 0, marginBottom: isMobile ? '180px' : '115px' }}>
                     {/* Row takes remaining height minus footer space */}
                     <Row className={`g-3 ${isMobile ? '' : 'h-100'}`}>
                         <Col lg={6} className={isMobile ? 'mb-4' : 'h-100'}>
@@ -328,7 +328,7 @@ Example format:
                         zIndex: 1020,
                         left: 0,
                         right: 0,
-                        bottom: isMobile ? '50px' : '42px', // Adjust for mobile nav if needed
+                        bottom: isMobile ? '90px' : '42px', // Clears Mobile Nav
                         height: isMobile ? 'auto' : '70px',
                         paddingLeft: isMobile ? '0' : 'var(--hk-sidebar-width, 270px)',
                         paddingTop: '1rem',
@@ -362,10 +362,12 @@ Example format:
                     </Container>
                 </div>
 
-                {/* Standard Page Footer */}
-                <div style={{ zIndex: 1200, position: 'relative' }}>
-                    <PageFooter style={{ left: 0, paddingLeft: isMobile ? '0' : 'var(--hk-sidebar-width, 270px)' }} />
-                </div>
+                {/* Standard Page Footer - Hide on mobile to prevent clutter */}
+                {!isMobile && (
+                    <div style={{ zIndex: 1200, position: 'relative' }}>
+                        <PageFooter style={{ left: 0, paddingLeft: 'var(--hk-sidebar-width, 270px)' }} />
+                    </div>
+                )}
 
                 <TemplatesDrawer
                     show={showTemplates}
