@@ -326,11 +326,11 @@ Example format:
                     className="position-fixed bg-white border-top shadow-sm py-2 d-flex justify-content-between align-items-center"
                     style={{
                         zIndex: 1020,
-                        left: 0,
+                        left: isMobile ? 0 : 'var(--hk-sidebar-width, 270px)',
+                        paddingLeft: 0,
                         right: 0,
                         bottom: isMobile ? '90px' : '42px', // Clears Mobile Nav
                         height: isMobile ? 'auto' : '70px',
-                        paddingLeft: isMobile ? '0' : 'var(--hk-sidebar-width, 270px)',
                         paddingTop: '1rem',
                         paddingBottom: '1rem'
                     }}
