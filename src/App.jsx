@@ -9,6 +9,11 @@ import { Toaster } from 'react-hot-toast';
 function App() {
   return (
     <>
+      {!import.meta.env.VITE_SUPABASE_URL && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, background: 'red', color: 'white', textAlign: 'center', zIndex: 10000, fontSize: '12px' }}>
+          DEBUG: Supabase URL Missing
+        </div>
+      )}
       <Toaster
         position="bottom-right"
         toastOptions={{
