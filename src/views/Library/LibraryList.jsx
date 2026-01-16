@@ -3,8 +3,9 @@ import { Badge, Card, Col, Row, Button, Modal, Spinner, Offcanvas, Dropdown, For
 import {
     FileText, Envelope, Scroll, ListChecks, CheckSquare, Video,
     Eye, DownloadSimple, Briefcase, Users, CurrencyDollar, ShieldCheck,
-    CaretRight, ShareNetwork, Plus, Copy, FilePdf, Paperclip, MagicWand, X, User, ArrowSquareOut
+    CaretRight, ShareNetwork, Plus, Copy, FilePdf, Paperclip, MagicWand, X, User, ArrowSquareOut, Star
 } from '@phosphor-icons/react';
+
 import SimpleBar from 'simplebar-react';
 import { supabase } from '../../configs/supabaseClient';
 import toast from 'react-hot-toast';
@@ -92,7 +93,7 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
         setLoading(true);
         try {
             const [docsRes, catsRes] = await Promise.all([
-                supabase.from('app_documents').select('id, name, type, category_id, file_path, created_at, content'),
+                supabase.from('app_documents').select('id, name, type, category_id, file_path, created_at, content, is_starred'),
                 supabase.from('app_document_categories').select('*')
             ]);
 
@@ -139,7 +140,9 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
     const baseFilteredDocs = documents.filter(item => {
         let matchesSidebarFilter = true;
         if (filter !== 'all') {
-            if (filter === 'starred' || filter === 'trash') {
+            if (filter === 'starred') {
+                matchesSidebarFilter = item.is_starred === true;
+            } else if (filter === 'trash') {
                 matchesSidebarFilter = false;
             } else {
                 matchesSidebarFilter = item.category_id === filter;
@@ -150,6 +153,7 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
 
         return matchesSidebarFilter && matchesSearch;
     });
+
 
     // 2. Identify distinct types present in the base filtered list
     const presentTypes = new Set(baseFilteredDocs.map(doc => doc.type));
@@ -181,6 +185,35 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
         const targetType = typeValueMap[type] || type;
         return baseFilteredDocs.filter(doc => doc.type === targetType).length;
     };
+
+    const handleToggleStar = async (e, item) => {
+        e.stopPropagation(); // Prevent card click from triggering
+        const newStarredState = !item.is_starred;
+
+        // Optimistic update
+        setDocuments(prev => prev.map(doc =>
+            doc.id === item.id ? { ...doc, is_starred: newStarredState } : doc
+        ));
+
+        try {
+            const { error } = await supabase
+                .from('app_documents')
+                .update({ is_starred: newStarredState })
+                .eq('id', item.id);
+
+            if (error) throw error;
+
+            toast.success(newStarredState ? 'Added to favorites' : 'Removed from favorites');
+        } catch (error) {
+            // Rollback on error
+            setDocuments(prev => prev.map(doc =>
+                doc.id === item.id ? { ...doc, is_starred: !newStarredState } : doc
+            ));
+            toast.error('Failed to update favorite status');
+            console.error('Error toggling star:', error);
+        }
+    };
+
 
     const handlePreview = async (item) => {
         setSelectedItem(item);
@@ -1073,13 +1106,22 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                                                 />
                                             </Card.Body>
                                             <Card.Footer className="bg-light border-top d-flex justify-content-between align-items-center py-2 px-4" style={{ minHeight: '50px' }}>
-                                                <div className="d-flex align-items-center">
+                                                <div className="d-flex align-items-center gap-2">
+                                                    <button
+                                                        className="btn btn-link p-0 d-flex align-items-center"
+                                                        onClick={(e) => handleToggleStar(e, item)}
+                                                        style={{ color: item.is_starred ? '#f59e0b' : '#94a3b8', transition: 'color 0.2s' }}
+                                                        title={item.is_starred ? 'Remove from favorites' : 'Add to favorites'}
+                                                    >
+                                                        <Star size={18} weight={item.is_starred ? 'fill' : 'regular'} />
+                                                    </button>
                                                     <small className="fw-bold text-primary" style={{ color: '#007D88 !important' }}>{getCategoryName(item.category_id)}</small>
                                                 </div>
                                                 <Badge bg="dark" className="badge-sm text-capitalize px-2 py-1" style={{ fontSize: '10px', fontWeight: '600' }}>
                                                     {item.type || 'General'}
                                                 </Badge>
                                             </Card.Footer>
+
                                         </Card>
                                     </Col>
                                 )

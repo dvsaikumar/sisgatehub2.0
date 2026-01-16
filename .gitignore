@@ -45,3 +45,4 @@ coverage/
 Archive.zip
 *.zip
 .vercel
+.env*.local
