@@ -4,4 +4,22 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseKey)
+if (!supabaseUrl || !supabaseUrl.startsWith('https://')) {
+    console.error(
+        'CRITICAL: Supabase URL is missing or invalid. ' +
+        'Check your Vercel Environment Variables (VITE_SUPABASE_URL).'
+    )
+}
+
+if (!supabaseKey) {
+    console.error(
+        'CRITICAL: Supabase Anon Key is missing. ' +
+        'Check your Vercel Environment Variables (VITE_SUPABASE_ANON_KEY).'
+    )
+}
+
+export const supabase = createClient(
+    supabaseUrl || 'https://placeholder-if-missing.supabase.co',
+    supabaseKey || 'placeholder-key'
+)
+
