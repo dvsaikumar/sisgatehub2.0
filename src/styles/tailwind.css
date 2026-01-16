@@ -458,19 +458,10 @@ video {
 
 /* ============================================
    DARK MODE SUPPORT
+   Dark mode is opt-in only via .dark class.
+   Removed automatic prefers-color-scheme detection
+   to ensure light mode is the default.
    ============================================ */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --color-background: #0f172a;
-        --color-surface: #1e293b;
-        --color-surface-hover: #334155;
-        --color-border: #334155;
-        --color-border-subtle: #1e293b;
-        --color-text-primary: #f1f5f9;
-        --color-text-secondary: #94a3b8;
-        --color-text-muted: #64748b;
-    }
-}
 
 /* Manual dark mode class support */
 .dark {
