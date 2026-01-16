@@ -8,7 +8,7 @@ const PageFooter = () => {
     return (
         <div className="hk-footer hk-fixed-footer border-top bg-white">
             <Container fluid className="footer">
-                <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 py-2 px-4">
+                <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 py-2 ">
                     {/* Left Side: Copyright */}
                     <div className="order-2 order-md-1">
                         <p className="mb-0 text-muted fs-7">

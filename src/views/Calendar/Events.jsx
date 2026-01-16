@@ -1,7 +1,7 @@
-import moment from "moment";
+import dayjs from "../../lib/dayjs";
 
-var curYear = moment().format('YYYY'),
-    curMonth = moment().format('MM');
+var curYear = dayjs().format('YYYY'),
+    curMonth = dayjs().format('MM');
 
 export const CalendarEvents = [
     {

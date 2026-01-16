@@ -3,7 +3,7 @@ import { Button, Col, Form, InputGroup, Modal, Row } from 'react-bootstrap';
 import DateRangePicker from 'react-bootstrap-daterangepicker';
 import { supabase } from '../../configs/supabaseClient';
 import toast from 'react-hot-toast';
-import moment from 'moment';
+import dayjs from '../../lib/dayjs';
 
 const CreateNewEvent = ({ show, hide, calendarRef, refreshEvents }) => {
 
@@ -32,7 +32,7 @@ const CreateNewEvent = ({ show, hide, calendarRef, refreshEvents }) => {
         setLoading(true);
         try {
             // Combine date and time
-            const sDate = moment(start).format('YYYY-MM-DD');
+            const sDate = dayjs(start).format('YYYY-MM-DD');
             const startDateTime = new Date(`${sDate}T${startTime}`);
 
             let endDateTime;
@@ -40,7 +40,7 @@ const CreateNewEvent = ({ show, hide, calendarRef, refreshEvents }) => {
                 // Default to 1 hour after start time if single time
                 endDateTime = new Date(startDateTime.getTime() + 60 * 60 * 1000);
             } else {
-                const eDate = moment(end).format('YYYY-MM-DD');
+                const eDate = dayjs(end).format('YYYY-MM-DD');
                 endDateTime = new Date(`${eDate}T${endTime}`);
             }
 

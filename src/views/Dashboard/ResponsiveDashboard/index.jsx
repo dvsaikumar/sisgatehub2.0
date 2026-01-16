@@ -13,7 +13,7 @@ import {
     BookOpen,
     TrendingUp
 } from 'react-feather';
-import moment from 'moment';
+import dayjs from '../../../lib/dayjs';
 import { toggleCollapsedNav } from '../../../redux/action/Theme';
 import { supabase } from '../../../configs/supabaseClient';
 
@@ -160,9 +160,15 @@ const ResponsiveDashboard = ({ toggleCollapsedNav }) => {
             marginBottom: '1.5rem'
         },
         headerFlex: {
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem'
+            display: 'grid',
+            gridTemplateColumns: '1fr auto',
+            alignItems: 'center',
+            gap: '1rem',
+            width: '100%'
+        },
+        headerText: {
+            flex: '1 1 auto',
+            minWidth: 0
         },
         title: {
             fontSize: 'clamp(1.5rem, 5vw, 2rem)',
@@ -180,7 +186,7 @@ const ResponsiveDashboard = ({ toggleCollapsedNav }) => {
             alignItems: 'center',
             justifyContent: 'center',
             gap: '0.5rem',
-            padding: '0.75rem 1.25rem',
+            padding: '0.625rem 1rem',
             borderRadius: '0.75rem',
             background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
             color: 'white',
@@ -191,7 +197,8 @@ const ResponsiveDashboard = ({ toggleCollapsedNav }) => {
             border: 'none',
             cursor: 'pointer',
             minHeight: '44px',
-            width: '100%'
+            whiteSpace: 'nowrap',
+            flexShrink: 0
         },
         statsGrid: {
             display: 'grid',
@@ -382,7 +389,7 @@ const ResponsiveDashboard = ({ toggleCollapsedNav }) => {
             {/* Page Header */}
             <motion.div variants={itemVariants} style={styles.header}>
                 <div style={styles.headerFlex}>
-                    <div>
+                    <div style={styles.headerText}>
                         <h1 style={styles.title}>Dashboard</h1>
                         <p style={styles.subtitle}>Welcome to Sisgate PRO Hub</p>
                     </div>
@@ -481,7 +488,7 @@ const ResponsiveDashboard = ({ toggleCollapsedNav }) => {
                                     <div style={{ minWidth: 0, flex: 1 }}>
                                         <p style={styles.listItemTitle}>{reminder.title}</p>
                                         <p style={styles.listItemSub}>
-                                            {moment(reminder.schedule_at).format('MMM D, YYYY [at] h:mm A')}
+                                            {dayjs(reminder.schedule_at).format('MMM D, YYYY [at] h:mm A')}
                                         </p>
                                     </div>
                                 </div>
@@ -521,7 +528,7 @@ const ResponsiveDashboard = ({ toggleCollapsedNav }) => {
                                             <span style={styles.badge}>{doc.type}</span>
                                         </div>
                                         <p style={styles.listItemSub}>
-                                            {doc.category} • {moment(doc.created_at).fromNow()}
+                                            {doc.category} • {dayjs(doc.created_at).fromNow()}
                                         </p>
                                     </div>
                                 </div>

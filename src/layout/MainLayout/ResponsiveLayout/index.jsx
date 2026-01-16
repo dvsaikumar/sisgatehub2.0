@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
-import { useRouteMatch } from 'react-router-dom';
+import { useMatch } from 'react-router-dom';
 import { toggleCollapsedNav } from '../../../redux/action/Theme';
 import PageFooter from '../../Footer/PageFooter';
 import TopNav from '../../Header/TopNav';
@@ -31,9 +31,9 @@ const ResponsiveLayout = ({
 }) => {
 
     const [dataHover, setDataHover] = useState(navCollapsed);
-    const appRoutes = useRouteMatch('/apps/');
-    const errro404Route = useRouteMatch('/error-404');
-    const dashboardRoute = useRouteMatch("/dashboard");
+    const appRoutes = useMatch('/apps/*');
+    const errro404Route = useMatch('/error-404');
+    const dashboardRoute = useMatch("/dashboard");
     const windowWidth = useWindowWidth();
 
     // Determine if we should use responsive navigation based on screen size

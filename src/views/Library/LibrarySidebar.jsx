@@ -25,12 +25,18 @@ const LibrarySidebar = ({ filter, setFilter, onCategorySelect }) => {
 
             if (error) throw error;
 
+            // Debug: log raw data
+            console.log('Raw categories data:', data);
+
             // Simple nesting logic: parents first, then attach children
             const parentCats = data.filter(c => !c.parent_id);
             const nested = parentCats.map(parent => ({
                 ...parent,
                 children: data.filter(c => c.parent_id === parent.id)
             }));
+
+            // Debug: log nested structure
+            console.log('Nested categories:', nested);
 
             setCategories(nested);
         } catch (error) {
@@ -81,16 +87,45 @@ const LibrarySidebar = ({ filter, setFilter, onCategorySelect }) => {
         <nav className="fmapp-sidebar">
             <style>
                 {`
-                .nav-category-link {
-                    padding: 0.65rem 1rem !important;
+                .fmapp-sidebar .menu-content-wrap {
+                    padding-top: 10px;
+                }
+                .fmapp-sidebar .nav-link, .nav-category-link {
+                    padding: 0.35rem 1.25rem !important;
+                    min-height: 38px;
+                    display: flex;
+                    align-items: center;
+                }
+                .fmapp-sidebar .nav-link-text {
+                    font-size: 0.85rem !important;
                     font-weight: 500;
+                }
+                .fmapp-sidebar .nav-icon-wrap {
+                    margin-right: 10px !important;
+                    min-width: 20px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .fmapp-sidebar .nav-icon-wrap svg {
+                    width: 18px !important;
+                    height: 18px !important;
+                }
+                .sidebar-divider {
+                    margin: 8px 10px;
+                    border-top: 1px solid rgba(0,0,0,0.1);
+                    opacity: 1;
+                }
+
+                /* Custom Overrides */
+                .nav-category-link {
+                    padding: 0.35rem 1.25rem !important;
                     color: #5e656f;
                     transition: all 0.2s;
-                    border-radius: 6px;
-                    margin-bottom: 2px;
+                    border-radius: 0; 
                 }
                 .nav-category-link:hover, .nav-category-link.active {
-                    background-color: rgba(0,0,0,0.04);
+                    background-color: transparent;
                     color: #007D88;
                 }
                 .nav-category-link .phrase-icon {
@@ -100,9 +135,10 @@ const LibrarySidebar = ({ filter, setFilter, onCategorySelect }) => {
                 .nav-category-link:hover .phrase-icon, .nav-category-link.active .phrase-icon {
                     color: #007D88;
                 }
+                
                 .sub-category-link {
-                    padding: 0.5rem 1rem !important; /* Matches main category horizontal padding */
-                    font-size: 1rem;
+                    padding: 0.35rem 1rem 0.35rem 2.75rem !important;
+                    font-size: 0.85rem;
                     color: #6c757d;
                     display: flex;
                     align-items: center;
@@ -112,12 +148,31 @@ const LibrarySidebar = ({ filter, setFilter, onCategorySelect }) => {
                    background: transparent;
                 }
                 .sub-category-list {
-                    margin-left: 1.6rem;
-                    border-left: 2px solid #e0e0e0;
-                    padding-left: 0.5rem;
+                    margin-left: 1.5rem;
+                    padding-left: 0;
+                    border-left: 2px solid rgba(0,125,136,0.2);
+                    list-style: none;
+                }
+                .sub-category-list .nav-item {
+                    display: block !important;
+                    visibility: visible !important;
+                }
+                .sub-category-list .nav-link {
+                    display: flex !important;
+                    visibility: visible !important;
+                }
+                /* Ensure Collapse content is visible */
+                .collapse.show {
+                    display: block !important;
+                    visibility: visible !important;
+                }
+                .collapsing {
+                    height: auto !important;
+                    overflow: visible !important;
                 }
                 `}
             </style>
+
             <SimpleBar className="nicescroll-bar">
                 <div className="menu-content-wrap">
                     <div className="menu-group">
@@ -141,12 +196,9 @@ const LibrarySidebar = ({ filter, setFilter, onCategorySelect }) => {
                         </ul>
                     </div>
 
-                    <div className="separator separator-light" />
+                    <hr className="sidebar-divider" />
 
                     <div className="menu-group">
-                        <div className="nav-header">
-                            <span>Categories</span>
-                        </div>
                         <ul className="nav nav-light navbar-nav flex-column">
                             {categories.map(cat => {
                                 const IconTag = getRelevantIcon(cat);
@@ -180,7 +232,7 @@ const LibrarySidebar = ({ filter, setFilter, onCategorySelect }) => {
                                                 </span>
                                             )}
                                         </a>
-                                        {cat.children && (
+                                        {cat.children && cat.children.length > 0 && (
                                             <Collapse in={expanded[cat.id]}>
                                                 <div>
                                                     <ul className="nav nav-light navbar-nav flex-column sub-category-list">
@@ -211,7 +263,7 @@ const LibrarySidebar = ({ filter, setFilter, onCategorySelect }) => {
                             })}
                         </ul>
                     </div>
-                    <div className="separator separator-light" />
+                    <hr className="sidebar-divider" />
                     <div className="menu-group">
                         <ul className="nav nav-light navbar-nav flex-column">
                             <li className="nav-item">
@@ -227,7 +279,7 @@ const LibrarySidebar = ({ filter, setFilter, onCategorySelect }) => {
 
                 </div>
             </SimpleBar>
-        </nav>
+        </nav >
     )
 }
 

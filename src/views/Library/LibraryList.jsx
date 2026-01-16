@@ -543,44 +543,89 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
         <div className="fm-body">
             <style>
                 {`
+                /* ========================================
+                   MODERN LIBRARY REDESIGN - Premium UI
+                   ======================================== */
+                
+                /* Filter Pills */
                 .filter-badge {
-                    font-size: 11px;
-                    padding: 3px 8px;
+                    font-size: 10px;
+                    padding: 2px 7px;
                     border-radius: 20px;
-                    margin-left: 8px;
-                    background: rgba(0,0,0,0.08);
+                    margin-left: 6px;
+                    background: rgba(0,0,0,0.06);
                     color: inherit;
                     vertical-align: middle;
+                    font-weight: 700;
                 }
                 .btn-primary .filter-badge {
-                    background: rgba(255,255,255,0.3);
+                    background: rgba(255,255,255,0.25);
                     color: white;
                 }
                 .filter-btn {
-                    font-size: 0.825rem !important;
-                    padding: 0.45rem 1.1rem !important;
-                    font-weight: 500;
+                    font-size: 0.8rem !important;
+                    padding: 0.5rem 1.25rem !important;
+                    font-weight: 600;
+                    border-radius: 50px !important;
+                    letter-spacing: 0.02em;
                 }
+                
+                /* Library Cards - Refined */
                 .library-card {
-                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                    border: 1px solid #e0e0e0;
+                    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+                    border: 1px solid rgba(0,0,0,0.06) !important;
                     overflow: hidden;
-                    border-radius: 12px;
+                    border-radius: 16px !important;
+                    background: linear-gradient(145deg, #ffffff 0%, #fafbfc 100%);
                 }
                 .library-card:hover {
-                    transform: translateY(-5px);
-                    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1) !important;
-                    border-color: #007D88;
+                    transform: translateY(-6px);
+                    box-shadow: 0 20px 40px rgba(0, 125, 136, 0.12), 0 8px 16px rgba(0,0,0,0.06) !important;
+                    border-color: rgba(0, 125, 136, 0.3) !important;
+                }
+                .card-icon-wrap {
+                    width: 36px;
+                    height: 36px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-right: 14px;
+                    background: linear-gradient(135deg, rgba(0, 125, 136, 0.08) 0%, rgba(0, 125, 136, 0.04) 100%);
+                    border-radius: 10px;
+                    color: #007D88 !important;
+                    transition: all 0.3s ease;
+                }
+                .card-icon-wrap svg {
+                    color: #007D88 !important;
+                }
+                .library-card:hover .card-icon-wrap {
+                    background: linear-gradient(135deg, rgba(0, 125, 136, 0.15) 0%, rgba(0, 125, 136, 0.08) 100%);
+                    transform: scale(1.05);
+                }
+                .rich-text-preview {
+                    color: #64748b;
+                    line-height: 1.65;
+                    font-size: 0.875rem;
+                }
+                .rich-text-preview * {
+                    font-size: inherit !important;
+                    color: inherit !important;
                 }
                 .rich-text-preview p {
                     margin-bottom: 0.25rem;
                 }
-                /* Drawer Styling */
+                
+                /* ========================================
+                   PREMIUM DRAWER - Complete Redesign
+                   ======================================== */
                 .library-drawer {
-                    width: 50% !important;
-                    border-left: 1px solid #e0e0e0;
-                    box-shadow: -15px 0 30px rgba(0,0,0,0.08);
-                    transition: transform 0.4s cubic-bezier(0.05, 0.7, 0.1, 1) !important;
+                    width: 52% !important;
+                    max-width: 720px;
+                    border: none !important;
+                    box-shadow: -24px 0 64px rgba(0,0,0,0.12), -8px 0 24px rgba(0,0,0,0.06);
+                    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                    border-radius: 24px 0 0 24px;
+                    overflow: hidden;
                 }
                 .library-drawer.offcanvas-end {
                     transform: translateX(100%);
@@ -588,169 +633,384 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                 .library-drawer.show {
                     transform: translateX(0);
                 }
-                .drawer-header {
-                    padding: 1.5rem 2.5rem;
-                    border-bottom: 1px solid #f0f0f0;
-                    display: block !important;
+                .library-drawer .offcanvas-body {
+                    padding: 0 !important;
+                }
+                
+                /* Modern Header */
+                .drawer-header-modern {
+                    padding: 2rem 2.25rem 1.75rem;
+                    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+                    border-bottom: 1px solid rgba(0,0,0,0.04);
                     position: relative;
                 }
-                .drawer-header .btn-close {
+                .drawer-handle {
+                    width: 36px;
+                    height: 4px;
+                    background: linear-gradient(90deg, #e2e8f0 0%, #cbd5e1 100%);
+                    border-radius: 4px;
                     position: absolute;
-                    top: 1.5rem;
-                    right: 1.5rem;
-                    margin: 0;
+                    top: 10px;
+                    left: 50%;
+                    transform: translateX(-50%);
                 }
-                .drawer-body {
-                    padding: 2.5rem;
-                    background-color: #fdfdfd;
-                    overflow-y: auto;
-                }
-                .drawer-footer {
-                    padding: 1.5rem 2.5rem;
-                    background: white;
-                    border-top: 1px solid #f0f0f0;
-                    box-shadow: 0 -5px 15px rgba(0,0,0,0.03);
-                    z-index: 10;
-                }
-                .document-preview-container {
-                    background: white;
-                    border: 1px solid #eaeaea;
-                    border-radius: 8px;
-                    padding: 2.5rem;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-                    max-width: 100%;
-                    overflow-x: auto; /* Handle wide tables */
-                }
-                .document-preview-content {
-                    font-size: 1rem;
-                    line-height: 1.7;
-                    color: #2d3436;
-                    font-family: inherit;
-                    word-wrap: break-word;
-                    overflow-wrap: break-word;
-                    word-break: break-word;
-                }
-                .document-preview-content h1, .document-preview-content h2, .document-preview-content h3 {
-                    margin-top: 1.5rem;
-                    margin-bottom: 1rem;
-                    font-weight: 700;
-                    color: #1a1a1a;
-                }
-                .document-preview-content p {
-                    margin-bottom: 1.25rem;
-                }
-                .document-preview-content ul, .document-preview-content ol {
-                    margin-bottom: 1.25rem;
-                    padding-left: 1.5rem;
-                }
-                .document-preview-content li {
-                    margin-bottom: 0.5rem;
-                }
-                .document-preview-content img {
-                    max-width: 100%;
-                    height: auto;
-                }
-                .document-preview-content table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-bottom: 1.5rem;
-                    display: block; 
-                    overflow-x: auto;
-                }
-                .document-preview-content th, .document-preview-content td {
-                    border: 1px solid #e0e0e0;
-                    padding: 0.75rem;
-                    text-align: left;
-                }
-                .document-preview-content th {
-                    background-color: #f8f9fa;
-                    font-weight: 600;
-                }
-                .document-preview-content blockquote {
-                    border-left: 4px solid #007D88;
-                    padding-left: 1rem;
-                    margin-left: 0;
-                    font-style: italic;
-                    color: #636e72;
-                }
-                /* Breadcrumb Styling */
-                .library-breadcrumb {
-                    display: flex;
-                    align-items: center;
-                    font-size: 11px;
-                    text-transform: uppercase;
-                    letter-spacing: 1px;
-                    color: #8c98a4;
-                    font-weight: 700;
-                }
-                .library-breadcrumb .breadcrumb-item {
-                    display: flex;
-                    align-items: center;
-                }
-                .library-breadcrumb .breadcrumb-item.active {
-                    color: #007D88;
-                }
-                .btn:hover .ph, .btn:focus .ph, .btn:active .ph,
-                .btn:hover svg, .btn:focus svg, .btn:active svg {
-                    color: inherit !important;
-                }
-                .card-icon-wrap {
-                    width: 32px;
-                    height: 32px;
+                .drawer-close-btn {
+                    position: absolute;
+                    top: 1.25rem;
+                    right: 1.25rem;
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 50%;
+                    background: linear-gradient(145deg, #f1f5f9 0%, #e2e8f0 100%);
+                    border: none;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    margin-right: 12px;
-                    background: transparent;
-                    color: #007D88 !important;
+                    cursor: pointer;
+                    transition: all 0.25s ease;
+                    color: #64748b;
+                }
+                .drawer-close-btn:hover {
+                    background: linear-gradient(145deg, #fee2e2 0%, #fecaca 100%);
+                    color: #dc2626;
+                    transform: rotate(90deg);
+                }
+                .drawer-category-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 6px 14px;
+                    background: linear-gradient(135deg, rgba(0, 125, 136, 0.08) 0%, rgba(0, 125, 136, 0.04) 100%);
+                    border-radius: 24px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    color: #007D88;
+                    margin-bottom: 16px;
+                }
+                .category-dot {
+                    width: 6px;
+                    height: 6px;
+                    background: #007D88;
+                    border-radius: 50%;
+                }
+                .drawer-title {
+                    font-size: 1.75rem;
+                    font-weight: 800;
+                    color: #0f172a;
+                    margin: 0 0 12px 0;
+                    line-height: 1.2;
+                    letter-spacing: -0.02em;
+                }
+                .drawer-type-tag {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 6px 14px;
+                    background: #f1f5f9;
+                    border-radius: 8px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: #475569;
+                }
+                
+                /* Body - Modern Stats Row */
+                .drawer-body-modern {
+                    padding: 0 !important;
+                    background: #f8fafc;
+                    overflow-y: auto;
+                    flex: 1;
+                }
+                .drawer-stats-row {
+                    display: flex;
+                    align-items: center;
+                    gap: 0;
+                    padding: 1rem 2.25rem;
+                    background: white;
+                    border-bottom: 1px solid rgba(0,0,0,0.04);
+                }
+                .stat-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: #64748b;
+                    padding: 0 1.5rem;
+                }
+                .stat-item:first-child {
+                    padding-left: 0;
+                }
+                .stat-item svg {
+                    color: #007D88;
+                }
+                .stat-divider {
+                    width: 1px;
+                    height: 20px;
+                    background: #e2e8f0;
+                }
+                
+                /* Content Preview Card */
+                .content-preview-card {
+                    margin: 1.75rem 2.25rem;
+                    background: white;
+                    border-radius: 16px;
+                    border: 1px solid rgba(0,0,0,0.04);
+                    box-shadow: 0 4px 16px rgba(0,0,0,0.03), 0 1px 4px rgba(0,0,0,0.02);
+                    overflow: hidden;
+                }
+                .content-preview-header {
+                    padding: 1rem 1.5rem;
+                    background: linear-gradient(180deg, #fafbfc 0%, #f8fafc 100%);
+                    border-bottom: 1px solid rgba(0,0,0,0.04);
+                }
+                .preview-label {
+                    font-size: 10px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    color: #94a3b8;
+                }
+                .content-preview-body {
+                    padding: 2rem;
+                    max-height: 400px;
+                    overflow-y: auto;
+                }
+                .preview-text {
+                    font-size: 0.9375rem;
+                    line-height: 1.8;
+                    color: #334155;
+                }
+                .preview-text h1, .preview-text h2, .preview-text h3 {
+                    color: #0f172a;
+                    font-weight: 700;
+                    margin-top: 1.5rem;
+                    margin-bottom: 0.75rem;
+                }
+                .preview-text p {
+                    margin-bottom: 1rem;
+                }
+                .preview-text ul, .preview-text ol {
+                    padding-left: 1.5rem;
+                    margin-bottom: 1rem;
+                }
+                .preview-text li {
+                    margin-bottom: 0.5rem;
+                }
+                .preview-text table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 1rem 0;
+                    font-size: 0.875rem;
+                }
+                .preview-text th, .preview-text td {
+                    border: 1px solid #e2e8f0;
+                    padding: 0.75rem;
+                    text-align: left;
+                }
+                .preview-text th {
+                    background: #f8fafc;
+                    font-weight: 600;
+                }
+                .preview-text blockquote {
+                    border-left: 3px solid #007D88;
+                    padding-left: 1rem;
+                    margin: 1rem 0;
+                    color: #64748b;
+                    font-style: italic;
+                }
+                .preview-loading {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 12px;
+                    padding: 3rem;
+                    color: #94a3b8;
+                }
+                
+                /* Attachment Card */
+                .attachment-card {
+                    margin: 0 2.25rem 1.75rem;
+                    padding: 1rem 1.25rem;
+                    background: linear-gradient(135deg, rgba(239, 68, 68, 0.04) 0%, rgba(239, 68, 68, 0.02) 100%);
+                    border: 1px solid rgba(239, 68, 68, 0.1);
+                    border-radius: 12px;
+                    transition: all 0.25s ease;
+                }
+                .attachment-card:hover {
+                    background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(239, 68, 68, 0.04) 100%);
+                    border-color: rgba(239, 68, 68, 0.2);
+                }
+                .attachment-info {
+                    display: flex;
+                    align-items: center;
+                    gap: 14px;
+                }
+                .attachment-icon {
+                    width: 40px;
+                    height: 40px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: linear-gradient(135deg, #fecaca 0%, #fee2e2 100%);
+                    border-radius: 10px;
+                    color: #dc2626;
+                }
+                .attachment-text {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 2px;
+                }
+                .attachment-label {
+                    font-size: 13px;
+                    font-weight: 700;
+                    color: #1e293b;
+                }
+                .attachment-action {
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: #dc2626;
+                    cursor: pointer;
+                    transition: color 0.2s ease;
+                }
+                .attachment-action:hover {
+                    color: #b91c1c;
+                    text-decoration: underline;
+                }
+                
+                /* Modern Footer */
+                .drawer-footer-modern {
+                    padding: 1.5rem 2.25rem;
+                    background: white;
+                    border-top: 1px solid rgba(0,0,0,0.04);
+                    box-shadow: 0 -8px 24px rgba(0,0,0,0.03);
+                }
+                .primary-action-btn {
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+                    padding: 1rem 2rem;
+                    background: linear-gradient(135deg, #007D88 0%, #006670 100%);
+                    border: none;
+                    border-radius: 14px;
+                    font-size: 15px;
+                    font-weight: 700;
+                    color: white;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 16px rgba(0, 125, 136, 0.25);
+                    margin-bottom: 1rem;
+                }
+                .primary-action-btn:hover {
+                    background: linear-gradient(135deg, #006670 0%, #005560 100%);
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 24px rgba(0, 125, 136, 0.35);
+                }
+                .primary-action-btn:active {
+                    transform: translateY(0);
+                }
+                .secondary-actions-row {
+                    display: grid;
+                    grid-template-columns: 1fr auto 1fr;
+                    gap: 10px;
+                }
+                .secondary-action-btn {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    padding: 0.875rem 1.25rem;
+                    background: #f8fafc;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 12px;
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: #475569;
+                    cursor: pointer;
+                    transition: all 0.25s ease;
+                }
+                .secondary-action-btn:hover {
+                    background: #007D88;
+                    border-color: #007D88;
+                    color: white;
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 12px rgba(0, 125, 136, 0.2);
+                }
+                .secondary-action-btn:hover svg {
+                    color: white !important;
+                }
+                .secondary-action-dropdown {
+                    flex: 1;
+                }
+                .secondary-action-dropdown .dropdown-toggle {
+                    width: 100%;
+                }
+                .secondary-action-dropdown .dropdown-toggle::after {
+                    display: none;
+                }
+                .modern-dropdown-menu {
+                    padding: 8px;
+                    border-radius: 12px;
+                    border: 1px solid rgba(0,0,0,0.06);
+                    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+                }
+                .modern-dropdown-menu .dropdown-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    padding: 10px 14px;
+                    border-radius: 8px;
+                    font-size: 13px;
+                    font-weight: 500;
                     transition: all 0.2s ease;
                 }
-                .card-icon-wrap svg {
-                    color: #007D88 !important;
+                .modern-dropdown-menu .dropdown-item:hover {
+                    background: linear-gradient(135deg, rgba(0, 125, 136, 0.08) 0%, rgba(0, 125, 136, 0.04) 100%);
                 }
-                .library-card:hover .card-icon-wrap {
-                    background: transparent;
-                    transform: scale(1.1);
+                .modern-dropdown-menu .dropdown-item svg {
+                    color: #64748b;
                 }
-                .library-card:hover .card-icon-wrap svg {
-                    color: #007D88 !important;
+                
+                /* Responsive */
+                @media (max-width: 992px) {
+                    .library-drawer {
+                        width: 80% !important;
+                        max-width: none;
+                        border-radius: 20px 0 0 20px;
+                    }
                 }
-                .library-action-btn {
-                    background-color: rgba(0,0,0,0.02) !important;
-                    border-color: rgba(0,0,0,0.1) !important;
-                    border-style: solid !important;
-                    border-width: 1px !important;
-                    transition: all 0.2s ease !important;
-                    color: #000 !important;
-                }
-                .library-action-btn:hover,
-                .library-action-btn.btn:hover {
-                    background-color: #007D88 !important;
-                    border-color: #007D88 !important;
-                    color: #fff !important;
-                }
-                .library-action-btn:hover svg,
-                .library-action-btn:hover span,
-                .library-action-btn:hover .ph,
-                .library-action-btn:hover * {
-                    color: #fff !important;
-                }
-                .rich-text-preview {
-                    color: #525c68;
-                    line-height: 1.6;
-                }
-                .rich-text-preview * {
-                    font-size: inherit !important;
-                    color: inherit !important;
-                }
-                .library-card {
-                    border: 1px solid #f0f0f0 !important;
-                    transition: all 0.3s ease;
-                }
-                .library-card:hover {
-                    transform: translateY(-4px);
-                    box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important;
-                    border-color: #007D88 !important;
+                @media (max-width: 768px) {
+                    .library-drawer {
+                        width: 100% !important;
+                        border-radius: 20px 20px 0 0;
+                    }
+                    .drawer-header-modern {
+                        padding: 1.5rem 1.5rem 1.25rem;
+                    }
+                    .drawer-title {
+                        font-size: 1.35rem;
+                    }
+                    .content-preview-card {
+                        margin: 1.25rem 1.5rem;
+                    }
+                    .drawer-stats-row {
+                        padding: 0.875rem 1.5rem;
+                    }
+                    .attachment-card {
+                        margin: 0 1.5rem 1.25rem;
+                    }
+                    .drawer-footer-modern {
+                        padding: 1.25rem 1.5rem;
+                    }
+                    .secondary-actions-row {
+                        grid-template-columns: 1fr 1fr;
+                    }
+                    .secondary-action-dropdown {
+                        grid-column: span 2;
+                    }
                 }
                 `}
             </style>
@@ -829,7 +1089,7 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                 </div>
             </SimpleBar>
 
-            {/* Preview Drawer */}
+            {/* Preview Drawer - Modern Design */}
             <Offcanvas
                 show={showPreview}
                 onHide={() => setShowPreview(false)}
@@ -837,122 +1097,127 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                 className="library-drawer"
                 backdrop={true}
             >
-                <Offcanvas.Header closeButton className="drawer-header bg-light">
-                    <Offcanvas.Title className="fw-bold mb-1">{selectedItem?.name}</Offcanvas.Title>
-                    <div className="library-breadcrumb">
-                        <div className="breadcrumb-item">Library</div>
-                        <CaretRight size={12} className="mx-2" weight="bold" />
-                        {getCategoryPath(selectedItem?.category_id).map((name, idx, arr) => (
-                            <React.Fragment key={idx}>
-                                <div className="breadcrumb-item">{name}</div>
-                                <CaretRight size={12} className="mx-2" weight="bold" />
-                            </React.Fragment>
-                        ))}
-                        <div className="breadcrumb-item active">{selectedItem?.type}</div>
-                    </div>
-                </Offcanvas.Header>
-                <Offcanvas.Body className="drawer-body">
+                {/* Modern Header */}
+                <div className="drawer-header-modern">
+                    <div className="drawer-handle" />
+                    <button
+                        className="drawer-close-btn"
+                        onClick={() => setShowPreview(false)}
+                        aria-label="Close"
+                    >
+                        <X size={20} weight="bold" />
+                    </button>
 
-                    <div className="mb-5">
-                        <h6 className="text-uppercase text-muted fs-8 fw-bold mb-3 tracking-wider d-flex align-items-center">
-                            <FileText size={16} className="me-2" /> Document Content
-                        </h6>
-                        <div className="document-preview-container">
+                    {/* Category Badge */}
+                    <div className="drawer-category-badge">
+                        <span className="category-dot" />
+                        <span>{getCategoryPath(selectedItem?.category_id).join(' › ') || 'Library'}</span>
+                    </div>
+
+                    {/* Title */}
+                    <h2 className="drawer-title">{selectedItem?.name}</h2>
+
+                    {/* Type Tag */}
+                    <div className="drawer-type-tag">
+                        <FileText size={14} weight="bold" />
+                        <span>{selectedItem?.type || 'Document'}</span>
+                    </div>
+                </div>
+
+                {/* Content Body */}
+                <Offcanvas.Body className="drawer-body-modern">
+                    {/* Quick Stats */}
+                    <div className="drawer-stats-row">
+                        <div className="stat-item">
+                            <Eye size={16} />
+                            <span>Preview</span>
+                        </div>
+                        <div className="stat-divider" />
+                        <div className="stat-item">
+                            <FileText size={16} />
+                            <span>{selectedItem?.type}</span>
+                        </div>
+                    </div>
+
+                    {/* Content Preview Card */}
+                    <div className="content-preview-card">
+                        <div className="content-preview-header">
+                            <span className="preview-label">Document Preview</span>
+                        </div>
+                        <div className="content-preview-body">
                             {selectedItem?.content ? (
-                                <div className="document-preview-content"
-                                    dangerouslySetInnerHTML={{ __html: selectedItem?.content }} />
+                                <div
+                                    className="preview-text"
+                                    dangerouslySetInnerHTML={{ __html: selectedItem?.content }}
+                                />
                             ) : (
-                                <div className="text-center py-5">
+                                <div className="preview-loading">
                                     <Spinner animation="border" variant="primary" size="sm" />
-                                    <p className="fs-8 text-muted mt-2">Loading content...</p>
+                                    <span>Loading content...</span>
                                 </div>
                             )}
                         </div>
                     </div>
 
-                </Offcanvas.Body>
-
-                <div className="drawer-footer">
+                    {/* Original Attachment Card */}
                     {selectedItem?.file_path && (
-                        <div className="mb-3">
-                            <div className="alert alert-light border border-dashed d-flex align-items-center justify-content-between p-3 mb-0">
-                                <div className="d-flex align-items-center">
-                                    <FileText size={20} className="text-primary me-2" />
-                                    <div>
-                                        <div className="fw-bold text-dark extra-small">Original Attachment</div>
-                                    </div>
+                        <div className="attachment-card">
+                            <div className="attachment-info">
+                                <div className="attachment-icon">
+                                    <Paperclip size={18} weight="bold" />
                                 </div>
-                                <Button variant="outline-primary" size="xs" className="btn-rounded px-3" onClick={() => handleFilePreview(selectedItem.file_path, selectedItem.name)}>
-                                    <Eye size={14} className="me-1" weight="bold" color="currentColor" /> View Original
-                                </Button>
+                                <div className="attachment-text">
+                                    <span className="attachment-label">Attached File</span>
+                                    <span className="attachment-action" onClick={() => handleFilePreview(selectedItem.file_path, selectedItem.name)}>
+                                        View Original →
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     )}
-                    <div className="d-flex gap-2">
+                </Offcanvas.Body>
 
-                        {(selectedItem?.type === 'Templates' || selectedItem?.file_path) && (
-                            <Button
-                                variant="outline-secondary"
-                                className="py-3 fw-bold btn-rounded d-flex align-items-center justify-content-center library-action-btn"
-                                style={{ width: '50%' }}
-                                onClick={() => handleUseTemplate()}
-                            >
-                                <Plus size={20} className="me-2" weight="bold" color="currentColor" />
-                                <span>Use This Template</span>
-                            </Button>
-                        )}
-                        <Dropdown style={{ width: (selectedItem?.type === 'Templates' || selectedItem?.file_path) ? '25%' : '50%' }}>
-                            <Dropdown.Toggle
-                                as={Button}
-                                variant="outline-secondary"
-                                className="py-3 fw-bold btn-rounded d-flex align-items-center justify-content-center library-action-btn w-100"
-                                title="Share Template"
-                            >
-                                <ShareNetwork size={20} weight="bold" className="me-2" color="currentColor" />
+                {/* Modern Footer */}
+                <div className="drawer-footer-modern">
+                    {/* Primary Action */}
+                    {(selectedItem?.type === 'Templates' || selectedItem?.file_path) && (
+                        <button
+                            className="primary-action-btn"
+                            onClick={() => handleUseTemplate()}
+                        >
+                            <MagicWand size={20} weight="bold" />
+                            <span>Use This Template</span>
+                        </button>
+                    )}
+
+                    {/* Secondary Actions Row */}
+                    <div className="secondary-actions-row">
+                        <button className="secondary-action-btn" onClick={handleCopy}>
+                            <Copy size={18} weight="bold" />
+                            <span>Copy</span>
+                        </button>
+
+                        <Dropdown className="secondary-action-dropdown">
+                            <Dropdown.Toggle as="button" className="secondary-action-btn">
+                                <ShareNetwork size={18} weight="bold" />
                                 <span>Share</span>
                             </Dropdown.Toggle>
-                            <Dropdown.Menu className="dropdown-menu-end shadow-lg border-0 rounded-4 p-2" style={{ minWidth: '220px', zIndex: 2000 }}>
-                                <Dropdown.Header className="text-uppercase fs-10px tracking-wider fw-bold text-muted px-3 py-2">Share Template</Dropdown.Header>
-                                <Dropdown.Item className="rounded-3 py-2 d-flex align-items-center gap-2" onClick={() => handleShareEmail('doc')}>
-                                    <div className="avatar avatar-xs avatar-soft-primary avatar-rounded">
-                                        <FileText size={16} weight="bold" />
-                                    </div>
-                                    <div className="d-flex flex-column">
-                                        <span className="fw-bold fs-13px">Email as Doc</span>
-                                        <small className="text-muted fs-11px">Share plain text content</small>
-                                    </div>
+                            <Dropdown.Menu className="modern-dropdown-menu">
+                                <Dropdown.Item onClick={() => handleShareEmail('doc')}>
+                                    <FileText size={16} />
+                                    <span>Email as Document</span>
                                 </Dropdown.Item>
-                                <Dropdown.Item className="rounded-3 py-2 d-flex align-items-center gap-2" onClick={() => handleShareEmail('pdf')}>
-                                    <div className="avatar avatar-xs avatar-soft-danger avatar-rounded">
-                                        <FilePdf size={16} weight="bold" />
-                                    </div>
-                                    <div className="d-flex flex-column">
-                                        <span className="fw-bold fs-13px">Email as PDF</span>
-                                        <small className="text-muted fs-11px">Share as printable PDF</small>
-                                    </div>
-                                </Dropdown.Item>
-                                <Dropdown.Divider className="my-2" />
-                                <Dropdown.Item className="rounded-3 py-2 d-flex align-items-center gap-2" onClick={handleCopy}>
-                                    <div className="avatar avatar-xs avatar-soft-info avatar-rounded">
-                                        <Copy size={16} weight="bold" />
-                                    </div>
-                                    <div className="d-flex flex-column">
-                                        <span className="fw-bold fs-13px">Copy Content</span>
-                                        <small className="text-muted fs-11px">Copy to your clipboard</small>
-                                    </div>
+                                <Dropdown.Item onClick={() => handleShareEmail('pdf')}>
+                                    <FilePdf size={16} />
+                                    <span>Email as PDF</span>
                                 </Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
-                        <Button
-                            variant="outline-secondary"
-                            className="py-3 fw-bold btn-rounded d-flex align-items-center justify-content-center library-action-btn"
-                            style={{ width: (selectedItem?.type === 'Templates' || selectedItem?.file_path) ? '25%' : '50%' }}
-                            title="Download Template"
-                            onClick={handleDownload}
-                        >
-                            <DownloadSimple size={20} weight="bold" className="me-2" color="currentColor" />
+
+                        <button className="secondary-action-btn" onClick={handleDownload}>
+                            <DownloadSimple size={18} weight="bold" />
                             <span>Download</span>
-                        </Button>
+                        </button>
                     </div>
                 </div>
             </Offcanvas>

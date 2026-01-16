@@ -7,7 +7,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin from "@fullcalendar/interaction";
-import moment from 'moment';
+import dayjs from '../../lib/dayjs';
 import { useWindowHeight } from '@react-hook/window-size';
 import CalendarSidebar from './CalendarSidebar';
 import EventsDrawer from './EventsDrawer';
@@ -38,15 +38,15 @@ const Calendar = ({ topNavCollapsed, toggleTopNav }) => {
     }, [dispatch]);
 
     const calendarRef = useRef(null);
-    var curYear = moment().format('YYYY'),
-        curMonth = moment().format('MM');
+    var curYear = dayjs().format('YYYY'),
+        curMonth = dayjs().format('MM');
 
     const [showSidebar, setShowSidebar] = useState(true)
     const [showEventInfo, setShowEventInfo] = useState(false);
     const [createEvent, setCreateEvent] = useState(false);
     const [eventTitle, setEventTitle] = useState();
     const [targetEvent, setTargetEvent] = useState();
-    const [date, setDate] = useState(moment().format('YYYY-MM-DD')); // Changed to dynamic today
+    const [date, setDate] = useState(dayjs().format('YYYY-MM-DD')); // Changed to dynamic today
     const [currentView, setCurrentView] = useState("month");
     const [events, setEvents] = useState([]);
     const [upcomingEvents, setUpcomingEvents] = useState([]);
@@ -161,7 +161,7 @@ const Calendar = ({ topNavCollapsed, toggleTopNav }) => {
                                     </Button>
                                 </div>
                                 <div className="d-flex flex-1 justify-content-center">
-                                    <h4 className="mb-0">{moment(date).format('MMMM' + ' ' + 'YYYY')}</h4>
+                                    <h4 className="mb-0">{dayjs(date).format('MMMM' + ' ' + 'YYYY')}</h4>
                                 </div>
                                 <div className="cd-options-wrap d-flex flex-1 justify-content-end">
                                     <ButtonGroup className="d-none d-md-flex">

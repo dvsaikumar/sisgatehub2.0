@@ -3,7 +3,7 @@ import { Button, Card, Table, Dropdown, Modal, Form, Row, Col, Pagination, Input
 import { Plus, Trash, PencilSimple, DotsThreeVertical, Archive, UserPlus, UserCirclePlus, MagnifyingGlass, FilePdf, FileXls } from '@phosphor-icons/react';
 import { supabase } from '../../../configs/supabaseClient';
 import toast from 'react-hot-toast';
-import moment from 'moment';
+import dayjs from '../../../lib/dayjs';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from 'xlsx';

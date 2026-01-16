@@ -3,7 +3,7 @@ import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
 import DateRangePicker from 'react-bootstrap-daterangepicker';
 import { supabase } from '../../configs/supabaseClient';
 import toast from 'react-hot-toast';
-import moment from 'moment';
+import dayjs from '../../lib/dayjs';
 import useAuditLog, { AuditResourceType } from '../../hooks/useAuditLog';
 
 const SetReminder = ({ show, hide, refreshEvents }) => {
@@ -24,7 +24,7 @@ const SetReminder = ({ show, hide, refreshEvents }) => {
         setLoading(true);
         try {
             // Combine date and time
-            const sDate = moment(start).format('YYYY-MM-DD');
+            const sDate = dayjs(start).format('YYYY-MM-DD');
             const startDateTime = new Date(`${sDate}T${startTime}`);
 
             // Create a default 1-hour duration for the calendar visual

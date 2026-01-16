@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Table, Badge, Form, Button, Row, Col } from 'react-bootstrap';
 import { supabase } from '../../configs/supabaseClient';
 import useAuditLog, { AuditActionType, AuditResourceType, AuditActionStatus } from '../../hooks/useAuditLog';
-import moment from 'moment';
+import dayjs from '../../lib/dayjs';
 import toast from 'react-hot-toast';
 
 const AuditLogs = () => {
@@ -126,7 +126,7 @@ const AuditLogs = () => {
         const csv = [
             ['Date', 'User', 'Action', 'Resource', 'Description', 'Status'].join(','),
             ...auditLogs.map(log => [
-                moment(log.created_at).format('YYYY-MM-DD HH:mm:ss'),
+                dayjs(log.created_at).format('YYYY-MM-DD HH:mm:ss'),
                 log.user_email || 'System',
                 log.action_type,
                 log.resource_type,
@@ -139,7 +139,7 @@ const AuditLogs = () => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `audit-logs-${moment().format('YYYY-MM-DD')}.csv`;
+        a.download = `audit-logs-${dayjs().format('YYYY-MM-DD')}.csv`;
         a.click();
 
         toast.success('Audit logs exported successfully');
@@ -279,9 +279,9 @@ const AuditLogs = () => {
                                         {auditLogs.map((log) => (
                                             <tr key={log.id}>
                                                 <td style={{ fontSize: '13px', whiteSpace: 'nowrap' }}>
-                                                    <div>{moment(log.created_at).format('MMM DD, YYYY')}</div>
+                                                    <div>{dayjs(log.created_at).format('MMM DD, YYYY')}</div>
                                                     <div style={{ fontSize: '11px', color: '#666' }}>
-                                                        {moment(log.created_at).format('HH:mm:ss')}
+                                                        {dayjs(log.created_at).format('HH:mm:ss')}
                                                     </div>
                                                 </td>
                                                 {isAdmin && (

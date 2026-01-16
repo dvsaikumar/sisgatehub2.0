@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import SimpleBar from 'simplebar-react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import classNames from 'classnames';
-import moment from 'moment';
+import dayjs from '../../lib/dayjs';
 import Swal from 'sweetalert2';
 import DateRangePicker from 'react-bootstrap-daterangepicker';
 import * as Icons from 'react-feather';
@@ -97,10 +97,10 @@ const EventsDrawer = ({ show, onClose, info, event }) => {
 
     // Safe access to event props
     const eProps = event?.extendedProps || {};
-    const startDate = event?.start ? moment(event.start).format('MMM DD, YYYY') : '';
-    const endDate = event?.end ? moment(event.end).format('MMM DD, YYYY') : startDate;
-    const startTimeComponent = event?.start ? moment(event.start).format('h:mm A') : '';
-    const endTimeComponent = event?.end ? moment(event.end).format('h:mm A') : '';
+    const startDate = event?.start ? dayjs(event.start).format('MMM DD, YYYY') : '';
+    const endDate = event?.end ? dayjs(event.end).format('MMM DD, YYYY') : startDate;
+    const startTimeComponent = event?.start ? dayjs(event.start).format('h:mm A') : '';
+    const endTimeComponent = event?.end ? dayjs(event.end).format('h:mm A') : '';
 
     return (
         <div className={classNames("hk-drawer calendar-drawer drawer-right", { "drawer-toggle": show })} >
@@ -249,8 +249,8 @@ const EventsDrawer = ({ show, onClose, info, event }) => {
                                             <DateRangePicker
                                                 initialSettings={{
                                                     timePicker: true,
-                                                    startDate: moment().startOf('hour').toDate(),
-                                                    endDate: moment().startOf('hour').add(32, 'hour').toDate(),
+                                                    startDate: dayjs().startOf('hour').toDate(),
+                                                    endDate: dayjs().startOf('hour').add(32, 'hour').toDate(),
                                                     locale: {
                                                         format: 'M/DD hh:mm A',
                                                     },

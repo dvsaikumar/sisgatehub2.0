@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
 import { Archive, ChevronDown, ChevronLeft, ChevronUp, ExternalLink, Info, MoreVertical, Phone, Slash, Star, UserPlus, Video } from 'react-feather';
 import HkTooltip from '../../components/@hk-tooltip/HkTooltip';
-import { useRouteMatch } from 'react-router-dom';
+import { useMatch } from 'react-router-dom';
 import AudioCallModal from './AudioCallModal';
 import { useWindowWidth } from '@react-hook/window-size';
 import classNames from 'classnames';
@@ -24,9 +24,9 @@ const ChatHeader = ({ topNavCollapsed, toggleTopNav, infoState, infoToggle, invi
     const [audioCall, setAudioCall] = useState(false);
     const [videoCall, setVideoCall] = useState(false);
 
-    const chatsRoute = useRouteMatch("/apps/chat/chats");
-    const groupRoutes = useRouteMatch("/apps/chat/chat-groups");
-    const contactsRoute = useRouteMatch("/apps/chat/chat-contact");
+    const chatsRoute = useMatch("/apps/chat/chats");
+    const groupRoutes = useMatch("/apps/chat/chat-groups");
+    const contactsRoute = useMatch("/apps/chat/chat-contact");
 
     const width = useWindowWidth();
     const BackToContactList = () => {

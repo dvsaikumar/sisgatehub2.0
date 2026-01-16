@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Container, Nav, Navbar } from 'react-bootstrap';
 import { HelpCircle } from 'react-feather';
-import { Link, useRouteMatch } from 'react-router-dom';
+import { Link, useMatch } from 'react-router-dom';
 
 //Images
 import sisgateLogo from '../../assets/img/sisgate-logo.png';
@@ -9,8 +9,8 @@ import sisgateLogoDark from '../../assets/img/sisgate-logo.png';
 import { useTheme } from '../../utils/theme-provider/theme-provider';
 
 const SimpleHeader = () => {
-    const loginPath = useRouteMatch("/auth/login-simple");
-    const signupPath = useRouteMatch("/auth/signup-simple");
+    const loginPath = useMatch("/auth/login-simple");
+    const signupPath = useMatch("/auth/signup-simple");
 
     const { theme } = useTheme();
 

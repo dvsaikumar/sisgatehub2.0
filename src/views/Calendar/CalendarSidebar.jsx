@@ -10,7 +10,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import HkTooltip from '../../components/@hk-tooltip/HkTooltip';
 import { Plus as PlusPhos } from '@phosphor-icons/react';
 import { supabase } from '../../configs/supabaseClient'; // Keep for now if needed, but unused in this version
-import moment from 'moment';
+import dayjs from '../../lib/dayjs';
 
 
 const CalendarSidebar = ({ showSidebar, toggleSidebar, createNewEvent, refreshEvents, upcomingEvents = [] }) => {
@@ -30,21 +30,18 @@ const CalendarSidebar = ({ showSidebar, toggleSidebar, createNewEvent, refreshEv
             <nav className="calendarapp-sidebar">
                 <SimpleBar className="nicescroll-bar">
                     <div className="menu-content-wrap">
-                        <Dropdown>
-                            <Dropdown.Toggle className="btn-gradient-primary btn-animated btn-block">
-                                <PlusPhos weight="bold" className="me-2" color="#fff" />Create
+                        <Dropdown className="w-100">
+                            <Dropdown.Toggle className="btn-gradient-primary btn-animated w-100 d-flex align-items-center justify-content-center gap-2">
+                                <PlusPhos weight="bold" size={18} color="#fff" />
+                                <span>Create</span>
                             </Dropdown.Toggle>
                             <Dropdown.Menu>
-                                <Dropdown.Item onClick={createNewEvent} >
-                                    <span className="feather-icon dropdown-icon">
-                                        <Calendar />
-                                    </span>
+                                <Dropdown.Item onClick={createNewEvent} className="d-flex align-items-center gap-2">
+                                    <Calendar size={18} />
                                     <span>Create an Event</span>
                                 </Dropdown.Item>
-                                <Dropdown.Item onClick={() => setReminder(!reminder)} >
-                                    <span className="feather-icon dropdown-icon">
-                                        <Bell />
-                                    </span>
+                                <Dropdown.Item onClick={() => setReminder(!reminder)} className="d-flex align-items-center gap-2">
+                                    <Bell size={18} />
                                     <span>Set a Reminder</span>
                                 </Dropdown.Item>
                             </Dropdown.Menu>
@@ -75,7 +72,7 @@ const CalendarSidebar = ({ showSidebar, toggleSidebar, createNewEvent, refreshEv
                                             <div className="d-flex align-items-center">
                                                 <Badge bg={event.category === 'Important' ? 'danger' : 'primary'} className="badge-indicator badge-indicator-lg me-2" style={{ backgroundColor: event.background_color }} />
                                                 <span className="event-time">
-                                                    {moment(event.start_date).calendar(null, {
+                                                    {dayjs(event.start_date).calendar(null, {
                                                         sameDay: '[Today], h:mm A',
                                                         nextDay: '[Tomorrow], h:mm A',
                                                         nextWeek: 'MMM DD, h:mm A',

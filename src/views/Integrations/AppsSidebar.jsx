@@ -1,13 +1,13 @@
 import React from 'react';
 import { Button, Form, Nav } from 'react-bootstrap';
 import { Archive, Book, Box, Briefcase, CheckSquare, Code, GitBranch, GitHub, Grid, Heart, PenTool, RefreshCw, Settings, Tool, Zap } from 'react-feather';
-import { NavLink, useRouteMatch } from 'react-router-dom';
+import { NavLink, useMatch } from 'react-router-dom';
 import SimpleBar from 'simplebar-react';
 import HkTooltip from '../../components/@hk-tooltip/HkTooltip';
 
 const AppsSidebar = () => {
     //All Apps page route
-    const allAppRoute = useRouteMatch("/all-apps");
+    const allAppRoute = useMatch("/apps/integrations/all-apps");
 
     return (
         <nav className="integrationsapp-sidebar">

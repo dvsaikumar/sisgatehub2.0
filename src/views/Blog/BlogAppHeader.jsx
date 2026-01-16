@@ -3,15 +3,15 @@ import classNames from 'classnames';
 import { Button, Dropdown } from 'react-bootstrap';
 import { ChevronDown, ChevronUp, ExternalLink, Flag, Grid, MoreVertical, RefreshCw, Settings, Slash, Tag, Users } from 'react-feather';
 import { connect } from 'react-redux';
-import { Link, useRouteMatch } from 'react-router-dom';
+import { Link, useMatch } from 'react-router-dom';
 import HkTooltip from '../../components/@hk-tooltip/HkTooltip';
 import { toggleTopNav } from '../../redux/action/Theme';
 
 const BlogAppHeader = ({ topNavCollapsed, toggleTopNav, toggleSidebar, showSidebar }) => {
 
-    const postsRoute = useRouteMatch('/apps/blog/posts');
-    const addNewPostRoute = useRouteMatch('/apps/blog/add-new-post');
-    const postDetail = useRouteMatch('/apps/blog/post-detail');
+    const postsRoute = useMatch('/apps/blog/posts');
+    const addNewPostRoute = useMatch('/apps/blog/add-new-post');
+    const postDetail = useMatch('/apps/blog/post-detail');
 
     return (
         <header className="blog-header">

@@ -1,16 +1,28 @@
 import { AnimatePresence } from 'framer-motion'
 import classNames from 'classnames'
 import { Suspense } from 'react'
-import { Redirect, Route, Switch, useRouteMatch } from 'react-router-dom'
+import { Route, Routes, Navigate, useMatch, useNavigate, useLocation, useParams } from 'react-router-dom'
 import { authRoutes } from './RouteList'
 import PageAnimate from '../components/Animation/PageAnimate'
 
+// Shim to provide v5 props (history, location, match) to components
+const LegacyRouteWrapper = ({ component: Component }) => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const params = useParams();
 
-const ClassicRoutes = (props) => {
+    const match = { params, path: location.pathname, url: location.pathname, isExact: true };
+    const history = {
+        push: (to) => navigate(to),
+        replace: (to) => navigate(to, { replace: true }),
+        goBack: () => navigate(-1)
+    };
 
-    const { match } = props;
+    return <Component history={history} location={location} match={match} />;
+};
 
-    const lockScreenAuth = useRouteMatch("/auth/lock-screen");
+const ClassicRoutes = () => {
+    const lockScreenAuth = useMatch("/auth/lock-screen");
 
     return (
         <AnimatePresence>
@@ -21,27 +33,23 @@ const ClassicRoutes = (props) => {
                     </div>
                 }>
                 <div className={classNames("hk-wrapper hk-pg-auth", { "bg-primary-dark-3": lockScreenAuth })} data-footer="simple" >
-                    <Switch>
-
+                    <Routes>
                         {
                             authRoutes.map((obj, i) => {
                                 return (obj.component) ? (
                                     <Route
                                         key={i}
-                                        exact={obj.exact}
-                                        path={match.path + obj.path}
-                                        render={matchProps => (
+                                        path={obj.path}
+                                        element={
                                             <PageAnimate>
-                                                <obj.component {...matchProps} />
+                                                <LegacyRouteWrapper component={obj.component} />
                                             </PageAnimate>
-                                        )}
+                                        }
                                     />) : (null)
                             })
                         }
-                        <Route path="*">
-                            <Redirect to="/error-404" />
-                        </Route>
-                    </Switch>
+                        <Route path="*" element={<Navigate to="/error-404" replace />} />
+                    </Routes>
                 </div>
             </Suspense>
         </AnimatePresence>

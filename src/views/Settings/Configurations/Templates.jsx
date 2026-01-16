@@ -3,7 +3,7 @@ import { Button, Card, Table, Modal, Form, Row, Col, InputGroup, Badge, Nav, Tab
 import { Plus, Trash, PencilSimple, MagnifyingGlass, FileText, Copy, Code, Eye, Info } from '@phosphor-icons/react';
 import { supabase } from '../../../configs/supabaseClient';
 import toast from 'react-hot-toast';
-import moment from 'moment';
+import dayjs from '../../../lib/dayjs';
 import AIFormControl from '../../../components/AIFormControl/AIFormControl';
 
 const availableVariables = [
@@ -18,7 +18,7 @@ const sampleData = {
     '{{username}}': 'John Doe',
     '{{user_email}}': 'john.doe@example.com',
     '{{company_name}}': 'Sisgate PRO',
-    '{{date}}': moment().format('MMMM DD, YYYY'),
+    '{{date}}': dayjs().format('MMMM DD, YYYY'),
     '{{doc_id}}': 'DOC-12345'
 };
 
@@ -242,7 +242,7 @@ const Templates = () => {
                                                     {tpl.status}
                                                 </span>
                                             </td>
-                                            <td>{moment(tpl.updated_at || tpl.created_at).format('MMM DD, YYYY')}</td>
+                                            <td>{dayjs(tpl.updated_at || tpl.created_at).format('MMM DD, YYYY')}</td>
                                             <td>
                                                 <div className="d-flex justify-content-end gap-2">
                                                     <Button variant="flush-light" className="btn-icon btn-rounded flush-soft-hover" title="Duplicate" onClick={() => handleDuplicate(tpl)}>

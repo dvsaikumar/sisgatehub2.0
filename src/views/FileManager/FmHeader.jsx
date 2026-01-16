@@ -3,13 +3,13 @@ import React, { useState } from 'react';
 import { Button, Dropdown, Form } from 'react-bootstrap';
 import { CaretDown, CaretUp, File, FilePlus, FolderPlus, SquaresFour, Info, List, CloudArrowUp, UserPlus, MagnifyingGlass, X } from '@phosphor-icons/react';
 import { connect } from 'react-redux';
-import { Link, NavLink, useRouteMatch } from 'react-router-dom';
+import { Link, NavLink, useMatch } from 'react-router-dom';
 import HkTooltip from '../../components/@hk-tooltip/HkTooltip';
 import { toggleTopNav } from '../../redux/action/Theme';
 
 const FmHeader = ({ topNavCollapsed, toggleTopNav, toggleSidebar, showSidebar, showInfo, toggleInfo, title, onSearch, searchValue, children }) => {
 
-    const listViewRoute = useRouteMatch("/apps/file-manager/list-view");
+    const listViewRoute = useMatch("/apps/file-manager/list-view");
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
     return (

@@ -4,7 +4,7 @@ import { Button, Card, Nav } from 'react-bootstrap';
 import SimpleBar from 'simplebar-react';
 import { connect } from 'react-redux';
 import { toggleCollapsedNav } from '../../redux/action/Theme';
-import { NavLink, useRouteMatch } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import SidebarHeader from './SidebarHeader';
 import { SidebarMenu } from './SidebarMenu';
 import classNames from 'classnames';
@@ -16,6 +16,7 @@ const Sidebar = ({ navCollapsed, toggleCollapsedNav }) => {
     const [activeSubMenu, setActiveSubMenu] = useState();
 
     const windowWidth = useWindowWidth();
+    const location = useLocation();
 
     const handleClick = (menuName) => {
         setActiveMenu(menuName);
@@ -43,18 +44,80 @@ const Sidebar = ({ navCollapsed, toggleCollapsedNav }) => {
             <div className="hk-menu">
                 {/* Brand */}
                 <SidebarHeader />
+                {/* Custom Compact Sidebar Styles */}
+                <style>
+                    {`
+                    .hk-menu .menu-content-wrap {
+                        padding-top: 10px;
+                    }
+                    .hk-menu .nav-link {
+                        padding: 0.35rem 1.25rem !important;
+                        min-height: 38px;
+                        display: flex;
+                        align-items: center;
+                    }
+                    .hk-menu .nav-link-text {
+                        font-size: 0.85rem !important;
+                        font-weight: 500;
+                    }
+                    .hk-menu .nav-header {
+                        padding: 0.75rem 1.25rem 0.25rem !important;
+                        font-size: 0.7rem !important;
+                        font-weight: 700;
+                        text-transform: uppercase;
+                        letter-spacing: 0.05em;
+                        opacity: 0.7;
+                    }
+                    .hk-menu .nav-icon-wrap {
+                        margin-right: 10px !important;
+                        min-width: 20px;
+                    }
+                    .hk-menu .svg-icon svg {
+                        width: 18px !important;
+                        height: 18px !important;
+                    }
+                    .sidebar-divider {
+                        margin: 8px 10px;
+                        border-top: 1px solid rgba(0,0,0,0.1);
+                        opacity: 1;
+                    }
+                    
+                    /* Hover expansion for collapsed sidebar */
+                    [data-layout-style="collapsed"] .hk-menu {
+                        transition: width 0.3s ease;
+                    }
+                    [data-layout-style="collapsed"] .hk-menu:hover {
+                        width: 260px !important;
+                        box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+                    }
+                    [data-layout-style="collapsed"] .hk-menu:hover .nav-link-text {
+                        opacity: 1 !important;
+                        width: auto !important;
+                        display: inline-block !important;
+                    }
+                    [data-layout-style="collapsed"] .hk-menu:hover .menu-header {
+                        padding: 1rem 1.25rem;
+                    }
+                    [data-layout-style="collapsed"] .hk-menu:hover .navbar-brand {
+                        gap: 0.625rem;
+                    }
+                    [data-layout-style="collapsed"] .hk-menu:hover .brand-logo-text {
+                        opacity: 1 !important;
+                        width: auto !important;
+                        height: 1.75rem !important;
+                        margin-left: 0.25rem !important;
+                    }
+                    `}
+                </style>
                 {/* Main Menu */}
                 <SimpleBar className="nicescroll-bar">
                     <div className="menu-content-wrap">
                         {SidebarMenu.map((routes, index) => (
                             <React.Fragment key={index}>
                                 <div className="menu-group" >
-                                    {routes.group && <div className="nav-header" >
-                                        <span>{routes.group}</span>
-                                    </div>}
                                     {routes.contents.map((menus, idx) => (
                                         <Nav bsPrefix="navbar-nav" className="flex-column" key={idx}>
-                                            <Nav.Item className={classNames({ "active": useRouteMatch(menus.path) })}  >
+                                            <Nav.Item className={classNames({ "active": location.pathname.startsWith(menus.path) })}  >
                                                 {
                                                     menus.childrens
                                                         ?
@@ -134,7 +197,7 @@ const Sidebar = ({ navCollapsed, toggleCollapsedNav }) => {
                                                                         {menus.badge && menus.badge}
                                                                     </a>
                                                                     :
-                                                                    <Nav.Link as={NavLink} exact={true} activeClassName="active" to={menus.path} onClick={() => handleClick(menus.name)} >
+                                                                    <Nav.Link as={NavLink} to={menus.path} onClick={() => handleClick(menus.name)} >
                                                                         <span className="nav-icon-wrap">
                                                                             <span className="svg-icon">
                                                                                 {menus.icon}
@@ -150,7 +213,7 @@ const Sidebar = ({ navCollapsed, toggleCollapsedNav }) => {
                                         </Nav>
                                     ))}
                                 </div>
-                                <div className="menu-gap" />
+                                {index < SidebarMenu.length - 1 && <hr className="sidebar-divider" />}
                             </React.Fragment>
                         ))}
 

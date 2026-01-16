@@ -1,24 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import { Col, Container, Row, Card, Button, Badge, ListGroup } from 'react-bootstrap';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { toggleCollapsedNav } from '../../redux/action/Theme';
 import { supabase } from '../../configs/supabaseClient';
-import { Link } from 'react-router-dom';
+import dayjs from '../../lib/dayjs';
+
+// UI Components
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+
+// Icons
 import {
     FileText,
     Bell,
-    Folder,
-    Calendar,
-    Plus,
-    ArrowRight,
+    ChartLineUp,
+    CaretRight,
     Clock,
-    BookOpen,
-    Activity,
-    TrendingUp
-} from 'react-feather';
-import moment from 'moment';
+    Folder,
+    CalendarBlank
+} from '@phosphor-icons/react';
 
-const Dashboard = ({ navCollapsed, toggleCollapsedNav }) => {
+const Dashboard = ({ toggleCollapsedNav }) => {
     const [reminders, setReminders] = useState([]);
     const [documents, setDocuments] = useState([]);
     const [stats, setStats] = useState({
@@ -76,293 +80,216 @@ const Dashboard = ({ navCollapsed, toggleCollapsedNav }) => {
         }
     };
 
-    return (
-        <Container>
-            {/* Page Header */}
-            <div className="hk-pg-header pt-7">
-                <Row className="align-items-center flex-nowrap">
-                    <Col>
-                        <div className="d-flex align-items-center">
-                            <div className="d-flex">
-                                <div>
-                                    <h1 className="pg-title">Dashboard</h1>
-                                    <p className="mb-0">Welcome to Sisgate PRO Hub</p>
-                                </div>
-                            </div>
-                        </div>
-                    </Col>
-                    <Col xs="auto" className="d-flex align-items-center">
-                        <Link to="/apps/ai/create-doc" className="text-decoration-none">
-                            <Button variant="primary" size="sm" className="btn-rounded">
-                                <Plus size={16} className="me-1" />
-                                Create Document
-                            </Button>
-                        </Link>
-                    </Col>
-                </Row>
-            </div>
+    const containerVariants = "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8";
 
-            {/* Page Body */}
-            <div className="hk-pg-body py-0">
-                {/* Statistics Cards */}
-                <Row className="mb-3">
-                    <Col lg={4} sm={6} className="mb-3">
-                        <Card className="card-border">
-                            <Card.Body>
-                                <div className="media">
-                                    <div className="media-head me-3">
-                                        <div className="avatar avatar-icon avatar-sm avatar-soft-primary avatar-rounded">
-                                            <span className="initial-wrap">
-                                                <FileText size={20} />
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="media-body">
-                                        <div className="d-flex align-items-center justify-content-between">
-                                            <div>
-                                                <span className="d-block text-uppercase fs-8 fw-medium text-muted mb-1">Documents</span>
-                                                <span className="d-block display-6 fw-bold text-dark mb-0">{stats.totalDocuments}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    <Col lg={4} sm={6} className="mb-3">
-                        <Card className="card-border">
-                            <Card.Body>
-                                <div className="media">
-                                    <div className="media-head me-3">
-                                        <div className="avatar avatar-icon avatar-sm avatar-soft-warning avatar-rounded">
-                                            <span className="initial-wrap">
-                                                <Bell size={20} />
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="media-body">
-                                        <div className="d-flex align-items-center justify-content-between">
-                                            <div>
-                                                <span className="d-block text-uppercase fs-8 fw-medium text-muted mb-1">Reminders</span>
-                                                <span className="d-block display-6 fw-bold text-dark mb-0">{stats.upcomingReminders}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    <Col lg={4} sm={6} className="mb-3">
-                        <Card className="card-border">
-                            <Card.Body>
-                                <div className="media">
-                                    <div className="media-head me-3">
-                                        <div className="avatar avatar-icon avatar-sm avatar-soft-success avatar-rounded">
-                                            <span className="initial-wrap">
-                                                <TrendingUp size={20} />
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="media-body">
-                                        <div className="d-flex align-items-center justify-content-between">
-                                            <div>
-                                                <span className="d-block text-uppercase fs-8 fw-medium text-muted mb-1">Activity</span>
-                                                <span className="d-block display-6 fw-bold text-dark mb-0">{stats.recentActivity}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
+    return (
+        <div className="min-h-screen bg-slate-50/50">
+            <div className={containerVariants}>
+                {/* Header Section */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Dashboard</h1>
+                        <p className="text-slate-500 mt-1">Welcome back to your Sisgate PRO Hub workspace.</p>
+                    </div>
+                </div>
+
+                {/* Statistics Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <StatsCard
+                        title="Total Documents"
+                        value={stats.totalDocuments}
+                        icon={FileText}
+                        color="text-blue-600"
+                        bg="bg-blue-50"
+                    />
+                    <StatsCard
+                        title="Upcoming Reminders"
+                        value={stats.upcomingReminders}
+                        icon={Bell}
+                        color="text-amber-600"
+                        bg="bg-amber-50"
+                    />
+                    <StatsCard
+                        title="Recent Activity"
+                        value={stats.recentActivity}
+                        icon={ChartLineUp}
+                        color="text-emerald-600"
+                        bg="bg-emerald-50"
+                    />
+                </div>
 
                 {/* Quick Actions */}
-                <Row className="mb-3">
-                    <Col md={12}>
-                        <div className="card-header card-header-action">
-                            <h6 className="mb-0">Quick Actions</h6>
-                        </div>
-                    </Col>
-                </Row>
-                <Row className="mb-3">
-                    <Col xl={3} sm={6} className="mb-3">
-                        <Link to="/apps/ai/create-doc" className="text-decoration-none">
-                            <Card className="card-border card-hover">
-                                <Card.Body className="text-center">
-                                    <div className="avatar avatar-icon avatar-lg avatar-soft-primary avatar-rounded mb-3">
-                                        <span className="initial-wrap">
-                                            <FileText size={28} />
-                                        </span>
-                                    </div>
-                                    <span className="d-block fw-medium text-dark">Create Document</span>
-                                </Card.Body>
-                            </Card>
-                        </Link>
-                    </Col>
-                    <Col xl={3} sm={6} className="mb-3">
-                        <Link to="/library" className="text-decoration-none">
-                            <Card className="card-border card-hover">
-                                <Card.Body className="text-center">
-                                    <div className="avatar avatar-icon avatar-lg avatar-soft-success avatar-rounded mb-3">
-                                        <span className="initial-wrap">
-                                            <Folder size={28} />
-                                        </span>
-                                    </div>
-                                    <span className="d-block fw-medium text-dark">View Library</span>
-                                </Card.Body>
-                            </Card>
-                        </Link>
-                    </Col>
-                    <Col xl={3} sm={6} className="mb-3">
-                        <Link to="/reminders" className="text-decoration-none">
-                            <Card className="card-border card-hover">
-                                <Card.Body className="text-center">
-                                    <div className="avatar avatar-icon avatar-lg avatar-soft-warning avatar-rounded mb-3">
-                                        <span className="initial-wrap">
-                                            <Bell size={28} />
-                                        </span>
-                                    </div>
-                                    <span className="d-block fw-medium text-dark">Reminders</span>
-                                </Card.Body>
-                            </Card>
-                        </Link>
-                    </Col>
-                    <Col xl={3} sm={6} className="mb-3">
-                        <Link to="/apps/calendar" className="text-decoration-none">
-                            <Card className="card-border card-hover">
-                                <Card.Body className="text-center">
-                                    <div className="avatar avatar-icon avatar-lg avatar-soft-info avatar-rounded mb-3">
-                                        <span className="initial-wrap">
-                                            <Calendar size={28} />
-                                        </span>
-                                    </div>
-                                    <span className="d-block fw-medium text-dark">Calendar</span>
-                                </Card.Body>
-                            </Card>
-                        </Link>
-                    </Col>
-                </Row>
+                <div className="mb-8">
+                    <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Quick Actions</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <QuickActionCard
+                            to="/apps/ai/create-doc"
+                            label="Create Document"
+                            icon={FileText}
+                            color="text-blue-600"
+                            bg="bg-blue-50 group-hover:bg-blue-600 group-hover:text-white"
+                        />
+                        <QuickActionCard
+                            to="/library"
+                            label="Browse Library"
+                            icon={Folder}
+                            color="text-teal-600"
+                            bg="bg-teal-50 group-hover:bg-teal-600 group-hover:text-white"
+                        />
+                        <QuickActionCard
+                            to="/reminders"
+                            label="Check Reminders"
+                            icon={Bell}
+                            color="text-amber-600"
+                            bg="bg-amber-50 group-hover:bg-amber-600 group-hover:text-white"
+                        />
+                        <QuickActionCard
+                            to="/apps/calendar"
+                            label="View Calendar"
+                            icon={CalendarBlank}
+                            color="text-indigo-600"
+                            bg="bg-indigo-50 group-hover:bg-indigo-600 group-hover:text-white"
+                        />
+                    </div>
+                </div>
 
-                {/* Content Sections */}
-                <Row>
-                    {/* Upcoming Reminders */}
-                    <Col lg={6} className="mb-3">
-                        <Card className="card-border">
-                            <Card.Header className="card-header-action">
-                                <h6 className="mb-0">Upcoming Reminders</h6>
-                                <div className="card-action-wrap">
-                                    <Link to="/reminders" className="text-muted">
-                                        <span className="feather-icon">
-                                            <ArrowRight size={16} />
-                                        </span>
-                                    </Link>
+                {/* Main Content Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Upcoming Reminders List */}
+                    <Card className="border-slate-200 shadow-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                            <CardTitle className="text-base font-semibold text-slate-900">Upcoming Reminders</CardTitle>
+                            <Link to="/reminders" className="text-sm font-medium text-teal-600 hover:text-teal-700 flex items-center transition-colors">
+                                View All <CaretRight className="ml-1 h-3 w-3" weight="bold" />
+                            </Link>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                            {loading ? (
+                                <div className="flex items-center justify-center h-48 text-slate-400">
+                                    <span className="loading-spinner mr-2"></span> Loading...
                                 </div>
-                            </Card.Header>
-                            <Card.Body className="p-0">
-                                {loading ? (
-                                    <div className="text-center py-5 text-muted">
-                                        <span className="spinner-border spinner-border-sm me-2"></span>
-                                        Loading...
-                                    </div>
-                                ) : reminders.length === 0 ? (
-                                    <div className="text-center py-5">
-                                        <div className="mb-3">
-                                            <Bell size={40} className="text-muted opacity-50" />
-                                        </div>
-                                        <p className="text-muted mb-0">No upcoming reminders</p>
-                                    </div>
-                                ) : (
-                                    <ListGroup variant="flush">
-                                        {reminders.map((reminder, idx) => (
-                                            <ListGroup.Item key={idx} className="py-3">
-                                                <div className="media">
-                                                    <div className="media-head me-3">
-                                                        <div className="avatar avatar-xs avatar-soft-warning avatar-rounded">
-                                                            <span className="initial-wrap">
-                                                                <Clock size={14} />
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="media-body">
-                                                        <div>
-                                                            <div className="fw-medium text-dark mb-1">{reminder.title}</div>
-                                                            <div className="fs-7 text-muted">
-                                                                {moment(reminder.schedule_at).format('MMM D, YYYY [at] h:mm A')}
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                            ) : reminders.length === 0 ? (
+                                <EmptyState
+                                    icon={Bell}
+                                    message="No upcoming reminders"
+                                    desc="You're all caught up for now!"
+                                />
+                            ) : (
+                                <div className="space-y-4">
+                                    {reminders.map((reminder, idx) => (
+                                        <div key={idx} className="flex items-start group">
+                                            <div className="flex-shrink-0 mr-4 mt-1">
+                                                <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center ring-1 ring-amber-100">
+                                                    <Clock size={16} weight="duotone" />
                                                 </div>
-                                            </ListGroup.Item>
-                                        ))}
-                                    </ListGroup>
-                                )}
-                            </Card.Body>
-                        </Card>
-                    </Col>
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium text-slate-900 truncate group-hover:text-teal-600 transition-colors">
+                                                    {reminder.title}
+                                                </p>
+                                                <p className="text-xs text-slate-500 mt-0.5">
+                                                    {dayjs(reminder.schedule_at).format('MMM D, YYYY [at] h:mm A')}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
 
-                    {/* Recent Documents */}
-                    <Col lg={6} className="mb-3">
-                        <Card className="card-border">
-                            <Card.Header className="card-header-action">
-                                <h6 className="mb-0">Recent Documents</h6>
-                                <div className="card-action-wrap">
-                                    <Link to="/library" className="text-muted">
-                                        <span className="feather-icon">
-                                            <ArrowRight size={16} />
-                                        </span>
-                                    </Link>
+                    {/* Recent Documents List */}
+                    <Card className="border-slate-200 shadow-sm">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                            <CardTitle className="text-base font-semibold text-slate-900">Recent Documents</CardTitle>
+                            <Link to="/library" className="text-sm font-medium text-teal-600 hover:text-teal-700 flex items-center transition-colors">
+                                Browse All <CaretRight className="ml-1 h-3 w-3" weight="bold" />
+                            </Link>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                            {loading ? (
+                                <div className="flex items-center justify-center h-48 text-slate-400">
+                                    <span className="loading-spinner mr-2"></span> Loading...
                                 </div>
-                            </Card.Header>
-                            <Card.Body className="p-0">
-                                {loading ? (
-                                    <div className="text-center py-5 text-muted">
-                                        <span className="spinner-border spinner-border-sm me-2"></span>
-                                        Loading...
-                                    </div>
-                                ) : documents.length === 0 ? (
-                                    <div className="text-center py-5">
-                                        <div className="mb-3">
-                                            <BookOpen size={40} className="text-muted opacity-50" />
-                                        </div>
-                                        <p className="text-muted mb-0">No documents yet</p>
-                                    </div>
-                                ) : (
-                                    <ListGroup variant="flush">
-                                        {documents.map((doc, idx) => (
-                                            <ListGroup.Item key={idx} className="py-3">
-                                                <div className="media">
-                                                    <div className="media-head me-3">
-                                                        <div className="avatar avatar-xs avatar-soft-primary avatar-rounded">
-                                                            <span className="initial-wrap">
-                                                                <FileText size={14} />
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="media-body">
-                                                        <div className="d-flex align-items-center justify-content-between">
-                                                            <div>
-                                                                <div className="fw-medium text-dark mb-1">{doc.name}</div>
-                                                                <div className="fs-7 text-muted">
-                                                                    {doc.category} • {moment(doc.created_at).fromNow()}
-                                                                </div>
-                                                            </div>
-                                                            <Badge bg="light" text="dark" className="ms-2">{doc.type}</Badge>
-                                                        </div>
-                                                    </div>
+                            ) : documents.length === 0 ? (
+                                <EmptyState
+                                    icon={FileText}
+                                    message="No documents yet"
+                                    desc="Create your first document to get started."
+                                />
+                            ) : (
+                                <div className="space-y-4">
+                                    {documents.map((doc, idx) => (
+                                        <div key={idx} className="flex items-center group p-2 -mx-2 rounded-lg hover:bg-slate-50 transition-colors cursor-default">
+                                            <div className="flex-shrink-0 mr-4">
+                                                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center ring-1 ring-blue-100 group-hover:scale-105 transition-transform">
+                                                    <FileText size={20} weight="duotone" />
                                                 </div>
-                                            </ListGroup.Item>
-                                        ))}
-                                    </ListGroup>
-                                )}
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium text-slate-900 truncate">
+                                                    {doc.name}
+                                                </p>
+                                                <div className="flex items-center mt-1 space-x-2">
+                                                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-5 font-normal bg-slate-100 text-slate-600 border-slate-200">
+                                                        {doc.type}
+                                                    </Badge>
+                                                    <span className="text-xs text-slate-400">•</span>
+                                                    <span className="text-xs text-slate-500">
+                                                        {dayjs(doc.created_at).fromNow()}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
-        </Container>
+        </div>
     );
 };
+
+const StatsCard = ({ title, value, icon: Icon, color, bg }) => (
+    <Card className="border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-200">
+        <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+                <div>
+                    <p className="text-sm font-medium text-slate-500 mb-1">{title}</p>
+                    <h3 className="text-3xl font-bold text-slate-900 tracking-tight">{value}</h3>
+                </div>
+                <div className={cn("p-3 rounded-2xl", bg)}>
+                    <Icon size={24} className={color} weight="duotone" />
+                </div>
+            </div>
+        </CardContent>
+    </Card>
+);
+
+const QuickActionCard = ({ to, label, icon: Icon, color, bg }) => (
+    <Link to={to} className="block group">
+        <Card className="h-full border-slate-200 shadow-sm group-hover:shadow-md group-hover:border-teal-500/30 transition-all duration-200 overflow-hidden">
+            <CardContent className="p-6 flex flex-col items-center justify-center text-center h-full">
+                <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-colors duration-200", bg)}>
+                    <Icon size={28} className={cn("transition-colors duration-200", color)} weight="duotone" />
+                </div>
+                <span className="font-semibold text-slate-700 group-hover:text-teal-700 transition-colors">{label}</span>
+            </CardContent>
+        </Card>
+    </Link>
+);
+
+const EmptyState = ({ icon: Icon, message, desc }) => (
+    <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+            <Icon size={32} className="text-slate-300" weight="duotone" />
+        </div>
+        <h3 className="text-sm font-medium text-slate-900 mb-1">{message}</h3>
+        <p className="text-xs text-slate-500 max-w-[200px]">{desc}</p>
+    </div>
+);
 
 const mapStateToProps = ({ theme }) => {
     const { navCollapsed } = theme;

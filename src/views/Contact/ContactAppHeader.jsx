@@ -3,13 +3,13 @@ import { Button, Dropdown } from 'react-bootstrap';
 import classNames from 'classnames';
 import { Archive, ChevronDown, ChevronUp, Edit, ExternalLink, Grid, List, MoreVertical, RefreshCw, Server, Settings, Slash, Star, Trash2, User } from 'react-feather';
 import { connect } from 'react-redux';
-import { NavLink, useRouteMatch } from 'react-router-dom';
+import { NavLink, useMatch } from 'react-router-dom';
 import { toggleTopNav } from '../../redux/action/Theme';
 import HkTooltip from '../../components/@hk-tooltip/HkTooltip';
 
 const ContactAppHeader = ({ topNavCollapsed, toggleTopNav, toggleSidebar, show }) => {
 
-    const contactListRoute = useRouteMatch("/apps/contacts/contact-list");
+    const contactListRoute = useMatch("/apps/contacts/contact-list");
 
     return (
         <header className="contact-header">

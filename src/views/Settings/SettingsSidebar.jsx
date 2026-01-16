@@ -6,6 +6,39 @@ import SimpleBar from 'simplebar-react';
 const SettingsSidebar = ({ activeTab, onChangeTab }) => {
     return (
         <nav className="fmapp-sidebar">
+            <style>
+                {`
+                .fmapp-sidebar .menu-content-wrap {
+                    padding-top: 10px;
+                }
+                .fmapp-sidebar .nav-link {
+                    padding: 0.35rem 1.25rem !important;
+                    min-height: 38px;
+                    display: flex;
+                    align-items: center;
+                }
+                .fmapp-sidebar .nav-link-text {
+                    font-size: 0.85rem !important;
+                    font-weight: 500;
+                }
+                .fmapp-sidebar .nav-icon-wrap {
+                    margin-right: 10px !important;
+                    min-width: 20px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .fmapp-sidebar .nav-icon-wrap svg {
+                    width: 18px !important;
+                    height: 18px !important;
+                }
+                .sidebar-divider {
+                    margin: 8px 10px;
+                    border-top: 1px solid rgba(0,0,0,0.1);
+                    opacity: 1;
+                }
+                `}
+            </style>
             <SimpleBar className="nicescroll-bar">
                 <div className="menu-content-wrap">
                     <div className="menu-group">

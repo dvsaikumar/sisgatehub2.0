@@ -1,12 +1,26 @@
-import React, { Suspense } from 'react'
-import { Route, Redirect, Switch } from 'react-router-dom'
+import React, { Suspense, useState, useEffect } from 'react'
+import { Route, Routes, Navigate, useNavigate, useLocation, useParams } from 'react-router-dom'
 import LayoutClassic from '../layout/MainLayout/ClassicLayout'
 import { routes } from './RouteList'
-
 import { supabase } from '../configs/supabaseClient';
-import { useState, useEffect } from 'react';
 
-const AppRoutes = (props) => {
+// Shim to provide v5 props (history, location, match) to components
+const LegacyRouteWrapper = ({ component: Component }) => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const params = useParams();
+
+    const match = { params, path: location.pathname, url: location.pathname, isExact: true };
+    const history = {
+        push: (to) => navigate(to),
+        replace: (to) => navigate(to, { replace: true }),
+        goBack: () => navigate(-1)
+    };
+
+    return <Component history={history} location={location} match={match} />;
+};
+
+const AppRoutes = () => {
     const [session, setSession] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -34,10 +48,8 @@ const AppRoutes = (props) => {
     }
 
     if (!session) {
-        return <Redirect to="/auth/login" />;
+        return <Navigate to="/auth/login" replace />;
     }
-
-    const { match } = props;
 
     return (
         <Suspense
@@ -47,25 +59,19 @@ const AppRoutes = (props) => {
                 </div>
             }>
             <LayoutClassic>
-                <Switch>
-
+                <Routes>
                     {
                         routes.map((obj, i) => {
                             return (obj.component) ? (
                                 <Route
                                     key={i}
-                                    exact={obj.exact}
-                                    path={match.path + obj.path}
-                                    render={matchProps => (
-                                        <obj.component {...matchProps} />
-                                    )}
+                                    path={obj.path}
+                                    element={<LegacyRouteWrapper component={obj.component} />}
                                 />) : (null)
                         })
                     }
-                    <Route path="*">
-                        <Redirect to="/error-404" />
-                    </Route>
-                </Switch>
+                    <Route path="*" element={<Navigate to="/error-404" replace />} />
+                </Routes>
             </LayoutClassic>
         </Suspense>
     )

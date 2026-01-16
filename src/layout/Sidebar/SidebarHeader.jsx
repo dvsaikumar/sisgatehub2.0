@@ -58,7 +58,7 @@ const SidebarHeader = ({ navCollapsed, toggleCollapsedNav }) => {
             filter: theme === 'dark' ? 'brightness(1.1)' : 'none'
         },
         logoText: {
-            height: navCollapsed ? '0' : '1.75rem',
+            height: '1.75rem',
             width: navCollapsed ? '0' : 'auto',
             opacity: navCollapsed ? 0 : 1,
             objectFit: 'contain',
@@ -92,15 +92,13 @@ const SidebarHeader = ({ navCollapsed, toggleCollapsedNav }) => {
                     alt="Sisgate"
                     style={headerStyles.logoIcon}
                 />
-                {/* Logo Text - Hidden when collapsed */}
-                {!navCollapsed && (
-                    <img
-                        className="brand-img img-fluid"
-                        src={theme === 'light' ? jampackImg : jampackImgDark}
-                        alt="Sisgate"
-                        style={headerStyles.logoText}
-                    />
-                )}
+                {/* Logo Text - CSS handles visibility based on hover/collapse state */}
+                <img
+                    className="brand-img img-fluid brand-logo-text"
+                    src={theme === 'light' ? jampackImg : jampackImgDark}
+                    alt="Sisgate"
+                    style={headerStyles.logoText}
+                />
             </Link>
 
             {/* Toggle Button */}
