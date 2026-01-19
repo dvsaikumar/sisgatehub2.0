@@ -285,6 +285,7 @@ export const SidebarMenu = [
         ]
     }, */
 
+    /* Pages group hidden
     {
         group: 'Pages',
         contents: [
@@ -383,9 +384,9 @@ export const SidebarMenu = [
 
         ]
     },
+    */
 
-
-
+    /* Documentation group hidden
     {
         group: 'Documentation',
         contents: [
@@ -401,5 +402,5 @@ export const SidebarMenu = [
             },
         ]
     },
-
+    */
 ]
