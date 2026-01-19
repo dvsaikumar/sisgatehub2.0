@@ -3,7 +3,8 @@ import { Badge, Card, Col, Row, Button, Modal, Spinner, Offcanvas, Dropdown, For
 import {
     FileText, Envelope, Scroll, ListChecks, CheckSquare, Video,
     Eye, DownloadSimple, Briefcase, Users, CurrencyDollar, ShieldCheck,
-    CaretRight, ShareNetwork, Plus, Copy, FilePdf, Paperclip, MagicWand, X, User, ArrowSquareOut, Star
+    CaretRight, CaretDown, ShareNetwork, Plus, Copy, FilePdf, Paperclip, MagicWand, X, User, ArrowSquareOut, Star,
+    ChatCircle, BookmarkSimple, Stack, NotePencil, ArrowsOutSimple
 } from '@phosphor-icons/react';
 
 import SimpleBar from 'simplebar-react';
@@ -649,14 +650,16 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                 }
                 
                 /* ========================================
-                   COMPACT MINIMALIST DRAWER - 320px
+                   NEW DRAWER DESIGN - MATCHING REFERENCE
                    ======================================== */
                 .library-drawer {
-                    width: 320px !important;
-                    max-width: 90vw;
+                    width: 420px !important;
+                    max-width: 95vw;
                     border: none !important;
-                    box-shadow: -2px 0 12px rgba(0,0,0,0.1);
+                    box-shadow: -4px 0 20px rgba(0,0,0,0.12);
                     background: #fff;
+                    display: flex !important;
+                    flex-direction: row !important;
                 }
                 .library-drawer.offcanvas-end {
                     transform: translateX(100%);
@@ -668,26 +671,115 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                     padding: 0 !important;
                     display: flex;
                     flex-direction: column;
-                    height: 100%;
+                    flex: 1;
+                    overflow: hidden;
                 }
                 
-                /* Compact Header */
+                /* Left Icon Toolbar */
+                .drawer-icon-toolbar {
+                    width: 48px;
+                    background: #fafafa;
+                    border-right: 1px solid #eee;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    padding: 12px 0;
+                    gap: 4px;
+                    flex-shrink: 0;
+                }
+                .toolbar-icon {
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    color: #666;
+                    transition: all 0.15s ease;
+                    border: none;
+                    background: transparent;
+                }
+                .toolbar-icon:hover {
+                    background: #f0f0f0;
+                    color: #333;
+                }
+                .toolbar-icon.active {
+                    background: #FFF3E0;
+                    color: #F57C00;
+                }
+                .toolbar-icon.has-badge {
+                    position: relative;
+                }
+                .toolbar-icon .badge-dot {
+                    position: absolute;
+                    top: 6px;
+                    right: 6px;
+                    width: 8px;
+                    height: 8px;
+                    background: #ef4444;
+                    border-radius: 50%;
+                    border: 2px solid #fafafa;
+                }
+                
+                /* Main Content Area */
+                .drawer-main-content {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    overflow: hidden;
+                }
+                
+                /* Header */
                 .drawer-header-modern {
-                    padding: 16px;
+                    padding: 14px 16px;
                     background: #fff;
                     border-bottom: 1px solid #eee;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
                 }
                 .drawer-handle {
                     display: none;
                 }
+                .drawer-id-badge {
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: #666;
+                    background: #f5f5f5;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                }
+                .drawer-header-title {
+                    flex: 1;
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #222;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+                .drawer-status-dropdown {
+                    background: #fff;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 6px;
+                    padding: 5px 10px;
+                    font-size: 12px;
+                    font-weight: 500;
+                    color: #555;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                }
+                .drawer-status-dropdown:hover {
+                    border-color: #bbb;
+                }
                 .drawer-close-btn {
-                    position: absolute;
-                    top: 12px;
-                    right: 12px;
                     width: 28px;
                     height: 28px;
                     border-radius: 6px;
-                    background: #f5f5f5;
+                    background: transparent;
                     border: none;
                     display: flex;
                     align-items: center;
@@ -696,93 +788,178 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                     color: #888;
                 }
                 .drawer-close-btn:hover {
-                    background: #eee;
+                    background: #f5f5f5;
                     color: #333;
                 }
+                
+                /* Content Body */
+                .drawer-body-modern {
+                    flex: 1;
+                    overflow-y: auto;
+                    padding: 0 !important;
+                    background: #fff;
+                }
+                
+                /* Document Info Section */
+                .drawer-doc-section {
+                    padding: 16px;
+                    border-bottom: 1px solid #f0f0f0;
+                }
+                .drawer-doc-header {
+                    display: flex;
+                    gap: 14px;
+                    margin-bottom: 14px;
+                }
+                .drawer-doc-thumb {
+                    width: 72px;
+                    height: 72px;
+                    background: #f8f8f8;
+                    border-radius: 8px;
+                    border: 1px solid #eee;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #bbb;
+                    flex-shrink: 0;
+                }
+                .drawer-doc-info {
+                    flex: 1;
+                    min-width: 0;
+                }
                 .drawer-category-badge {
-                    display: inline-block;
-                    padding: 3px 8px;
-                    background: #e8f5e9;
-                    border-radius: 4px;
-                    font-size: 10px;
-                    font-weight: 600;
-                    text-transform: uppercase;
-                    color: #2e7d32;
-                    margin-bottom: 8px;
+                    font-size: 11px;
+                    color: #888;
+                    margin-bottom: 4px;
                 }
                 .category-dot {
                     display: none;
                 }
                 .drawer-title {
-                    font-size: 15px;
+                    font-size: 16px;
                     font-weight: 600;
-                    color: #222;
-                    margin: 0 0 6px 0;
+                    color: #1a1a1a;
+                    margin: 0 0 8px 0;
                     line-height: 1.3;
-                    padding-right: 32px;
+                }
+                
+                /* Metadata Grid */
+                .drawer-metadata {
+                    display: grid;
+                    grid-template-columns: 70px 1fr;
+                    gap: 8px 12px;
+                    font-size: 13px;
+                }
+                .meta-label {
+                    color: #888;
+                    font-weight: 400;
+                }
+                .meta-value {
+                    color: #333;
+                    font-weight: 500;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
                 }
                 .drawer-type-tag {
                     display: inline-block;
                     padding: 2px 8px;
-                    background: #f0f0f0;
+                    background: #E3F2FD;
+                    border-radius: 4px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    color: #1976D2;
+                }
+                .tag-chip {
+                    display: inline-block;
+                    padding: 2px 8px;
+                    border: 1px solid #e0e0e0;
                     border-radius: 4px;
                     font-size: 11px;
                     font-weight: 500;
-                    color: #666;
+                    color: #555;
+                    margin-right: 4px;
+                }
+                .tag-chip.urgent {
+                    background: #FFEBEE;
+                    border-color: #FFCDD2;
+                    color: #C62828;
+                }
+                .tag-chip.special {
+                    background: #FFF8E1;
+                    border-color: #FFE082;
+                    color: #F57C00;
+                }
+                .add-tag-btn {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 2px;
+                    padding: 2px 6px;
+                    border: 1px dashed #ccc;
+                    border-radius: 4px;
+                    font-size: 11px;
+                    color: #888;
+                    cursor: pointer;
+                    background: transparent;
+                }
+                .add-tag-btn:hover {
+                    border-color: #999;
+                    color: #555;
                 }
                 
-                /* Compact Body */
-                .drawer-body-modern {
-                    padding: 0 !important;
-                    background: #fafafa;
-                    overflow-y: auto;
-                    flex: 1;
+                /* Section Headers */
+                .drawer-section {
+                    padding: 14px 16px;
+                    border-bottom: 1px solid #f0f0f0;
                 }
-                .drawer-stats-row {
-                    display: flex;
-                    gap: 12px;
-                    padding: 10px 16px;
-                    background: #fff;
-                    border-bottom: 1px solid #eee;
-                }
-                .stat-item {
+                .section-header {
                     display: flex;
                     align-items: center;
-                    gap: 4px;
-                    font-size: 11px;
-                    font-weight: 500;
+                    justify-content: space-between;
+                    margin-bottom: 12px;
+                }
+                .section-title {
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: #333;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                }
+                .section-count {
+                    font-weight: 400;
+                    color: #888;
+                }
+                .section-link {
+                    font-size: 12px;
                     color: #666;
+                    cursor: pointer;
+                    text-decoration: none;
                 }
-                .stat-item svg {
-                    color: #2e7d32;
-                    width: 14px;
-                    height: 14px;
-                }
-                .stat-divider {
-                    display: none;
+                .section-link:hover {
+                    color: #333;
                 }
                 
-                /* Compact Preview */
+                /* Content Preview */
                 .content-preview-card {
-                    margin: 12px;
-                    background: #fff;
-                    border-radius: 6px;
+                    background: #fafafa;
+                    border-radius: 8px;
                     border: 1px solid #eee;
+                    overflow: hidden;
                 }
                 .content-preview-header {
-                    padding: 8px 12px;
-                    background: #fafafa;
+                    padding: 10px 12px;
+                    background: #f5f5f5;
                     border-bottom: 1px solid #eee;
                 }
                 .preview-label {
-                    font-size: 10px;
+                    font-size: 11px;
                     font-weight: 600;
                     text-transform: uppercase;
-                    color: #999;
+                    color: #888;
                 }
                 .content-preview-body {
                     padding: 12px;
-                    max-height: 200px;
+                    max-height: 180px;
                     overflow-y: auto;
                 }
                 .preview-text {
@@ -792,99 +969,77 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                 }
                 .preview-text h1, .preview-text h2, .preview-text h3 {
                     font-size: 14px;
-                    color: #222;
-                    font-weight: 600;
-                    margin: 12px 0 6px;
+                    margin: 10px 0 6px;
                 }
                 .preview-text p {
                     margin-bottom: 8px;
                 }
-                .preview-text ul, .preview-text ol {
-                    padding-left: 16px;
-                    margin-bottom: 8px;
-                }
-                .preview-text li {
-                    margin-bottom: 2px;
-                }
-                .preview-text table {
-                    width: 100%;
-                    font-size: 11px;
-                    border-collapse: collapse;
-                }
-                .preview-text th, .preview-text td {
-                    border: 1px solid #eee;
-                    padding: 6px 8px;
-                }
-                .preview-text th {
-                    background: #fafafa;
-                }
-                .preview-text blockquote {
-                    border-left: 2px solid #2e7d32;
-                    padding-left: 10px;
-                    margin: 8px 0;
-                    color: #666;
-                    font-size: 12px;
-                }
                 .preview-loading {
-                    padding: 24px;
+                    padding: 20px;
                     text-align: center;
                     color: #999;
                     font-size: 12px;
                 }
                 
-                /* Compact Attachment */
+                /* File Attachments */
                 .attachment-card {
-                    margin: 0 12px 12px;
-                    padding: 10px;
-                    background: #fff4f4;
-                    border: 1px solid #ffcdd2;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    padding: 10px 12px;
+                    background: #fafafa;
+                    border: 1px solid #eee;
                     border-radius: 6px;
+                    margin-top: 8px;
+                    cursor: pointer;
                 }
                 .attachment-card:hover {
-                    background: #ffebee;
+                    background: #f5f5f5;
+                }
+                .attachment-icon {
+                    width: 32px;
+                    height: 32px;
+                    background: #e8f5e9;
+                    border-radius: 6px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #43A047;
                 }
                 .attachment-info {
                     display: flex;
                     align-items: center;
                     gap: 10px;
-                }
-                .attachment-icon {
-                    width: 32px;
-                    height: 32px;
-                    background: #ffebee;
-                    border-radius: 6px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: #d32f2f;
+                    flex: 1;
                 }
                 .attachment-text {
                     flex: 1;
                 }
                 .attachment-label {
                     font-size: 12px;
-                    font-weight: 600;
+                    font-weight: 500;
                     color: #333;
                 }
-                .attachment-action {
+                .attachment-size {
                     font-size: 11px;
-                    color: #d32f2f;
-                    cursor: pointer;
+                    color: #888;
                 }
-                .attachment-action:hover {
-                    text-decoration: underline;
+                .attachment-action {
+                    display: none;
                 }
                 
-                /* Compact Footer */
+                /* Footer */
                 .drawer-footer-modern {
-                    padding: 12px;
+                    padding: 12px 16px;
                     background: #fff;
                     border-top: 1px solid #eee;
+                    display: flex;
+                    gap: 8px;
                 }
                 .primary-action-btn {
-                    width: 100%;
-                    padding: 10px;
-                    background: #2e7d32;
+                    flex: 1;
+                    padding: 10px 16px;
+                    background: #1976D2;
                     border: none;
                     border-radius: 6px;
                     font-size: 13px;
@@ -895,20 +1050,18 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                     align-items: center;
                     justify-content: center;
                     gap: 6px;
-                    margin-bottom: 8px;
                 }
                 .primary-action-btn:hover {
-                    background: #1b5e20;
+                    background: #1565C0;
                 }
                 .secondary-actions-row {
                     display: flex;
                     gap: 6px;
                 }
                 .secondary-action-btn {
-                    flex: 1;
-                    padding: 8px;
+                    padding: 10px 14px;
                     background: #fff;
-                    border: 1px solid #ddd;
+                    border: 1px solid #e0e0e0;
                     border-radius: 6px;
                     font-size: 12px;
                     font-weight: 500;
@@ -921,14 +1074,9 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                 }
                 .secondary-action-btn:hover {
                     background: #f5f5f5;
+                    border-color: #ccc;
                 }
                 .secondary-action-dropdown {
-                    flex: 1;
-                }
-                .secondary-action-dropdown .dropdown-toggle {
-                    width: 100%;
-                }
-                .secondary-action-dropdown .dropdown-toggle::after {
                     display: none;
                 }
                 .modern-dropdown-menu {
@@ -936,30 +1084,28 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                     border-radius: 6px;
                     border: 1px solid #eee;
                     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                    min-width: 140px;
                 }
                 .modern-dropdown-menu .dropdown-item {
-                    display: flex;
-                    align-items: center;
-                    gap: 6px;
-                    padding: 6px 10px;
-                    border-radius: 4px;
+                    padding: 8px 12px;
                     font-size: 12px;
+                    border-radius: 4px;
                 }
                 .modern-dropdown-menu .dropdown-item:hover {
                     background: #f5f5f5;
                 }
-                .modern-dropdown-menu .dropdown-item svg {
-                    color: #666;
-                    width: 14px;
-                    height: 14px;
+                
+                /* Hide unused elements */
+                .drawer-stats-row, .stat-item, .stat-divider {
+                    display: none;
                 }
                 
                 /* Mobile */
                 @media (max-width: 480px) {
                     .library-drawer {
                         width: 100% !important;
-                        max-width: 100%;
+                    }
+                    .drawer-icon-toolbar {
+                        width: 44px;
                     }
                 }
                 `}
@@ -1048,7 +1194,7 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                 </div>
             </SimpleBar>
 
-            {/* Preview Drawer - Modern Design */}
+            {/* Preview Drawer - New Design */}
             <Offcanvas
                 show={showPreview}
                 onHide={() => setShowPreview(false)}
@@ -1056,126 +1202,144 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                 className="library-drawer"
                 backdrop={true}
             >
-                {/* Modern Header */}
-                <div className="drawer-header-modern">
-                    <div className="drawer-handle" />
-                    <button
-                        className="drawer-close-btn"
-                        onClick={() => setShowPreview(false)}
-                        aria-label="Close"
-                    >
-                        <X size={20} weight="bold" />
+                {/* Left Icon Toolbar */}
+                <div className="drawer-icon-toolbar">
+                    <button className="toolbar-icon active">
+                        <ChatCircle size={18} weight="bold" />
                     </button>
-
-                    {/* Category Badge */}
-                    <div className="drawer-category-badge">
-                        <span className="category-dot" />
-                        <span>{getCategoryPath(selectedItem?.category_id).join(' › ') || 'Library'}</span>
-                    </div>
-
-                    {/* Title */}
-                    <h2 className="drawer-title">{selectedItem?.name}</h2>
-
-                    {/* Type Tag */}
-                    <div className="drawer-type-tag">
-                        <FileText size={14} weight="bold" />
-                        <span>{selectedItem?.type || 'Document'}</span>
-                    </div>
+                    <button className="toolbar-icon">
+                        <Users size={18} />
+                    </button>
+                    <button className="toolbar-icon">
+                        <Paperclip size={18} />
+                    </button>
+                    <button className="toolbar-icon has-badge">
+                        <BookmarkSimple size={18} />
+                        <span className="badge-dot" />
+                    </button>
+                    <button className="toolbar-icon">
+                        <Stack size={18} />
+                    </button>
+                    <button className="toolbar-icon">
+                        <NotePencil size={18} />
+                    </button>
+                    <button className="toolbar-icon">
+                        <ArrowsOutSimple size={18} />
+                    </button>
                 </div>
 
-                {/* Content Body */}
-                <Offcanvas.Body className="drawer-body-modern">
-                    {/* Quick Stats */}
-                    <div className="drawer-stats-row">
-                        <div className="stat-item">
-                            <Eye size={16} />
-                            <span>Preview</span>
-                        </div>
-                        <div className="stat-divider" />
-                        <div className="stat-item">
-                            <FileText size={16} />
-                            <span>{selectedItem?.type}</span>
-                        </div>
+                {/* Main Content */}
+                <div className="drawer-main-content">
+                    {/* Header */}
+                    <div className="drawer-header-modern">
+                        <span className="drawer-id-badge">DOC-{selectedItem?.id?.slice(-5)?.toUpperCase() || '00000'}</span>
+                        <span className="drawer-header-title">{selectedItem?.name}</span>
+                        <button className="drawer-status-dropdown">
+                            {selectedItem?.type || 'Document'}
+                            <CaretDown size={12} />
+                        </button>
+                        <button
+                            className="drawer-close-btn"
+                            onClick={() => setShowPreview(false)}
+                            aria-label="Close"
+                        >
+                            <X size={16} />
+                        </button>
                     </div>
 
-                    {/* Content Preview Card */}
-                    <div className="content-preview-card">
-                        <div className="content-preview-header">
-                            <span className="preview-label">Document Preview</span>
+                    {/* Content Body */}
+                    <Offcanvas.Body className="drawer-body-modern">
+                        {/* Document Info Section */}
+                        <div className="drawer-doc-section">
+                            <div className="drawer-doc-header">
+                                <div className="drawer-doc-thumb">
+                                    <FileText size={32} weight="thin" />
+                                </div>
+                                <div className="drawer-doc-info">
+                                    <div className="drawer-category-badge">
+                                        {getCategoryPath(selectedItem?.category_id).join(' › ') || 'Library'}
+                                    </div>
+                                    <h2 className="drawer-title">{selectedItem?.name}</h2>
+                                </div>
+                            </div>
+
+                            {/* Metadata Grid */}
+                            <div className="drawer-metadata">
+                                <span className="meta-label">Type</span>
+                                <span className="meta-value">
+                                    <span className="drawer-type-tag">{selectedItem?.type || 'Document'}</span>
+                                </span>
+
+                                <span className="meta-label">Created</span>
+                                <span className="meta-value">
+                                    {selectedItem?.created_at ? new Date(selectedItem.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+                                </span>
+
+                                <span className="meta-label">Tags</span>
+                                <span className="meta-value">
+                                    <span className="tag-chip">{selectedItem?.type}</span>
+                                    <button className="add-tag-btn">
+                                        <Plus size={10} /> Add
+                                    </button>
+                                </span>
+                            </div>
                         </div>
-                        <div className="content-preview-body">
-                            {selectedItem?.content ? (
-                                <div
-                                    className="preview-text"
-                                    dangerouslySetInnerHTML={{ __html: selectedItem?.content }}
-                                />
-                            ) : (
-                                <div className="preview-loading">
-                                    <Spinner animation="border" variant="primary" size="sm" />
-                                    <span>Loading content...</span>
+
+                        {/* Content Preview Section */}
+                        <div className="drawer-section">
+                            <div className="section-header">
+                                <span className="section-title">
+                                    Preview
+                                </span>
+                                <span className="section-link">Full View</span>
+                            </div>
+                            <div className="content-preview-card">
+                                <div className="content-preview-body">
+                                    {selectedItem?.content ? (
+                                        <div
+                                            className="preview-text"
+                                            dangerouslySetInnerHTML={{ __html: selectedItem?.content }}
+                                        />
+                                    ) : (
+                                        <div className="preview-loading">
+                                            <Spinner animation="border" variant="primary" size="sm" />
+                                            <span>Loading...</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Attachments */}
+                            {selectedItem?.file_path && (
+                                <div className="attachment-card" onClick={() => handleFilePreview(selectedItem.file_path, selectedItem.name)}>
+                                    <div className="attachment-icon">
+                                        <Paperclip size={16} />
+                                    </div>
+                                    <div className="attachment-text">
+                                        <span className="attachment-label">Original Document</span>
+                                        <span className="attachment-size">View file →</span>
+                                    </div>
                                 </div>
                             )}
                         </div>
-                    </div>
+                    </Offcanvas.Body>
 
-                    {/* Original Attachment Card */}
-                    {selectedItem?.file_path && (
-                        <div className="attachment-card">
-                            <div className="attachment-info">
-                                <div className="attachment-icon">
-                                    <Paperclip size={18} weight="bold" />
-                                </div>
-                                <div className="attachment-text">
-                                    <span className="attachment-label">Attached File</span>
-                                    <span className="attachment-action" onClick={() => handleFilePreview(selectedItem.file_path, selectedItem.name)}>
-                                        View Original →
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </Offcanvas.Body>
-
-                {/* Modern Footer */}
-                <div className="drawer-footer-modern">
-                    {/* Primary Action */}
-                    {(selectedItem?.type === 'Templates' || selectedItem?.file_path) && (
-                        <button
-                            className="primary-action-btn"
-                            onClick={() => handleUseTemplate()}
-                        >
-                            <MagicWand size={20} weight="bold" />
-                            <span>Use This Template</span>
-                        </button>
-                    )}
-
-                    {/* Secondary Actions Row */}
-                    <div className="secondary-actions-row">
+                    {/* Footer */}
+                    <div className="drawer-footer-modern">
+                        {(selectedItem?.type === 'Templates' || selectedItem?.file_path) && (
+                            <button
+                                className="primary-action-btn"
+                                onClick={() => handleUseTemplate()}
+                            >
+                                <MagicWand size={16} />
+                                <span>Use Template</span>
+                            </button>
+                        )}
                         <button className="secondary-action-btn" onClick={handleCopy}>
-                            <Copy size={18} weight="bold" />
-                            <span>Copy</span>
+                            <Copy size={16} />
                         </button>
-
-                        <Dropdown className="secondary-action-dropdown">
-                            <Dropdown.Toggle as="button" className="secondary-action-btn">
-                                <ShareNetwork size={18} weight="bold" />
-                                <span>Share</span>
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu className="modern-dropdown-menu">
-                                <Dropdown.Item onClick={() => handleShareEmail('doc')}>
-                                    <FileText size={16} />
-                                    <span>Email as Document</span>
-                                </Dropdown.Item>
-                                <Dropdown.Item onClick={() => handleShareEmail('pdf')}>
-                                    <FilePdf size={16} />
-                                    <span>Email as PDF</span>
-                                </Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown>
-
                         <button className="secondary-action-btn" onClick={handleDownload}>
-                            <DownloadSimple size={18} weight="bold" />
-                            <span>Download</span>
+                            <DownloadSimple size={16} />
                         </button>
                     </div>
                 </div>
