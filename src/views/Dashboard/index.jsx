@@ -76,8 +76,7 @@ const Dashboard = ({ toggleCollapsedNav }) => {
     const styles = {
         container: {
             padding: '24px',
-            maxWidth: '1200px',
-            margin: '0 auto',
+            width: '100%',
             fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
         },
         header: {
@@ -96,7 +95,7 @@ const Dashboard = ({ toggleCollapsedNav }) => {
         },
         statsGrid: {
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gridTemplateColumns: 'repeat(3, 1fr)',
             gap: '16px',
             marginBottom: '32px'
         },
@@ -130,7 +129,7 @@ const Dashboard = ({ toggleCollapsedNav }) => {
         },
         actionsGrid: {
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+            gridTemplateColumns: 'repeat(4, 1fr)',
             gap: '12px',
             marginBottom: '32px'
         },
@@ -163,7 +162,7 @@ const Dashboard = ({ toggleCollapsedNav }) => {
         },
         contentGrid: {
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gridTemplateColumns: 'repeat(2, 1fr)',
             gap: '24px'
         },
         card: {
