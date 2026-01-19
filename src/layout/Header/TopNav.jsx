@@ -234,10 +234,10 @@ const TopNav = ({ navCollapsed, toggleCollapsedNav }) => {
                                 <span className="ai-text fw-bold text-primary fs-7 px-1 transition-all">SISgate AI</span>
                             </Button>
                         </Nav.Item>
-                        <Nav.Item className='ms-2'>
+                        <Nav.Item className='ms-2' style={{ display: 'none' }}>
                             <ThemeSwitcher />
                         </Nav.Item>
-                        <Nav.Item>
+                        <Nav.Item style={{ display: 'none' }}>
                             <Button variant="flush-dark" as={Link} to="/apps/email" className="btn-icon btn-rounded flush-soft-hover">
                                 <span className="icon">
                                     <span className=" position-relative">
@@ -247,7 +247,7 @@ const TopNav = ({ navCollapsed, toggleCollapsedNav }) => {
                                 </span>
                             </Button>
                         </Nav.Item>
-                        <Nav.Item>
+                        <Nav.Item style={{ display: 'none' }}>
                             <Dropdown className="dropdown-notifications">
                                 <Dropdown.Toggle variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover no-caret">
                                     <span className="icon">
@@ -386,7 +386,7 @@ const TopNav = ({ navCollapsed, toggleCollapsedNav }) => {
                                 </Dropdown.Menu>
                             </Dropdown>
                         </Nav.Item>
-                        <Nav.Item>
+                        <Nav.Item style={{ display: 'none' }}>
                             <Dropdown className="ps-2">
                                 <Dropdown.Toggle as={Link} to="#" className="no-caret">
                                     <div className="avatar avatar-rounded avatar-xs">
