@@ -649,14 +649,14 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                 }
                 
                 /* ========================================
-                   CLEAN PROFESSIONAL DRAWER
+                   COMPACT MINIMALIST DRAWER - 320px
                    ======================================== */
                 .library-drawer {
-                    width: 480px !important;
-                    max-width: 100%;
+                    width: 320px !important;
+                    max-width: 90vw;
                     border: none !important;
-                    box-shadow: -4px 0 24px rgba(0,0,0,0.08);
-                    background: #ffffff;
+                    box-shadow: -2px 0 12px rgba(0,0,0,0.1);
+                    background: #fff;
                 }
                 .library-drawer.offcanvas-end {
                     transform: translateX(100%);
@@ -666,79 +666,72 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                 }
                 .library-drawer .offcanvas-body {
                     padding: 0 !important;
+                    display: flex;
+                    flex-direction: column;
+                    height: 100%;
                 }
                 
-                /* Header */
+                /* Compact Header */
                 .drawer-header-modern {
-                    padding: 20px 24px;
-                    background: #ffffff;
-                    border-bottom: 1px solid #e5e7eb;
-                    position: relative;
+                    padding: 16px;
+                    background: #fff;
+                    border-bottom: 1px solid #eee;
                 }
                 .drawer-handle {
                     display: none;
                 }
                 .drawer-close-btn {
                     position: absolute;
-                    top: 16px;
-                    right: 16px;
-                    width: 32px;
-                    height: 32px;
-                    border-radius: 8px;
-                    background: #f3f4f6;
+                    top: 12px;
+                    right: 12px;
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 6px;
+                    background: #f5f5f5;
                     border: none;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     cursor: pointer;
-                    transition: all 0.2s ease;
-                    color: #6b7280;
+                    color: #888;
                 }
                 .drawer-close-btn:hover {
-                    background: #fee2e2;
-                    color: #dc2626;
+                    background: #eee;
+                    color: #333;
                 }
                 .drawer-category-badge {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 6px;
-                    padding: 4px 12px;
-                    background: #f0fdf4;
-                    border-radius: 6px;
-                    font-size: 11px;
+                    display: inline-block;
+                    padding: 3px 8px;
+                    background: #e8f5e9;
+                    border-radius: 4px;
+                    font-size: 10px;
                     font-weight: 600;
                     text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                    color: #16a34a;
-                    margin-bottom: 12px;
+                    color: #2e7d32;
+                    margin-bottom: 8px;
                 }
                 .category-dot {
-                    width: 6px;
-                    height: 6px;
-                    background: #16a34a;
-                    border-radius: 50%;
+                    display: none;
                 }
                 .drawer-title {
-                    font-size: 18px;
+                    font-size: 15px;
                     font-weight: 600;
-                    color: #1a1a2e;
-                    margin: 0 0 8px 0;
+                    color: #222;
+                    margin: 0 0 6px 0;
                     line-height: 1.3;
-                    padding-right: 40px;
+                    padding-right: 32px;
                 }
                 .drawer-type-tag {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 6px;
-                    padding: 4px 10px;
-                    background: #f3f4f6;
-                    border-radius: 6px;
-                    font-size: 12px;
+                    display: inline-block;
+                    padding: 2px 8px;
+                    background: #f0f0f0;
+                    border-radius: 4px;
+                    font-size: 11px;
                     font-weight: 500;
-                    color: #6b7280;
+                    color: #666;
                 }
                 
-                /* Body */
+                /* Compact Body */
                 .drawer-body-modern {
                     padding: 0 !important;
                     background: #fafafa;
@@ -747,205 +740,187 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                 }
                 .drawer-stats-row {
                     display: flex;
-                    align-items: center;
-                    gap: 0;
-                    padding: 12px 24px;
-                    background: #ffffff;
-                    border-bottom: 1px solid #e5e7eb;
+                    gap: 12px;
+                    padding: 10px 16px;
+                    background: #fff;
+                    border-bottom: 1px solid #eee;
                 }
                 .stat-item {
                     display: flex;
                     align-items: center;
-                    gap: 6px;
-                    font-size: 13px;
+                    gap: 4px;
+                    font-size: 11px;
                     font-weight: 500;
-                    color: #6b7280;
-                    padding: 0 16px;
-                }
-                .stat-item:first-child {
-                    padding-left: 0;
+                    color: #666;
                 }
                 .stat-item svg {
-                    color: #16a34a;
+                    color: #2e7d32;
+                    width: 14px;
+                    height: 14px;
                 }
                 .stat-divider {
-                    width: 1px;
-                    height: 16px;
-                    background: #e5e7eb;
+                    display: none;
                 }
                 
-                /* Content Preview Card */
+                /* Compact Preview */
                 .content-preview-card {
-                    margin: 16px 24px;
-                    background: #ffffff;
-                    border-radius: 8px;
-                    border: 1px solid #e5e7eb;
-                    overflow: hidden;
+                    margin: 12px;
+                    background: #fff;
+                    border-radius: 6px;
+                    border: 1px solid #eee;
                 }
                 .content-preview-header {
-                    padding: 12px 16px;
+                    padding: 8px 12px;
                     background: #fafafa;
-                    border-bottom: 1px solid #e5e7eb;
+                    border-bottom: 1px solid #eee;
                 }
                 .preview-label {
-                    font-size: 11px;
+                    font-size: 10px;
                     font-weight: 600;
                     text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                    color: #9ca3af;
+                    color: #999;
                 }
                 .content-preview-body {
-                    padding: 16px;
-                    max-height: 300px;
+                    padding: 12px;
+                    max-height: 200px;
                     overflow-y: auto;
                 }
                 .preview-text {
-                    font-size: 14px;
-                    line-height: 1.7;
-                    color: #374151;
+                    font-size: 13px;
+                    line-height: 1.6;
+                    color: #444;
                 }
                 .preview-text h1, .preview-text h2, .preview-text h3 {
-                    color: #1a1a2e;
+                    font-size: 14px;
+                    color: #222;
                     font-weight: 600;
-                    margin-top: 16px;
-                    margin-bottom: 8px;
+                    margin: 12px 0 6px;
                 }
                 .preview-text p {
-                    margin-bottom: 12px;
+                    margin-bottom: 8px;
                 }
                 .preview-text ul, .preview-text ol {
-                    padding-left: 20px;
-                    margin-bottom: 12px;
+                    padding-left: 16px;
+                    margin-bottom: 8px;
                 }
                 .preview-text li {
-                    margin-bottom: 4px;
+                    margin-bottom: 2px;
                 }
                 .preview-text table {
                     width: 100%;
+                    font-size: 11px;
                     border-collapse: collapse;
-                    margin: 12px 0;
-                    font-size: 13px;
                 }
                 .preview-text th, .preview-text td {
-                    border: 1px solid #e5e7eb;
-                    padding: 8px 12px;
-                    text-align: left;
+                    border: 1px solid #eee;
+                    padding: 6px 8px;
                 }
                 .preview-text th {
                     background: #fafafa;
-                    font-weight: 600;
                 }
                 .preview-text blockquote {
-                    border-left: 3px solid #16a34a;
-                    padding-left: 12px;
-                    margin: 12px 0;
-                    color: #6b7280;
-                    font-style: italic;
+                    border-left: 2px solid #2e7d32;
+                    padding-left: 10px;
+                    margin: 8px 0;
+                    color: #666;
+                    font-size: 12px;
                 }
                 .preview-loading {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 8px;
-                    padding: 40px;
-                    color: #9ca3af;
+                    padding: 24px;
+                    text-align: center;
+                    color: #999;
+                    font-size: 12px;
                 }
                 
-                /* Attachment Card */
+                /* Compact Attachment */
                 .attachment-card {
-                    margin: 0 24px 16px;
-                    padding: 12px 16px;
-                    background: #fef2f2;
-                    border: 1px solid #fecaca;
-                    border-radius: 8px;
+                    margin: 0 12px 12px;
+                    padding: 10px;
+                    background: #fff4f4;
+                    border: 1px solid #ffcdd2;
+                    border-radius: 6px;
                 }
                 .attachment-card:hover {
-                    background: #fee2e2;
+                    background: #ffebee;
                 }
                 .attachment-info {
                     display: flex;
                     align-items: center;
-                    gap: 12px;
+                    gap: 10px;
                 }
                 .attachment-icon {
-                    width: 36px;
-                    height: 36px;
+                    width: 32px;
+                    height: 32px;
+                    background: #ffebee;
+                    border-radius: 6px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    background: #fee2e2;
-                    border-radius: 8px;
-                    color: #dc2626;
+                    color: #d32f2f;
                 }
                 .attachment-text {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 2px;
+                    flex: 1;
                 }
                 .attachment-label {
-                    font-size: 13px;
+                    font-size: 12px;
                     font-weight: 600;
-                    color: #1a1a2e;
+                    color: #333;
                 }
                 .attachment-action {
-                    font-size: 12px;
-                    font-weight: 500;
-                    color: #dc2626;
+                    font-size: 11px;
+                    color: #d32f2f;
                     cursor: pointer;
                 }
                 .attachment-action:hover {
                     text-decoration: underline;
                 }
                 
-                /* Footer */
+                /* Compact Footer */
                 .drawer-footer-modern {
-                    padding: 16px 24px;
-                    background: #ffffff;
-                    border-top: 1px solid #e5e7eb;
+                    padding: 12px;
+                    background: #fff;
+                    border-top: 1px solid #eee;
                 }
                 .primary-action-btn {
                     width: 100%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 8px;
-                    padding: 12px 20px;
-                    background: #16a34a;
+                    padding: 10px;
+                    background: #2e7d32;
                     border: none;
-                    border-radius: 8px;
-                    font-size: 14px;
+                    border-radius: 6px;
+                    font-size: 13px;
                     font-weight: 600;
-                    color: white;
+                    color: #fff;
                     cursor: pointer;
-                    transition: all 0.2s ease;
-                    margin-bottom: 12px;
-                }
-                .primary-action-btn:hover {
-                    background: #15803d;
-                }
-                .secondary-actions-row {
-                    display: grid;
-                    grid-template-columns: 1fr auto 1fr;
-                    gap: 8px;
-                }
-                .secondary-action-btn {
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     gap: 6px;
-                    padding: 10px 16px;
-                    background: #ffffff;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 8px;
-                    font-size: 13px;
+                    margin-bottom: 8px;
+                }
+                .primary-action-btn:hover {
+                    background: #1b5e20;
+                }
+                .secondary-actions-row {
+                    display: flex;
+                    gap: 6px;
+                }
+                .secondary-action-btn {
+                    flex: 1;
+                    padding: 8px;
+                    background: #fff;
+                    border: 1px solid #ddd;
+                    border-radius: 6px;
+                    font-size: 12px;
                     font-weight: 500;
-                    color: #374151;
+                    color: #555;
                     cursor: pointer;
-                    transition: all 0.2s ease;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 4px;
                 }
                 .secondary-action-btn:hover {
-                    background: #f3f4f6;
-                    border-color: #d1d5db;
+                    background: #f5f5f5;
                 }
                 .secondary-action-dropdown {
                     flex: 1;
@@ -957,56 +932,34 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                     display: none;
                 }
                 .modern-dropdown-menu {
-                    padding: 6px;
-                    border-radius: 8px;
-                    border: 1px solid #e5e7eb;
-                    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+                    padding: 4px;
+                    border-radius: 6px;
+                    border: 1px solid #eee;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                    min-width: 140px;
                 }
                 .modern-dropdown-menu .dropdown-item {
                     display: flex;
                     align-items: center;
-                    gap: 8px;
-                    padding: 8px 12px;
-                    border-radius: 6px;
-                    font-size: 13px;
-                    font-weight: 500;
-                    transition: all 0.2s ease;
+                    gap: 6px;
+                    padding: 6px 10px;
+                    border-radius: 4px;
+                    font-size: 12px;
                 }
                 .modern-dropdown-menu .dropdown-item:hover {
-                    background: #f3f4f6;
+                    background: #f5f5f5;
                 }
                 .modern-dropdown-menu .dropdown-item svg {
-                    color: #6b7280;
+                    color: #666;
+                    width: 14px;
+                    height: 14px;
                 }
                 
-                /* Responsive */
-                @media (max-width: 768px) {
+                /* Mobile */
+                @media (max-width: 480px) {
                     .library-drawer {
                         width: 100% !important;
-                    }
-                    .drawer-header-modern {
-                        padding: 16px 20px;
-                    }
-                    .drawer-title {
-                        font-size: 16px;
-                    }
-                    .content-preview-card {
-                        margin: 12px 20px;
-                    }
-                    .drawer-stats-row {
-                        padding: 10px 20px;
-                    }
-                    .attachment-card {
-                        margin: 0 20px 12px;
-                    }
-                    .drawer-footer-modern {
-                        padding: 12px 20px;
-                    }
-                    .secondary-actions-row {
-                        grid-template-columns: 1fr 1fr;
-                    }
-                    .secondary-action-dropdown {
-                        grid-column: span 2;
+                        max-width: 100%;
                     }
                 }
                 `}
