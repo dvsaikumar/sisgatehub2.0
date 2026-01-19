@@ -653,7 +653,7 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                    NEW DRAWER DESIGN - MATCHING REFERENCE
                    ======================================== */
                 .library-drawer {
-                    width: 420px !important;
+                    width: 50% !important;
                     max-width: 95vw;
                     border: none !important;
                     box-shadow: -4px 0 20px rgba(0,0,0,0.12);
