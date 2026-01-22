@@ -27,107 +27,107 @@ const CalendarSidebar = ({ showSidebar, toggleSidebar, createNewEvent, refreshEv
     };
     return (
         <>
-            <nav className="calendarapp-sidebar">
-                <SimpleBar className="nicescroll-bar">
-                    <div className="menu-content-wrap">
-                        <Dropdown className="w-100">
-                            <Dropdown.Toggle className="btn-gradient-primary btn-animated w-100 d-flex align-items-center justify-content-center gap-2">
-                                <PlusPhos weight="bold" size={18} color="#fff" />
-                                <span>Create</span>
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                <Dropdown.Item onClick={createNewEvent} className="d-flex align-items-center gap-2">
-                                    <Calendar size={18} />
-                                    <span>Create an Event</span>
-                                </Dropdown.Item>
-                                <Dropdown.Item onClick={() => setReminder(!reminder)} className="d-flex align-items-center gap-2">
-                                    <Bell size={18} />
-                                    <span>Set a Reminder</span>
-                                </Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown>
-                        <div className="text-center mt-4">
-                            <div id="inline_calendar" className="d-inline-block">
-                                <DatePicker
-                                    selected={startDate}
-                                    onChange={onChange}
-                                    dateFormatCalendar={"MMM yyyy"}
-                                    selectsRange
-                                    inline
-                                />
-                            </div>
-                        </div>
-                        <div className="separator separator-light" />
-                        <div className="title-sm text-primary">Upcoming Events</div>
-                        <div className="upcoming-event-wrap">
-                            <Nav as="ul" className="nav-light navbar-nav flex-column">
-                                {upcomingEvents.length === 0 && (
-                                    <Nav.Item as="li">
-                                        <div className="text-muted fs-7 ms-2">No upcoming events.</div>
-                                    </Nav.Item>
-                                )}
-                                {upcomingEvents.map((event) => (
-                                    <Nav.Item as="li" key={event.id}>
-                                        <Nav.Link>
-                                            <div className="d-flex align-items-center">
-                                                <Badge bg={event.category === 'Important' ? 'danger' : 'primary'} className="badge-indicator badge-indicator-lg me-2" style={{ backgroundColor: event.background_color }} />
-                                                <span className="event-time">
-                                                    {dayjs(event.start_date).calendar(null, {
-                                                        sameDay: '[Today], h:mm A',
-                                                        nextDay: '[Tomorrow], h:mm A',
-                                                        nextWeek: 'MMM DD, h:mm A',
-                                                        lastDay: '[Yesterday], h:mm A',
-                                                        lastWeek: '[Last] dddd, h:mm A',
-                                                        sameElse: 'MMM DD, h:mm A'
-                                                    })}
-                                                </span>
-                                            </div>
-                                            <div className="event-name">{event.title}</div>
-                                        </Nav.Link>
-                                    </Nav.Item>
-                                ))}
-                            </Nav>
-                        </div>
-                        <div className="separator separator-light" />
-                        <div className="d-flex align-items-center justify-content-between mb-2">
-                            <div className="title-sm text-primary mb-0">Categories</div>
-                            <Button size="xs" variant="light" className="btn-icon btn-rounded" onClick={() => setAddCategory(!addCategory)} >
-                                <HkTooltip id="tt1" placement="top" title="Add Category" >
-                                    <span className="feather-icon">
-                                        <Plus />
-                                    </span>
-                                </HkTooltip>
-                            </Button>
-                        </div>
-                        <div className="categories-wrap">
-                            <Form.Check
-                                id="customChecksc1"
-                                type="checkbox"
-                                label="Meetings"
-                                defaultChecked
-                            />
-                            <Form.Check
-                                id="customChecksc2"
-                                type="checkbox"
-                                label="Flights"
-                                defaultChecked
-                            />
-                            <Form.Check
-                                id="customChecksc3"
-                                type="checkbox"
-                                label="Birthday"
-                                defaultChecked
-                            />
-                            <Form.Check
-                                id="customChecksc4"
-                                type="checkbox"
-                                label="Conferences"
+            <nav className="calendarapp-sidebar" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                {/* Main Content - No Scroll */}
+                <div className="menu-content-wrap" style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                    <Dropdown className="w-100">
+                        <Dropdown.Toggle className="btn-gradient-primary btn-animated w-100 d-flex align-items-center justify-content-center gap-2">
+                            <PlusPhos weight="bold" size={18} color="#fff" />
+                            <span>Create</span>
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                            <Dropdown.Item onClick={createNewEvent} className="d-flex align-items-center gap-2">
+                                <Calendar size={18} />
+                                <span>Create an Event</span>
+                            </Dropdown.Item>
+                            <Dropdown.Item onClick={() => setReminder(!reminder)} className="d-flex align-items-center gap-2">
+                                <Bell size={18} />
+                                <span>Set a Reminder</span>
+                            </Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                    <div className="text-center mt-4">
+                        <div id="inline_calendar" className="d-inline-block">
+                            <DatePicker
+                                selected={startDate}
+                                onChange={onChange}
+                                dateFormatCalendar={"MMM yyyy"}
+                                selectsRange
+                                inline
                             />
                         </div>
                     </div>
-                </SimpleBar>
-                {/*Sidebar Fixnav*/}
-                <div className="calendarapp-fixednav">
+                    <div className="separator separator-light" />
+                    <div className="title-sm text-primary">Upcoming Events</div>
+                    <div className="upcoming-event-wrap">
+                        <Nav as="ul" className="nav-light navbar-nav flex-column">
+                            {upcomingEvents.length === 0 && (
+                                <Nav.Item as="li">
+                                    <div className="text-muted fs-7 ms-2">No upcoming events.</div>
+                                </Nav.Item>
+                            )}
+                            {upcomingEvents.map((event) => (
+                                <Nav.Item as="li" key={event.id}>
+                                    <Nav.Link>
+                                        <div className="d-flex align-items-center">
+                                            <Badge bg={event.category === 'Important' ? 'danger' : 'primary'} className="badge-indicator badge-indicator-lg me-2" style={{ backgroundColor: event.background_color }} />
+                                            <span className="event-time">
+                                                {dayjs(event.start_date).calendar(null, {
+                                                    sameDay: '[Today], h:mm A',
+                                                    nextDay: '[Tomorrow], h:mm A',
+                                                    nextWeek: 'MMM DD, h:mm A',
+                                                    lastDay: '[Yesterday], h:mm A',
+                                                    lastWeek: '[Last] dddd, h:mm A',
+                                                    sameElse: 'MMM DD, h:mm A'
+                                                })}
+                                            </span>
+                                        </div>
+                                        <div className="event-name">{event.title}</div>
+                                    </Nav.Link>
+                                </Nav.Item>
+                            ))}
+                        </Nav>
+                    </div>
+                    <div className="separator separator-light" />
+                    <div className="d-flex align-items-center justify-content-between mb-2">
+                        <div className="title-sm text-primary mb-0">Categories</div>
+                        <Button size="xs" variant="light" className="btn-icon btn-rounded" onClick={() => setAddCategory(!addCategory)} >
+                            <HkTooltip id="tt1" placement="top" title="Add Category" >
+                                <span className="feather-icon">
+                                    <Plus />
+                                </span>
+                            </HkTooltip>
+                        </Button>
+                    </div>
+                    <div className="categories-wrap">
+                        <Form.Check
+                            id="customChecksc1"
+                            type="checkbox"
+                            label="Meetings"
+                            defaultChecked
+                        />
+                        <Form.Check
+                            id="customChecksc2"
+                            type="checkbox"
+                            label="Flights"
+                            defaultChecked
+                        />
+                        <Form.Check
+                            id="customChecksc3"
+                            type="checkbox"
+                            label="Birthday"
+                            defaultChecked
+                        />
+                        <Form.Check
+                            id="customChecksc4"
+                            type="checkbox"
+                            label="Conferences"
+                        />
+                    </div>
+                </div>
+
+                {/*Sidebar Fixed Footer - Icons above fixed footer */}
+                <div className="calendarapp-fixednav" style={{ marginTop: 'auto', paddingBottom: '125px' }}>
                     <div className="hk-toolbar">
                         <Nav className="nav-light">
                             <Nav.Item className="nav-link">

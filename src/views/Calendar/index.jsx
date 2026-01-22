@@ -22,6 +22,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ChevronDown, ChevronUp } from 'react-feather';
 import { supabase } from '../../configs/supabaseClient';
 import useReminderPoller from './useReminderPoller';
+import '../../styles/css/calendar-fixes.css';
 
 const Calendar = ({ topNavCollapsed, toggleTopNav }) => {
 

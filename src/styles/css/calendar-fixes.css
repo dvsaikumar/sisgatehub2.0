@@ -1,0 +1,35 @@
+/* Reminders Page - Independent scrolling for sidebar and calendar */
+
+/* Remove bottom padding from pg-wrapper on reminders page */
+[data-footer="simple"].hk-wrapper .hk-pg-wrapper,
+.footer-simple-example.hk-wrapper .hk-pg-wrapper {
+    padding-bottom: 0 !important;
+}
+
+/* Ensure wrapper doesn't create extra height */
+.hk-pg-wrapper {
+    overflow: hidden !important;
+    height: 100vh;
+}
+
+/* Calendar container layout */
+.calendarapp-wrap {
+    display: flex;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Sidebar - independent scrolling */
+.calendarapp-sidebar {
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    height: 100%;
+}
+
+/* Calendar content - independent scrolling */
+.calendarapp-content {
+    flex: 1;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    height: 100%;
+}

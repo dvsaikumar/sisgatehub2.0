@@ -85,4 +85,28 @@
 			margin-left: auto;
 			margin-right: auto;
 		}
-  } */
+  }
+
+/* Remove scrolling from calendar view */
+.calendarapp-content {
+  overflow: hidden !important;
+}
+
+.fc-scroller,
+.fc-scroller-liquid-absolute {
+  overflow: hidden !important;
+}
+
+.fc-daygrid-body,
+.fc-scrollgrid-section-body {
+  overflow: hidden !important;
+}
+
+/* Ensure calendar fits without scroll */
+.fc {
+  overflow: hidden !important;
+}
+
+.fc-view-harness {
+  overflow: hidden !important;
+}
