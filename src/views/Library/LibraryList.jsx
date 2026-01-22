@@ -653,7 +653,7 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                    POLISHED DRAWER DESIGN
                    ======================================== */
                 .library-drawer {
-                    width: 55% !important;
+                    width: 60% !important;
                     min-width: 450px;
                     max-width: 800px;
                     border: none !important;
@@ -744,7 +744,7 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                 
                 /* Header */
                 .drawer-header-modern {
-                    padding: 12px 16px;
+                    padding: 10px 16px;
                     background: #fff;
                     border-bottom: 1px solid #f0f0f0;
                     display: flex;
@@ -818,20 +818,20 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                 
                 /* Document Info Section */
                 .drawer-doc-section {
-                    padding: 14px 16px;
+                    padding: 12px 16px;
                     background: #fff;
                     border-bottom: 1px solid #f0f0f0;
                 }
                 .drawer-doc-header {
                     display: flex;
-                    gap: 12px;
-                    margin-bottom: 12px;
+                    gap: 14px;
+                    margin-bottom: 14px;
                 }
                 .drawer-doc-thumb {
-                    width: 64px;
-                    height: 64px;
+                    width: 70px;
+                    height: 70px;
                     background: linear-gradient(135deg, #f8f9fa 0%, #e8e8e8 100%);
-                    border-radius: 10px;
+                    border-radius: 12px;
                     border: 1px solid #e0e0e0;
                     display: flex;
                     align-items: center;
@@ -844,19 +844,25 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                     min-width: 0;
                     display: flex;
                     flex-direction: column;
-                    justify-content: center;
+                    gap: 8px;
                 }
                 .drawer-category-badge {
-                    font-size: 11px;
-                    color: #888;
-                    margin-bottom: 6px;
-                    font-weight: 500;
+                    font-size: 13px;
+                    color: #555;
+                    font-weight: 600;
+                    line-height: 1.4;
+                    letter-spacing: 0.3px;
+                    padding: 7px 14px;
+                    background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+                    border-radius: 8px;
+                    border: 1px solid #d0dae6;
+                    width: fit-content;
                 }
                 .category-dot {
                     display: none;
                 }
                 .drawer-title {
-                    font-size: 16px;
+                    font-size: 20px;
                     font-weight: 700;
                     color: #1a1a1a;
                     margin: 0;
@@ -931,15 +937,15 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                 
                 /* Section Headers */
                 .drawer-section {
-                    padding: 14px 16px;
+                    padding: 10px 16px 14px;
                     background: #fff;
-                    margin-top: 4px;
+                    margin-top: 0;
                 }
                 .section-header {
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
-                    margin-bottom: 10px;
+                    margin-bottom: 8px;
                 }
                 .section-title {
                     font-size: 14px;
@@ -978,8 +984,8 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                     display: none;
                 }
                 .content-preview-body {
-                    padding: 12px;
-                    max-height: 320px;
+                    padding: 14px;
+                    max-height: 400px;
                     overflow-y: auto;
                 }
                 .preview-text {
@@ -1014,61 +1020,70 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                     gap: 10px;
                 }
                 
-                /* File Attachments */
+                /* File Attachments - Redesigned */
                 .attachment-card {
                     display: flex;
                     align-items: center;
-                    gap: 12px;
-                    padding: 12px 14px;
-                    background: #fff;
-                    border: 1px solid #e8e8e8;
-                    border-radius: 10px;
+                    gap: 16px;
+                    padding: 14px 18px;
+                    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+                    border: 1px solid #e5e7eb;
+                    border-radius: 12px;
                     margin-top: 12px;
                     cursor: pointer;
-                    transition: all 0.2s ease;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
                 }
                 .attachment-card:hover {
-                    background: #f8f9fa;
-                    border-color: #1976D2;
-                    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.1);
+                    background: #fff;
+                    border-color: #007D88;
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 24px rgba(0, 125, 136, 0.08), 0 2px 4px rgba(0,0,0,0.02);
                 }
                 .attachment-icon {
-                    width: 40px;
-                    height: 40px;
-                    background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+                    width: 44px;
+                    height: 44px;
+                    background: linear-gradient(135deg, rgba(0, 125, 136, 0.1) 0%, rgba(0, 125, 136, 0.05) 100%);
                     border-radius: 10px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    color: #43A047;
+                    color: #007D88;
+                    transition: all 0.3s ease;
                 }
-                .attachment-info {
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-                    flex: 1;
+                .attachment-card:hover .attachment-icon {
+                    background: linear-gradient(135deg, rgba(0, 125, 136, 0.15) 0%, rgba(0, 125, 136, 0.1) 100%);
+                    transform: scale(1.05);
                 }
                 .attachment-text {
                     flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 2px;
                 }
                 .attachment-label {
-                    font-size: 13px;
-                    font-weight: 600;
-                    color: #333;
+                    font-size: 14px;
+                    font-weight: 700;
+                    color: #1a1a1a;
                     display: block;
                 }
                 .attachment-size {
                     font-size: 12px;
-                    color: #1976D2;
-                    font-weight: 500;
+                    color: #007D88;
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
                 }
                 .attachment-action {
-                    display: none;
+                    display: flex;
+                    align-items: center;
+                    color: #94a3b8;
                 }
                 
                 /* Footer */
                 .drawer-footer-modern {
-                    padding: 12px 16px;
+                    padding: 10px 16px;
                     background: #fff;
                     border-top: 1px solid #f0f0f0;
                     display: flex;
@@ -1205,6 +1220,45 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                         padding: 14px 16px;
                     }
                 }
+                
+                /* Redesigned Preview Modal */
+                .preview-modal-modern .modal-content {
+                    border-radius: 16px !important;
+                    border: none !important;
+                    box-shadow: 0 24px 80px rgba(0,0,0,0.15);
+                }
+                .preview-modal-header {
+                    padding: 16px 24px !important;
+                    background: #fff;
+                    border-bottom: 1px solid #f0f0f0 !important;
+                }
+                .btn-preview-open {
+                    background: #fff !important;
+                    border: 1px solid #e5e7eb !important;
+                    color: #1a1a1a !important;
+                    font-weight: 600 !important;
+                    padding: 8px 16px !important;
+                    border-radius: 8px !important;
+                    transition: all 0.2s ease;
+                }
+                .btn-preview-open:hover {
+                    background: #f9fafb !important;
+                    border-color: #d1d5db !important;
+                }
+                .btn-preview-download {
+                    background: #007D88 !important;
+                    border: none !important;
+                    color: #fff !important;
+                    font-weight: 600 !important;
+                    padding: 8px 16px !important;
+                    border-radius: 8px !important;
+                    transition: all 0.2s ease;
+                    box-shadow: 0 2px 4px rgba(13, 115, 119, 0.2);
+                }
+                .btn-preview-download:hover {
+                    background: #0A5C5F !important;
+                    box-shadow: 0 4px 8px rgba(13, 115, 119, 0.3);
+                }
                 `}
             </style>
 
@@ -1299,38 +1353,13 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                 className="library-drawer"
                 backdrop={true}
             >
-                {/* Left Icon Toolbar */}
-                <div className="drawer-icon-toolbar">
-                    <button className="toolbar-icon active">
-                        <ChatCircle size={18} weight="bold" />
-                    </button>
-                    <button className="toolbar-icon">
-                        <Users size={18} />
-                    </button>
-                    <button className="toolbar-icon">
-                        <Paperclip size={18} />
-                    </button>
-                    <button className="toolbar-icon has-badge">
-                        <BookmarkSimple size={18} />
-                        <span className="badge-dot" />
-                    </button>
-                    <button className="toolbar-icon">
-                        <Stack size={18} />
-                    </button>
-                    <button className="toolbar-icon">
-                        <NotePencil size={18} />
-                    </button>
-                    <button className="toolbar-icon">
-                        <ArrowsOutSimple size={18} />
-                    </button>
-                </div>
-
                 {/* Main Content */}
                 <div className="drawer-main-content">
                     {/* Header */}
                     <div className="drawer-header-modern">
-                        <span className="drawer-id-badge">DOC-{selectedItem?.id?.slice(-5)?.toUpperCase() || '00000'}</span>
-                        <span className="drawer-header-title">{selectedItem?.name}</span>
+                        <div className="drawer-category-badge">
+                            {getCategoryPath(selectedItem?.category_id).join(' › ') || 'Library'}
+                        </div>
                         <button
                             className="drawer-close-btn"
                             onClick={() => setShowPreview(false)}
@@ -1349,18 +1378,15 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                                     <FileText size={32} weight="thin" />
                                 </div>
                                 <div className="drawer-doc-info">
-                                    <div className="drawer-category-badge">
-                                        {getCategoryPath(selectedItem?.category_id).join(' › ') || 'Library'}
-                                    </div>
                                     <h2 className="drawer-title">{selectedItem?.name}</h2>
                                 </div>
                             </div>
 
                             {/* Metadata Grid */}
                             <div className="drawer-metadata">
-                                <span className="meta-label">Type</span>
+                                <span className="meta-label">Doc ID</span>
                                 <span className="meta-value">
-                                    <span className="drawer-type-tag">{selectedItem?.type || 'Document'}</span>
+                                    DOC-{selectedItem?.id?.slice(-5)?.toUpperCase() || '00000'}
                                 </span>
 
                                 <span className="meta-label">Created</span>
@@ -1368,12 +1394,9 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                                     {selectedItem?.created_at ? new Date(selectedItem.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
                                 </span>
 
-                                <span className="meta-label">Tags</span>
+                                <span className="meta-label">Modified</span>
                                 <span className="meta-value">
-                                    <span className="tag-chip">{selectedItem?.type}</span>
-                                    <button className="add-tag-btn">
-                                        <Plus size={10} /> Add
-                                    </button>
+                                    {selectedItem?.updated_at ? new Date(selectedItem.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
                                 </span>
                             </div>
                         </div>
@@ -1406,11 +1429,17 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                             {selectedItem?.file_path && (
                                 <div className="attachment-card" onClick={() => handleFilePreview(selectedItem.file_path, selectedItem.name)}>
                                     <div className="attachment-icon">
-                                        <Paperclip size={16} />
+                                        <Paperclip size={20} weight="bold" />
                                     </div>
                                     <div className="attachment-text">
                                         <span className="attachment-label">Original Document</span>
-                                        <span className="attachment-size">View file →</span>
+                                        <div className="attachment-size">
+                                            <span>View file</span>
+                                            <CaretRight size={12} weight="bold" />
+                                        </div>
+                                    </div>
+                                    <div className="attachment-action">
+                                        <ArrowSquareOut size={18} />
                                     </div>
                                 </div>
                             )}
@@ -1463,8 +1492,8 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
 
             {/* Document Preview Modal */}
 
-            <Modal show={showFilePreview} onHide={() => setShowFilePreview(false)} size="xl" centered style={{ zIndex: 1060 }}>
-                <Modal.Header closeButton className="border-bottom py-3 px-4">
+            <Modal show={showFilePreview} onHide={() => setShowFilePreview(false)} size="xl" centered style={{ zIndex: 1060 }} className="preview-modal-modern">
+                <Modal.Header closeButton className="preview-modal-header">
                     <div className="d-flex align-items-center justify-content-between w-100 me-4">
                         <Modal.Title className="h6 mb-0 fw-bold text-truncate" style={{ maxWidth: '60%' }}>
                             Preview: {previewDocName}
@@ -1472,21 +1501,19 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                         <div className="d-flex gap-2">
                             <Button
                                 variant="light"
-                                size="sm"
                                 href={previewUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="d-flex align-items-center gap-2 fw-medium text-dark bg-white border"
+                                className="btn-preview-open d-flex align-items-center gap-2"
                             >
-                                <ArrowSquareOut size={16} weight="bold" />
+                                <ArrowSquareOut size={16} weight="bold" color="#ef4444" />
                                 <span className="d-none d-sm-inline">Open New Tab</span>
                             </Button>
                             <Button
                                 variant="primary"
-                                size="sm"
                                 href={previewUrl}
                                 download
-                                className="d-flex align-items-center gap-2 fw-medium"
+                                className="btn-preview-download d-flex align-items-center gap-2"
                             >
                                 <DownloadSimple size={16} weight="bold" />
                                 <span className="d-none d-sm-inline">Download</span>
