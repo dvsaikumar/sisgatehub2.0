@@ -68,36 +68,53 @@ const SettingsSidebar = ({ activeTab, onChangeTab }) => {
                                 </a>
                             </li>
                             <li className="nav-item">
-                                <a className={`nav-link ${activeTab === 'templates' ? 'active' : ''}`} href="#" onClick={(e) => { e.preventDefault(); onChangeTab('templates'); }}>
-                                    <span className="nav-icon-wrap">
-                                        <FileText />
-                                    </span>
-                                    <span className="nav-link-text">Templates</span>
-                                </a>
-                            </li>
-                            <li className="nav-item">
-                                <a className={`nav-link ${activeTab === 'pdf_design' ? 'active' : ''}`} href="#" onClick={(e) => { e.preventDefault(); onChangeTab('pdf_design'); }}>
-                                    <span className="nav-icon-wrap">
-                                        <FilePdf />
-                                    </span>
-                                    <span className="nav-link-text">PDF Design</span>
-                                </a>
-                            </li>
-                            <li className="nav-item">
-                                <a className={`nav-link ${activeTab === 'audit-logs' ? 'active' : ''}`} href="#" onClick={(e) => { e.preventDefault(); onChangeTab('audit-logs'); }}>
-                                    <span className="nav-icon-wrap">
-                                        <Shield />
-                                    </span>
-                                    <span className="nav-link-text">Audit Logs</span>
-                                </a>
-                            </li>
-                            <li className="nav-item">
-                                <a className={`nav-link ${activeTab === 'system-settings' ? 'active' : ''}`} href="#" onClick={(e) => { e.preventDefault(); onChangeTab('system-settings'); }}>
+                                <a className={`nav-link ${(activeTab === 'system-settings' || activeTab === 'templates' || activeTab === 'pdf_design' || activeTab === 'audit-logs') ? 'active' : ''}`}
+                                    href="#"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        const collapse = document.getElementById('system-settings-collapse');
+                                        if (collapse) {
+                                            collapse.classList.toggle('show');
+                                            e.currentTarget.setAttribute('aria-expanded', e.currentTarget.getAttribute('aria-expanded') === 'true' ? 'false' : 'true');
+                                        }
+                                    }}
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#system-settings-collapse"
+                                    aria-expanded={activeTab === 'templates' || activeTab === 'pdf_design' || activeTab === 'audit-logs'}
+                                >
                                     <span className="nav-icon-wrap">
                                         <Gear />
                                     </span>
                                     <span className="nav-link-text">System Settings</span>
                                 </a>
+                                <div className={`collapse ${(activeTab === 'templates' || activeTab === 'pdf_design' || activeTab === 'audit-logs') ? 'show' : ''}`} id="system-settings-collapse">
+                                    <ul className="nav nav-light navbar-nav flex-column ms-3">
+                                        <li className="nav-item">
+                                            <a className={`nav-link ${activeTab === 'templates' ? 'active' : ''}`} href="#" onClick={(e) => { e.preventDefault(); onChangeTab('templates'); }}>
+                                                <span className="nav-icon-wrap">
+                                                    <FileText size={16} />
+                                                </span>
+                                                <span className="nav-link-text">Templates</span>
+                                            </a>
+                                        </li>
+                                        <li className="nav-item">
+                                            <a className={`nav-link ${activeTab === 'pdf_design' ? 'active' : ''}`} href="#" onClick={(e) => { e.preventDefault(); onChangeTab('pdf_design'); }}>
+                                                <span className="nav-icon-wrap">
+                                                    <FilePdf size={16} />
+                                                </span>
+                                                <span className="nav-link-text">PDF Design</span>
+                                            </a>
+                                        </li>
+                                        <li className="nav-item">
+                                            <a className={`nav-link ${activeTab === 'audit-logs' ? 'active' : ''}`} href="#" onClick={(e) => { e.preventDefault(); onChangeTab('audit-logs'); }}>
+                                                <span className="nav-icon-wrap">
+                                                    <Shield size={16} />
+                                                </span>
+                                                <span className="nav-link-text">Audit Logs</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </li>
                         </ul>
                     </div>

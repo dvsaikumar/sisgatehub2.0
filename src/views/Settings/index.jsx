@@ -138,8 +138,9 @@ const Settings = () => {
                             {activeSidebarTab === 'configurations' && <Configurations activeTab={configTab} />}
 
                             {activeSidebarTab === 'pdf_design' && <Configurations activeTab="pdf_design" />}
+                            {activeSidebarTab === 'templates' && <Configurations activeTab="templates" />}
                             {activeSidebarTab === 'audit-logs' && <AuditLogs />}
-                            {activeSidebarTab !== 'users' && activeSidebarTab !== 'documents' && activeSidebarTab !== 'configurations' && activeSidebarTab !== 'pdf_design' && activeSidebarTab !== 'audit-logs' && <DummyList toggleInfo={() => setShowInfo(true)} />}
+                            {activeSidebarTab !== 'users' && activeSidebarTab !== 'documents' && activeSidebarTab !== 'configurations' && activeSidebarTab !== 'pdf_design' && activeSidebarTab !== 'audit-logs' && activeSidebarTab !== 'templates' && <DummyList toggleInfo={() => setShowInfo(true)} />}
 
                             <FileInfo onHide={() => setShowInfo(false)} />
                         </div>
