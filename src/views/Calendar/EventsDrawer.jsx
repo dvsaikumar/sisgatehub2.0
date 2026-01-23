@@ -19,9 +19,44 @@ import avatar11 from '../../assets/img/avatar11.jpg';
 import avatar12 from '../../assets/img/avatar12.jpg';
 import avatar13 from '../../assets/img/avatar13.jpg';
 
-const EventsDrawer = ({ show, onClose, info, event }) => {
+const EventsDrawer = ({ show, onClose, info, event, onUpdate }) => {
     const [editable, setEditable] = useState(false);
+    const [saving, setSaving] = useState(false);
+
+    // Edit form state
+    const [editTitle, setEditTitle] = useState('');
+    const [editDescription, setEditDescription] = useState('');
+    const [editStartDate, setEditStartDate] = useState(new Date());
+    const [editStartTime, setEditStartTime] = useState('09:00');
+    const [editEndDate, setEditEndDate] = useState(new Date());
+    const [editEndTime, setEditEndTime] = useState('10:00');
+    const [editLocation, setEditLocation] = useState('');
+    const [editCategory, setEditCategory] = useState('');
+    const [editPriority, setEditPriority] = useState('Medium');
+    const [editVisibility, setEditVisibility] = useState('Public');
     const [eventColor, setEventColor] = useState("#009B84");
+
+    // Initialize edit form when entering edit mode
+    const startEditing = () => {
+        const eProps = event?.extendedProps || {};
+        setEditTitle(event?.title || '');
+        setEditDescription(eProps.description || '');
+        setEditLocation(eProps.location || '');
+        setEditCategory(eProps.category || 'Meetings');
+        setEditPriority(eProps.priority || 'Medium');
+        setEditVisibility(eProps.visibility || 'Public');
+        setEventColor(event?.backgroundColor || '#009B84');
+
+        if (event?.start) {
+            setEditStartDate(new Date(event.start));
+            setEditStartTime(dayjs(event.start).format('HH:mm'));
+        }
+        if (event?.end) {
+            setEditEndDate(new Date(event.end));
+            setEditEndTime(dayjs(event.end).format('HH:mm'));
+        }
+        setEditable(true);
+    };
 
     const hideCalender = (ev, picker) => {
         picker.container.find(".calendar-table").hide();
@@ -29,12 +64,49 @@ const EventsDrawer = ({ show, onClose, info, event }) => {
 
     const handleClose = () => {
         if (editable) {
-            setEditable(!editable);
-        }
-        else {
+            setEditable(false);
+        } else {
             onClose();
         }
-    }
+    };
+
+    // Save edited reminder
+    const saveChanges = async () => {
+        setSaving(true);
+        try {
+            const startDateTime = new Date(`${dayjs(editStartDate).format('YYYY-MM-DD')}T${editStartTime}`);
+            const endDateTime = new Date(`${dayjs(editEndDate).format('YYYY-MM-DD')}T${editEndTime}`);
+
+            const { error } = await supabase
+                .from('reminders')
+                .update({
+                    title: editTitle,
+                    description: editDescription,
+                    start_date: startDateTime.toISOString(),
+                    end_date: endDateTime.toISOString(),
+                    location: editLocation,
+                    category: editCategory,
+                    priority: editPriority,
+                    visibility: editVisibility,
+                    background_color: eventColor,
+                })
+                .eq('id', event.id);
+
+            if (error) throw error;
+
+            toast.success('Reminder updated successfully!');
+            setEditable(false);
+
+            // Trigger parent refresh
+            if (onUpdate) onUpdate();
+            onClose();
+        } catch (error) {
+            console.error('Error updating reminder:', error);
+            toast.error('Failed to update reminder');
+        } finally {
+            setSaving(false);
+        }
+    };
 
     /*Event Delete*/
     const DeletEvent = () => {
@@ -97,24 +169,29 @@ const EventsDrawer = ({ show, onClose, info, event }) => {
 
     // Safe access to event props
     const eProps = event?.extendedProps || {};
-    const startDate = event?.start ? dayjs(event.start).format('MMM DD, YYYY') : '';
-    const endDate = event?.end ? dayjs(event.end).format('MMM DD, YYYY') : startDate;
+    const startDate = event?.start ? dayjs(event.start).format('DD-MM-YYYY') : '';
+    const endDate = event?.end ? dayjs(event.end).format('DD-MM-YYYY') : startDate;
     const startTimeComponent = event?.start ? dayjs(event.start).format('h:mm A') : '';
     const endTimeComponent = event?.end ? dayjs(event.end).format('h:mm A') : '';
+
+    // Check if reminder is in the past (completed)
+    const isPastReminder = event?.start ? dayjs(event.start).isBefore(dayjs()) : false;
 
     return (
         <div className={classNames("hk-drawer calendar-drawer drawer-right", { "drawer-toggle": show })} >
             <div className={classNames({ "d-none": editable })}>
                 <div className="drawer-header">
                     <div className="drawer-header-action">
-                        {/* Edit functionality to be implemented fully later, disabling for now to focus on View/Delete */}
-                        {/* <Button size="sm" variant="flush-secondary" id="edit_event" className="btn-icon btn-rounded flush-soft-hover" onClick={() => setEditable(!editable)} >
-                            <span className="icon">
-                                <span className="feather-icon">
-                                    <Icons.Edit2 />
+                        {/* Show edit button only for future/incomplete reminders */}
+                        {!isPastReminder && (
+                            <Button size="sm" variant="flush-secondary" id="edit_event" className="btn-icon btn-rounded flush-soft-hover" onClick={startEditing}>
+                                <span className="icon">
+                                    <span className="feather-icon">
+                                        <Icons.Edit2 />
+                                    </span>
                                 </span>
-                            </span>
-                        </Button> */}
+                            </Button>
+                        )}
                         <Button size="sm" variant="flush-secondary" id="del_event" className="btn-icon btn-rounded flush-soft-hover" onClick={DeletEvent} >
                             <span className="icon">
                                 <span className="feather-icon">
@@ -170,7 +247,7 @@ const EventsDrawer = ({ show, onClose, info, event }) => {
                                             <Icons.CheckSquare />
                                         </span>
                                     </span>
-                                    {eProps.priority || 'Medium'} Application
+                                    {eProps.priority || 'Medium'} Priority
                                 </li>
                                 <li>
                                     <span className="ev-icon-wrap">
@@ -192,20 +269,26 @@ const EventsDrawer = ({ show, onClose, info, event }) => {
                                     </li>
                                 )}
                             </ul>
+
+                            {/* Show status badge */}
+                            {isPastReminder && (
+                                <div className="mt-3 p-2 bg-light rounded">
+                                    <span className="text-muted small">
+                                        <Icons.CheckCircle size={14} className="me-1 text-success" />
+                                        This reminder has passed
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     </SimpleBar>
                 </div>
             </div>
+
+            {/* Edit Mode */}
             <div className={classNames({ "d-none": !editable })}>
                 <div className="drawer-header">
                     <div className="drawer-header-action">
-                        <Button size="sm" variant="flush-secondary" className="btn-icon btn-rounded flush-soft-hover me-2">
-                            <span className="icon">
-                                <span className="feather-icon">
-                                    <Icons.ExternalLink />
-                                </span>
-                            </span>
-                        </Button>
+                        <h6 className="mb-0 flex-grow-1">Edit Reminder</h6>
                         <Button bsPrefix="btn-close" className="drawer-close" onClick={handleClose} >
                             <span aria-hidden="true">×</span>
                         </Button>
@@ -214,154 +297,142 @@ const EventsDrawer = ({ show, onClose, info, event }) => {
                 <div className="drawer-body">
                     <SimpleBar className="nicescroll-bar">
                         <div className="drawer-content-wrap">
-                            <div className="event-head mb-4">
-                                <HkBadge bg="violet" indicator className="badge-indicator-xl flex-shrink-0 me-2" />
-                                <div>
-                                    <div id="editableContent" contentEditable="true" suppressContentEditableWarning={true} className="event-name">{info}</div>
-                                    <Form.Group className="mt-2 mb-0">
-                                        <Form.Check
-                                            inline
-                                            label="Event"
-                                            name="group1"
-                                            type="radio"
-                                            id="radio-1"
-                                            defaultChecked
-                                        />
-                                        <Form.Check
-                                            inline
-                                            label="Reminder"
-                                            name="group1"
-                                            type="radio"
-                                            id="radio-2"
-                                        />
-                                    </Form.Group>
-                                </div>
-                            </div>
                             <Form>
-                                <Form.Group className="mb-3" >
-                                    <InputGroup>
-                                        <span className="input-affix-wrapper">
-                                            <span className="input-prefix">
-                                                <span className="feather-icon">
-                                                    <Icons.Calendar />
-                                                </span>
-                                            </span>
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Title</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        value={editTitle}
+                                        onChange={(e) => setEditTitle(e.target.value)}
+                                        placeholder="Reminder title"
+                                    />
+                                </Form.Group>
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Description</Form.Label>
+                                    <Form.Control
+                                        as="textarea"
+                                        rows={3}
+                                        value={editDescription}
+                                        onChange={(e) => setEditDescription(e.target.value)}
+                                    />
+                                </Form.Group>
+
+                                <div className="row gx-3">
+                                    <div className="col-6">
+                                        <Form.Group className="mb-3">
+                                            <Form.Label>Start Date</Form.Label>
                                             <DateRangePicker
                                                 initialSettings={{
-                                                    timePicker: true,
-                                                    startDate: dayjs().startOf('hour').toDate(),
-                                                    endDate: dayjs().startOf('hour').add(32, 'hour').toDate(),
-                                                    locale: {
-                                                        format: 'M/DD hh:mm A',
-                                                    },
+                                                    singleDatePicker: true,
+                                                    showDropdowns: true,
+                                                    startDate: editStartDate,
+                                                    locale: { format: 'DD-MM-YYYY' }
                                                 }}
+                                                onApply={(ev, picker) => setEditStartDate(new Date(picker.startDate))}
                                             >
-                                                <Form.Control type="text" name="datetimes" />
+                                                <Form.Control type="text" />
                                             </DateRangePicker>
-                                        </span>
-                                    </InputGroup>
-                                </Form.Group>
-                                <Form.Group className="mb-3" >
-                                    <InputGroup>
-                                        <span className="input-affix-wrapper">
-                                            <span className="input-prefix">
-                                                <span className="feather-icon">
-                                                    <Icons.Clock />
-                                                </span>
-                                            </span>
+                                        </Form.Group>
+                                    </div>
+                                    <div className="col-6">
+                                        <Form.Group className="mb-3">
+                                            <Form.Label>Start Time</Form.Label>
+                                            <Form.Control
+                                                type="time"
+                                                value={editStartTime}
+                                                onChange={(e) => setEditStartTime(e.target.value)}
+                                            />
+                                        </Form.Group>
+                                    </div>
+                                </div>
+
+                                <div className="row gx-3">
+                                    <div className="col-6">
+                                        <Form.Group className="mb-3">
+                                            <Form.Label>End Date</Form.Label>
                                             <DateRangePicker
                                                 initialSettings={{
-                                                    timePicker: true,
-                                                    timePicker24Hour: true,
-                                                    timePickerIncrement: 1,
-                                                    timePickerSeconds: true,
-                                                    locale: {
-                                                        format: 'HH:mm:ss'
-                                                    }
+                                                    singleDatePicker: true,
+                                                    showDropdowns: true,
+                                                    startDate: editEndDate,
+                                                    locale: { format: 'DD-MM-YYYY' }
                                                 }}
-                                                onShow={hideCalender}
+                                                onApply={(ev, picker) => setEditEndDate(new Date(picker.startDate))}
                                             >
-                                                <Form.Control className="input-timepicker" type="text" name="time" />
+                                                <Form.Control type="text" />
                                             </DateRangePicker>
-                                        </span>
-                                    </InputGroup>
+                                        </Form.Group>
+                                    </div>
+                                    <div className="col-6">
+                                        <Form.Group className="mb-3">
+                                            <Form.Label>End Time</Form.Label>
+                                            <Form.Control
+                                                type="time"
+                                                value={editEndTime}
+                                                onChange={(e) => setEditEndTime(e.target.value)}
+                                            />
+                                        </Form.Group>
+                                    </div>
+                                </div>
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Location</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        value={editLocation}
+                                        onChange={(e) => setEditLocation(e.target.value)}
+                                        placeholder="Optional location"
+                                    />
                                 </Form.Group>
-                                <Form.Group className="mb-3" >
-                                    <InputGroup>
-                                        <span className="input-affix-wrapper">
-                                            <span className="input-prefix">
-                                                <span className="feather-icon">
-                                                    <Icons.MapPin />
-                                                </span>
-                                            </span>
-                                            <Form.Control type="text" className="form-wth-icon" defaultValue="Oslo, Canada" />
-                                        </span>
-                                    </InputGroup>
-                                </Form.Group>
-                                <Form.Group className="mb-3" >
-                                    <InputGroup>
-                                        <span className="input-affix-wrapper">
-                                            <span className="input-prefix">
-                                                <span className="feather-icon">
-                                                    <Icons.CheckSquare />
-                                                </span>
-                                            </span>
-                                            <Form.Select>
-                                                <option value={1}>All Time</option>
-                                                <option value={2}>Half Day</option>
-                                                <option value={3}>9 to 5</option>
+
+                                <div className="row gx-3">
+                                    <div className="col-6">
+                                        <Form.Group className="mb-3">
+                                            <Form.Label>Priority</Form.Label>
+                                            <Form.Select value={editPriority} onChange={(e) => setEditPriority(e.target.value)}>
+                                                <option value="Low">Low</option>
+                                                <option value="Medium">Medium</option>
+                                                <option value="High">High</option>
+                                                <option value="Urgent">Urgent</option>
                                             </Form.Select>
-                                        </span>
-                                    </InputGroup>
-                                </Form.Group>
-                                <Form.Group className="mb-3" >
-                                    <InputGroup>
-                                        <span className="input-affix-wrapper">
-                                            <span className="input-prefix">
-                                                <span className="feather-icon">
-                                                    <Icons.Eye />
-                                                </span>
-                                            </span>
-                                            <Form.Select>
-                                                <option value={0}>Default Visibility</option>
-                                                <option value={1}>Private</option>
-                                                <option value={2}>Public</option>
+                                        </Form.Group>
+                                    </div>
+                                    <div className="col-6">
+                                        <Form.Group className="mb-3">
+                                            <Form.Label>Visibility</Form.Label>
+                                            <Form.Select value={editVisibility} onChange={(e) => setEditVisibility(e.target.value)}>
+                                                <option value="Public">Public</option>
+                                                <option value="Private">Private</option>
                                             </Form.Select>
-                                        </span>
-                                    </InputGroup>
-                                </Form.Group>
-                                <Form.Group className="mb-3" >
+                                        </Form.Group>
+                                    </div>
+                                </div>
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Color</Form.Label>
                                     <InputGroup className="color-picker">
                                         <InputGroup.Text className="colorpicker-input-addon">
                                             <Form.Control
                                                 type="color"
-                                                id="exampleColorInput"
-                                                title="Choose your color"
                                                 value={eventColor}
-                                                onChange={e => setEventColor(e.target.value)}
+                                                onChange={(e) => setEventColor(e.target.value)}
                                             />
                                         </InputGroup.Text>
-                                        <Form.Control type="text" value={eventColor} onChange={() => setEventColor(eventColor)} />
+                                        <Form.Control type="text" value={eventColor} readOnly />
                                     </InputGroup>
-                                </Form.Group>
-                                <Form.Group className="mb-3" >
-                                    <div className="d-flex flex-wrap">
-                                        <HkChips variant="primary" src={avatar11} dismissable className="mb-2 me-2" >Morgan</HkChips>
-                                        <HkChips variant="primary" src={avatar12} dismissable className="mb-2 me-2" >Charlie</HkChips>
-                                        <HkChips variant="primary" src={avatar13} dismissable className="mb-2 me-2" >Winston</HkChips>
-                                        <Form.Control type="text" className="border-0 p-0 shadow-none flex-1 mb-2 me-2" />
-                                    </div>
-                                </Form.Group>
-                                <Form.Group className="mb-3" >
-                                    <Form.Control as="textarea" rows={4} defaultValue={"Annual meeting with global branch teams & bosses about growth planning and fiscal year reports"} />
                                 </Form.Group>
                             </Form>
                         </div>
                     </SimpleBar>
                 </div>
                 <div className="drawer-footer d-flex justify-content-end">
-                    <Button variant="secondary" className="drawer-edit-close me-2" onClick={() => setEditable(!editable)}>discard</Button>
-                    <Button variant="primary" className="drawer-edit-close" onClick={() => setEditable(!editable)} >save</Button>
+                    <Button variant="secondary" className="me-2" onClick={() => setEditable(false)} disabled={saving}>
+                        Discard
+                    </Button>
+                    <Button variant="primary" onClick={saveChanges} disabled={saving || !editTitle.trim()}>
+                        {saving ? 'Saving...' : 'Save Changes'}
+                    </Button>
                 </div>
             </div>
         </div >

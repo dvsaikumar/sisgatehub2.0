@@ -18,7 +18,7 @@ const sampleData = {
     '{{username}}': 'John Doe',
     '{{user_email}}': 'john.doe@example.com',
     '{{company_name}}': 'Sisgate PRO',
-    '{{date}}': dayjs().format('MMMM DD, YYYY'),
+    '{{date}}': dayjs().format('DD-MM-YYYY'),
     '{{doc_id}}': 'DOC-12345'
 };
 
@@ -242,7 +242,7 @@ const Templates = () => {
                                                     {tpl.status}
                                                 </span>
                                             </td>
-                                            <td>{dayjs(tpl.updated_at || tpl.created_at).format('MMM DD, YYYY')}</td>
+                                            <td>{dayjs(tpl.updated_at || tpl.created_at).format('DD-MM-YYYY')}</td>
                                             <td>
                                                 <div className="d-flex justify-content-end gap-2">
                                                     <Button variant="flush-light" className="btn-icon btn-rounded flush-soft-hover" title="Duplicate" onClick={() => handleDuplicate(tpl)}>

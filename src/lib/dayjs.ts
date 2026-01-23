@@ -8,6 +8,7 @@ import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import duration from 'dayjs/plugin/duration';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import calendar from 'dayjs/plugin/calendar';
 
 /**
  * Day.js Configuration
@@ -28,6 +29,7 @@ dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 dayjs.extend(duration);
 dayjs.extend(customParseFormat);
+dayjs.extend(calendar);
 
 // Re-export configured dayjs
 export default dayjs;
@@ -40,17 +42,17 @@ export { dayjs };
  */
 
 /**
- * Format a date for display (e.g., "Jan 15, 2026")
+ * Format a date for display (e.g., "22-01-2026")
  */
-export function formatDate(date: string | Date | null | undefined, format = 'MMM D, YYYY'): string {
+export function formatDate(date: string | Date | null | undefined, format = 'DD-MM-YYYY'): string {
     if (!date) return '';
     return dayjs(date).format(format);
 }
 
 /**
- * Format a date with time (e.g., "Jan 15, 2026 3:30 PM")
+ * Format a date with time (e.g., "22-01-2026 3:30 PM")
  */
-export function formatDateTime(date: string | Date | null | undefined, format = 'MMM D, YYYY h:mm A'): string {
+export function formatDateTime(date: string | Date | null | undefined, format = 'DD-MM-YYYY h:mm A'): string {
     if (!date) return '';
     return dayjs(date).format(format);
 }

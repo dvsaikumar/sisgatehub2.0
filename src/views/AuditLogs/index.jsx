@@ -126,7 +126,7 @@ const AuditLogs = () => {
         const csv = [
             ['Date', 'User', 'Action', 'Resource', 'Description', 'Status'].join(','),
             ...auditLogs.map(log => [
-                dayjs(log.created_at).format('YYYY-MM-DD HH:mm:ss'),
+                dayjs(log.created_at).format('DD-MM-YYYY HH:mm:ss'),
                 log.user_email || 'System',
                 log.action_type,
                 log.resource_type,
@@ -139,7 +139,7 @@ const AuditLogs = () => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `audit-logs-${dayjs().format('YYYY-MM-DD')}.csv`;
+        a.download = `audit-logs-${dayjs().format('DD-MM-YYYY')}.csv`;
         a.click();
 
         toast.success('Audit logs exported successfully');
@@ -279,7 +279,7 @@ const AuditLogs = () => {
                                         {auditLogs.map((log) => (
                                             <tr key={log.id}>
                                                 <td style={{ fontSize: '13px', whiteSpace: 'nowrap' }}>
-                                                    <div>{dayjs(log.created_at).format('MMM DD, YYYY')}</div>
+                                                    <div>{dayjs(log.created_at).format('DD-MM-YYYY')}</div>
                                                     <div style={{ fontSize: '11px', color: '#666' }}>
                                                         {dayjs(log.created_at).format('HH:mm:ss')}
                                                     </div>

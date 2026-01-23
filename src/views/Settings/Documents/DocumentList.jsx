@@ -116,7 +116,7 @@ const DocumentList = () => {
             Type: doc.type,
             Category: getCategoryDisplayName(doc),
             Content: doc.content ? doc.content.replace(/<[^>]+>/g, '') : '', // Strip HTML
-            Created_At: new Date(doc.created_at).toLocaleDateString()
+            Created_At: dayjs(doc.created_at).format('DD-MM-YYYY')
         }));
 
         const wb = XLSX.utils.book_new();
@@ -136,7 +136,7 @@ const DocumentList = () => {
                 d.name,
                 d.type,
                 getCategoryDisplayName(d),
-                new Date(d.created_at).toLocaleDateString()
+                dayjs(d.created_at).format('DD-MM-YYYY')
             ];
             tableRows.push(rowData);
         });

@@ -88,7 +88,7 @@ const UsersList = () => {
             Group: user.app_groups?.name || 'No Group',
             Access_Level: user.access_level,
             Status: user.status,
-            Created_At: new Date(user.created_at).toLocaleDateString()
+            Created_At: dayjs(user.created_at).format('DD-MM-YYYY')
         }));
 
         const wb = XLSX.utils.book_new();

@@ -86,7 +86,7 @@ const Groups = () => {
         const dataToExport = filteredGroups.map(group => ({
             Name: group.name,
             Description: group.description || 'No Description',
-            Created_At: new Date(group.created_at).toLocaleDateString()
+            Created_At: dayjs(group.created_at).format('DD-MM-YYYY')
         }));
 
         const wb = XLSX.utils.book_new();
@@ -105,7 +105,7 @@ const Groups = () => {
             const rowData = [
                 group.name,
                 group.description || 'No Description',
-                new Date(group.created_at).toLocaleDateString()
+                dayjs(group.created_at).format('DD-MM-YYYY')
             ];
             tableRows.push(rowData);
         });

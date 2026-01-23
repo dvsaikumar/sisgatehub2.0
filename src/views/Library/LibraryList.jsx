@@ -1391,12 +1391,12 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
 
                                 <span className="meta-label">Created</span>
                                 <span className="meta-value">
-                                    {selectedItem?.created_at ? new Date(selectedItem.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+                                    {selectedItem?.created_at ? dayjs(selectedItem.created_at).format('DD-MM-YYYY') : '—'}
                                 </span>
 
                                 <span className="meta-label">Modified</span>
                                 <span className="meta-value">
-                                    {selectedItem?.updated_at ? new Date(selectedItem.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+                                    {selectedItem?.updated_at ? dayjs(selectedItem.updated_at).format('DD-MM-YYYY') : '—'}
                                 </span>
                             </div>
                         </div>
@@ -2053,7 +2053,7 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
             if (k.includes('name') && user.full_name) newData[key] = user.full_name;
             if (k.includes('email') && user.email) newData[key] = user.email;
             if (k.includes('phone')) newData[key] = "N/A"; // Placeholder logic
-            if (k.includes('date')) newData[key] = new Date().toLocaleDateString();
+            if (k.includes('date')) newData[key] = dayjs().format('DD-MM-YYYY');
         });
 
         setTemplateData(newData);

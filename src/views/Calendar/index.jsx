@@ -10,7 +10,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import dayjs from '../../lib/dayjs';
 import { useWindowHeight } from '@react-hook/window-size';
 import CalendarSidebar from './CalendarSidebar';
-import EventsDrawer from './EventsDrawer';
+import EventsModal from './EventsModal';
 import CreateNewEvent from './CreateNewEvent';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 //Redux
@@ -23,6 +23,7 @@ import { ChevronDown, ChevronUp } from 'react-feather';
 import { supabase } from '../../configs/supabaseClient';
 import useReminderPoller from './useReminderPoller';
 import '../../styles/css/calendar-fixes.css';
+import { Bell, CalendarBlank } from '@phosphor-icons/react';
 
 const Calendar = ({ topNavCollapsed, toggleTopNav }) => {
 
@@ -82,7 +83,10 @@ const Calendar = ({ topNavCollapsed, toggleTopNav }) => {
                         location: evt.location,
                         priority: evt.priority,
                         category: evt.category,
-                        visibility: evt.visibility
+                        visibility: evt.visibility,
+                        notified: evt.notified,
+                        created_at: evt.created_at,
+                        updated_at: evt.updated_at // Assuming this exists or will be null
                     }
                 }));
                 setEvents(mappedEvents);
@@ -131,6 +135,19 @@ const Calendar = ({ topNavCollapsed, toggleTopNav }) => {
     // Toggle sidebar visibility
     const toggleSidebar = () => {
         setShowSidebar(!showSidebar);
+    };
+
+    const renderEventContent = (eventInfo) => {
+        const isReminder = eventInfo.event.extendedProps.location === 'REMINDER';
+        return (
+            <div className="d-flex align-items-center gap-1 overflow-hidden px-1 w-100">
+                {isReminder ?
+                    <Bell size={12} weight="fill" className="flex-shrink-0" /> :
+                    <CalendarBlank size={12} weight="bold" className="flex-shrink-0" />
+                }
+                <span className="text-truncate fw-medium fs-7">{eventInfo.timeText && <span className="me-1">{eventInfo.timeText}</span>}{eventInfo.event.title}</span>
+            </div>
+        );
     };
 
     return (
@@ -195,6 +212,7 @@ const Calendar = ({ topNavCollapsed, toggleTopNav }) => {
                                 height={Calender_height - 130}
                                 windowResizeDelay={500}
                                 droppable={true}
+                                eventContent={renderEventContent}
                                 editable={true}
                                 events={events}
                                 eventClick={function (info) {
@@ -209,8 +227,14 @@ const Calendar = ({ topNavCollapsed, toggleTopNav }) => {
                 </div>
             </div>
 
-            {/* Event Info */}
-            <EventsDrawer show={showEventInfo} info={eventTitle} event={targetEvent} onClose={() => setShowEventInfo(!showEventInfo)} />
+            {/* Event Info (Modal) */}
+            <EventsModal
+                show={showEventInfo}
+                info={eventTitle}
+                event={targetEvent}
+                onClose={() => setShowEventInfo(false)}
+                onUpdate={fetchEvents}
+            />
 
             {/* New Event */}
             <CreateNewEvent

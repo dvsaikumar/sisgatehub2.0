@@ -9,14 +9,17 @@ import "react-datepicker/dist/react-datepicker.css";
 //Custom Components
 import HkTooltip from '../../components/@hk-tooltip/HkTooltip';
 import { Plus as PlusPhos } from '@phosphor-icons/react';
-import { supabase } from '../../configs/supabaseClient'; // Keep for now if needed, but unused in this version
 import dayjs from '../../lib/dayjs';
+import { useCategories } from '../../hooks/useCategories';
 
 
 const CalendarSidebar = ({ showSidebar, toggleSidebar, createNewEvent, refreshEvents, upcomingEvents = [] }) => {
     const [addCategory, setAddCategory] = useState(false);
     const [reminder, setReminder] = useState(false);
     const [startDate, setStartDate] = useState(new Date());
+
+    // Use categories hook for dynamic categories
+    const { categories, loading: categoriesLoading, createCategory, updateCategory, deleteCategory } = useCategories();
 
     // Internal fetch removed to fix crash. 
     // Data is now passed from parent.
@@ -100,29 +103,22 @@ const CalendarSidebar = ({ showSidebar, toggleSidebar, createNewEvent, refreshEv
                         </Button>
                     </div>
                     <div className="categories-wrap">
-                        <Form.Check
-                            id="customChecksc1"
-                            type="checkbox"
-                            label="Meetings"
-                            defaultChecked
-                        />
-                        <Form.Check
-                            id="customChecksc2"
-                            type="checkbox"
-                            label="Flights"
-                            defaultChecked
-                        />
-                        <Form.Check
-                            id="customChecksc3"
-                            type="checkbox"
-                            label="Birthday"
-                            defaultChecked
-                        />
-                        <Form.Check
-                            id="customChecksc4"
-                            type="checkbox"
-                            label="Conferences"
-                        />
+                        {categoriesLoading ? (
+                            <div className="text-muted small">Loading...</div>
+                        ) : categories.length === 0 ? (
+                            <div className="text-muted small">No categories</div>
+                        ) : (
+                            categories.map((cat, idx) => (
+                                <Form.Check
+                                    key={cat.id}
+                                    id={`customChecksc${idx + 1}`}
+                                    type="checkbox"
+                                    label={cat.name}
+                                    defaultChecked={true}
+                                    style={{ '--bs-form-check-bg': cat.color }}
+                                />
+                            ))
+                        )}
                     </div>
                 </div>
 
@@ -169,7 +165,15 @@ const CalendarSidebar = ({ showSidebar, toggleSidebar, createNewEvent, refreshEv
             </nav>
 
             {/* Add Category */}
-            <AddCategory show={addCategory} hide={() => setAddCategory(!addCategory)} />
+            <AddCategory
+                show={addCategory}
+                hide={() => setAddCategory(!addCategory)}
+                categories={categories}
+                loading={categoriesLoading}
+                onCreate={createCategory}
+                onUpdate={updateCategory}
+                onDelete={deleteCategory}
+            />
             {/* New Event */}
             <SetReminder show={reminder} hide={() => setReminder(!reminder)} refreshEvents={refreshEvents} />
         </>

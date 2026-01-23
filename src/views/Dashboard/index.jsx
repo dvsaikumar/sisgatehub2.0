@@ -328,7 +328,7 @@ const Dashboard = ({ toggleCollapsedNav }) => {
                                     <div style={styles.listContent}>
                                         <p style={styles.listTitle}>{reminder.title}</p>
                                         <p style={styles.listMeta}>
-                                            {dayjs(reminder.schedule_at).format('MMM D, YYYY • h:mm A')}
+                                            {dayjs(reminder.schedule_at).format('DD-MM-YYYY • h:mm A')}
                                         </p>
                                     </div>
                                 </div>

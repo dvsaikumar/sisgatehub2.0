@@ -488,7 +488,7 @@ const ResponsiveDashboard = ({ toggleCollapsedNav }) => {
                                     <div style={{ minWidth: 0, flex: 1 }}>
                                         <p style={styles.listItemTitle}>{reminder.title}</p>
                                         <p style={styles.listItemSub}>
-                                            {dayjs(reminder.schedule_at).format('MMM D, YYYY [at] h:mm A')}
+                                            {dayjs(reminder.schedule_at).format('DD-MM-YYYY [at] h:mm A')}
                                         </p>
                                     </div>
                                 </div>
