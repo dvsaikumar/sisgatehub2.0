@@ -1917,14 +1917,36 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                 reader.onload = (e) => {
                     try {
                         const content = e.target.result;
-                        const zip = new PizZip(content);
+                        const createDoc = (delimiters) => {
+                            const freshZip = new PizZip(content);
+                            return new Docxtemplater(freshZip, {
+                                paragraphLoop: true,
+                                linebreaks: true,
+                                nullGetter: () => "",
+                                delimiters: delimiters
+                            });
+                        };
 
-                        // We use Docxtemplater to get the text cleanly (handling XML tags inside keys)
-                        const doc = new Docxtemplater(zip, {
-                            paragraphLoop: true,
-                            linebreaks: true,
-                            nullGetter: () => "" // Replace undefined keys with empty string to keep preview clean
-                        });
+                        let doc;
+                        let detectedDelimiters = { start: '{', end: '}' }; // Default
+
+                        // ROBUST PRE-DETECTION: Scan XML content directly to find delimiters
+                        try {
+                            const tempZip = new PizZip(content);
+                            const xmlContent = tempZip.file("word/document.xml")?.asText() || "";
+
+                            if (xmlContent.includes("{{")) {
+                                detectedDelimiters = { start: '{{', end: '}}' };
+                            } else if (xmlContent.includes("<<")) {
+                                detectedDelimiters = { start: '<<', end: '>>' };
+                            }
+
+                            // Initialize with the detected delimiters
+                            doc = createDoc(detectedDelimiters);
+                        } catch (error) {
+                            // If initialization fails even with detection, throw it to be handled below
+                            throw error;
+                        }
 
                         // Check valid structure by checking full text size or specific tags
                         // (Previously we checked document.xml existence, PizZip does that implicitly usually)
@@ -1937,7 +1959,7 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                         const regex = /(\{{1,2}|<{1,2})\s*([\w\-\s]+?)\s*(\}{1,2}|>{1,2})/g;
                         const foundKeys = new Set();
                         let match;
-                        let detectedDelimiters = { start: '{', end: '}' }; // Default
+
                         let hasAngleBrackets = false;
 
                         while ((match = regex.exec(text)) !== null) {
@@ -1952,6 +1974,9 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                                 } else {
                                     detectedDelimiters = { start: '<', end: '>' };
                                 }
+                            } else if (startTag === '{{') {
+                                // Explicitly handle double curly braces to avoid "duplicate open tag" errors
+                                detectedDelimiters = { start: '{{', end: '}}' };
                             }
 
                             if (key && !key.startsWith('/')) foundKeys.add(key);
@@ -1969,7 +1994,12 @@ const LibraryList = ({ filter, searchTerm, toggleInfo }) => {
                         toast.success(`Template ready! Found ${keys.length} variables.`, { id: toastId });
                     } catch (error) {
                         console.error('Template Parsing Error:', error);
-                        if (error.message.includes("Corrupted zip")) {
+                        if (error.properties && error.properties.errors instanceof Array) {
+                            const errorMessages = error.properties.errors.map(function (error) {
+                                return error.properties.explanation;
+                            }).join("\n");
+                            toast.error(`Template Syntax Error:\n${errorMessages}`, { id: toastId, duration: 6000 });
+                        } else if (error.message.includes("Corrupted zip")) {
                             toast.error("The document file appears to be corrupted.", { id: toastId });
                         } else if (error.message.includes("missing document.xml")) {
                             toast.error("This does not appear to be a defined Word document.", { id: toastId });
