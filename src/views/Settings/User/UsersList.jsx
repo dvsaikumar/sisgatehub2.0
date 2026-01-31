@@ -47,6 +47,8 @@ const UsersList = () => {
             if (error) throw error;
             setUsers(data || []);
         } catch (error) {
+            // Ignore AbortError - happens during normal navigation
+            if (error?.name === 'AbortError' || error?.message?.includes('abort')) return;
             console.error('Error fetching users:', error.message);
             toast.error('Failed to load users');
         } finally {
@@ -85,6 +87,7 @@ const UsersList = () => {
         const dataToExport = filteredUsers.map(user => ({
             Name: user.full_name,
             Email: user.email,
+            Role: user.role || 'Member',
             Group: user.app_groups?.name || 'No Group',
             Access_Level: user.access_level,
             Status: user.status,
@@ -106,13 +109,14 @@ const UsersList = () => {
     // Export to PDF
     const handleExportPDF = () => {
         const doc = new jsPDF();
-        const tableColumn = ["Name", "Email", "Group", "Access", "Status"];
+        const tableColumn = ["Name", "Email", "Role", "Group", "Access", "Status"];
         const tableRows = [];
 
         filteredUsers.forEach(user => {
             const rowData = [
                 user.full_name,
                 user.email,
+                user.role || 'Member',
                 user.app_groups?.name || 'No Group',
                 user.access_level,
                 user.status
@@ -250,266 +254,288 @@ const UsersList = () => {
 
     return (
         <>
-            <Card className="card-border">
-                <Card.Body className="p-0">
+            <div>
 
-                    <div className="d-flex justify-content-between align-items-center mb-3 p-3 flex-wrap gap-2">
-                        <div className="d-flex align-items-center gap-2">
-                            <h5 className="mb-0 me-3">Users</h5>
-                            <InputGroup size="sm" style={{ width: '250px' }}>
-                                <InputGroup.Text><MagnifyingGlass /></InputGroup.Text>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Search users..."
-                                    value={searchTerm}
-                                    onChange={handleSearch}
-                                />
-                            </InputGroup>
-                        </div>
-                        <div className="d-flex gap-2">
-                            <Button variant="outline-success" size="sm" onClick={handleExportExcel} title="Export to Excel">
-                                <FileXls size={18} weight="bold" /> Excel
-                            </Button>
-                            <Button variant="outline-danger" size="sm" onClick={handleExportPDF} title="Export to PDF">
-                                <FilePdf size={18} weight="bold" /> PDF
-                            </Button>
-                            <Button className="btn-gradient-primary btn-animated" size="sm" onClick={handleShowAdd}>
-                                <UserCirclePlus weight="bold" className="me-2" color="#fff" /> Add User
-                            </Button>
-                        </div>
+                <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <div className="d-flex align-items-center gap-2">
+                        <InputGroup size="sm" style={{ width: '250px' }}>
+                            <InputGroup.Text><MagnifyingGlass /></InputGroup.Text>
+                            <Form.Control
+                                type="text"
+                                placeholder="Search users..."
+                                value={searchTerm}
+                                onChange={handleSearch}
+                            />
+                        </InputGroup>
                     </div>
-                    <div className="table-advance-container">
-                        <Table responsive borderless className="nowrap table-advance">
-                            <thead>
+                    <div className="d-flex gap-2 align-items-center">
+                        <Button
+                            variant="outline-success"
+                            size="sm"
+                            onClick={handleExportExcel}
+                            title="Export to Excel"
+                            className="d-flex align-items-center gap-1"
+                        >
+                            <FileXls size={16} weight="bold" />
+                            <span>Excel</span>
+                        </Button>
+                        <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={handleExportPDF}
+                            title="Export to PDF"
+                            className="d-flex align-items-center gap-1"
+                        >
+                            <FilePdf size={16} weight="bold" />
+                            <span>PDF</span>
+                        </Button>
+                        <Button
+                            className="btn-gradient-primary btn-animated d-flex align-items-center gap-2"
+                            size="sm"
+                            onClick={handleShowAdd}
+                        >
+                            <UserCirclePlus size={16} weight="bold" color="#fff" />
+                            <span>Add User</span>
+                        </Button>
+                    </div>
+                </div>
+                <div className="table-advance-container">
+                    <Table responsive borderless className="nowrap table-advance">
+                        <thead>
+                            <tr>
+                                <th className="mnw-200p">Name</th>
+                                <th className="mnw-100p">Role</th>
+                                <th className="mnw-150p">Group</th>
+                                <th>Access Level</th>
+                                <th>Status</th>
+                                <th />
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loading ? (
                                 <tr>
-                                    <th className="mnw-200p">Name</th>
-                                    <th className="mnw-150p">Group</th>
-                                    <th>Access Level</th>
-                                    <th>Status</th>
-                                    <th />
+                                    <td colSpan="6" className="text-center">Loading users...</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {loading ? (
-                                    <tr>
-                                        <td colSpan="5" className="text-center">Loading users...</td>
-                                    </tr>
-                                ) : users.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="5" className="text-center">No users found. Create one to get started.</td>
-                                    </tr>
-                                ) : (
-                                    currentRows.map((user, index) => (
-                                        <React.Fragment key={user.id}>
-                                            <tr>
-                                                <td className="text-truncate">
-                                                    <div className="media align-items-center">
-                                                        <div className="media-head me-3">
-                                                            <div className="avatar avatar-xs avatar-soft-primary avatar-rounded">
-                                                                <span className="initial-wrap">{user.full_name?.charAt(0) || 'U'}</span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="media-body mnw-0">
-                                                            <Button variant="link" className="table-link-text text-high-em text-truncate mb-0 p-0" onClick={() => handleShowEdit(user)}>{user.full_name || user.email}</Button>
-                                                            <div className="fs-8 text-muted text-truncate pt-1">{user.email}</div>
+                            ) : users.length === 0 ? (
+                                <tr>
+                                    <td colSpan="6" className="text-center">No users found. Create one to get started.</td>
+                                </tr>
+                            ) : (
+                                currentRows.map((user, index) => (
+                                    <React.Fragment key={user.id}>
+                                        <tr>
+                                            <td className="text-truncate">
+                                                <div className="media align-items-center">
+                                                    <div className="media-head me-3">
+                                                        <div className="avatar avatar-xs avatar-soft-primary avatar-rounded">
+                                                            <span className="initial-wrap">{user.full_name?.charAt(0) || 'U'}</span>
                                                         </div>
                                                     </div>
-                                                </td>
-                                                <td className="text-truncate">
-                                                    {user.app_groups?.name || <span className="text-muted">No Group</span>}
-                                                </td>
-                                                <td>
-                                                    <span className={classNames("badge badge-sm badge-outline", {
-                                                        "badge-danger": user.access_level === 'Administrator',
-                                                        "badge-primary": user.access_level === 'Manager',
-                                                        "badge-secondary": user.access_level === 'Employee'
-                                                    })}>
-                                                        {user.access_level}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <span className={classNames("badge badge-indicator badge-indicator-lg", {
-                                                        "badge-success": user.status === 'Active',
-                                                        "badge-warning": user.status === 'Inactive',
-                                                        "badge-danger": user.status === 'Suspended'
-                                                    })} />
-                                                    <span className="ms-2">{user.status}</span>
-                                                </td>
-                                                <td>
-                                                    <div className="d-flex align-items-center justify-content-end">
-                                                        <HkTooltip placement="top" title="Disable" trigger="hover">
-                                                            <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleDisableUser(user.id)}>
-                                                                <span className="icon">
-                                                                    <Archive size={20} weight="bold" />
-                                                                </span>
-                                                            </Button>
-                                                        </HkTooltip>
-                                                        <HkTooltip placement="top" title="Edit" trigger="hover">
-                                                            <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleShowEdit(user)}>
-                                                                <span className="icon">
-                                                                    <PencilSimple size={20} weight="bold" />
-                                                                </span>
-                                                            </Button>
-                                                        </HkTooltip>
-                                                        <Dropdown className="dropdown-inline" align="end">
-                                                            <Dropdown.Toggle variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover no-caret">
-                                                                <HkTooltip placement="top" title="More" trigger="hover">
-                                                                    <span className="icon">
-                                                                        <DotsThreeVertical size={20} weight="bold" />
-                                                                    </span>
-                                                                </HkTooltip>
-                                                            </Dropdown.Toggle>
-                                                            <Dropdown.Menu
-                                                                popperConfig={{
-                                                                    modifiers: [
-                                                                        {
-                                                                            name: 'flip',
-                                                                            options: {
-                                                                                fallbackPlacements: ['bottom-end', 'top-end'],
-                                                                                boundary: 'viewport',
-                                                                            },
-                                                                        },
-                                                                        {
-                                                                            name: 'preventOverflow',
-                                                                            options: {
-                                                                                boundary: 'viewport',
-                                                                            },
-                                                                        },
-                                                                    ],
-                                                                }}
-                                                                style={{ zIndex: 1100 }}
-                                                            >
-                                                                <Dropdown.Item onClick={() => handleShowEdit(user)}>Edit User</Dropdown.Item>
-                                                                <Dropdown.Item onClick={() => handleDisableUser(user.id)}>Disable User</Dropdown.Item>
-                                                                <Dropdown.Divider />
-                                                                <Dropdown.Item className="text-danger" onClick={() => handleDeleteUser(user.id)}>Delete User</Dropdown.Item>
-                                                            </Dropdown.Menu>
-                                                        </Dropdown>
+                                                    <div className="media-body mnw-0">
+                                                        <Button variant="link" className="table-link-text text-high-em text-truncate mb-0 p-0" onClick={() => handleShowEdit(user)}>{user.full_name || user.email}</Button>
+                                                        <div className="fs-8 text-muted text-truncate pt-1">{user.email}</div>
                                                     </div>
-                                                </td>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span className="badge badge-soft-info">
+                                                    {user.role || 'Member'}
+                                                </span>
+                                            </td>
+                                            <td className="text-truncate">
+                                                {user.app_groups?.name || <span className="text-muted">No Group</span>}
+                                            </td>
+                                            <td>
+                                                <span className={classNames("badge badge-sm badge-outline", {
+                                                    "badge-danger": user.access_level === 'Administrator',
+                                                    "badge-primary": user.access_level === 'Manager',
+                                                    "badge-secondary": user.access_level === 'Employee'
+                                                })}>
+                                                    {user.access_level}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span className={classNames("badge badge-indicator badge-indicator-lg", {
+                                                    "badge-success": user.status === 'Active',
+                                                    "badge-warning": user.status === 'Inactive',
+                                                    "badge-danger": user.status === 'Suspended'
+                                                })} />
+                                                <span className="ms-2">{user.status}</span>
+                                            </td>
+                                            <td>
+                                                <div className="d-flex align-items-center justify-content-end">
+                                                    <HkTooltip placement="top" title="Disable" trigger="hover">
+                                                        <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleDisableUser(user.id)}>
+                                                            <span className="icon">
+                                                                <Archive size={20} weight="bold" />
+                                                            </span>
+                                                        </Button>
+                                                    </HkTooltip>
+                                                    <HkTooltip placement="top" title="Edit" trigger="hover">
+                                                        <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleShowEdit(user)}>
+                                                            <span className="icon">
+                                                                <PencilSimple size={20} weight="bold" />
+                                                            </span>
+                                                        </Button>
+                                                    </HkTooltip>
+                                                    <Dropdown className="dropdown-inline" align="end">
+                                                        <Dropdown.Toggle variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover no-caret">
+                                                            <HkTooltip placement="top" title="More" trigger="hover">
+                                                                <span className="icon">
+                                                                    <DotsThreeVertical size={20} weight="bold" />
+                                                                </span>
+                                                            </HkTooltip>
+                                                        </Dropdown.Toggle>
+                                                        <Dropdown.Menu
+                                                            popperConfig={{
+                                                                modifiers: [
+                                                                    {
+                                                                        name: 'flip',
+                                                                        options: {
+                                                                            fallbackPlacements: ['bottom-end', 'top-end'],
+                                                                            boundary: 'viewport',
+                                                                        },
+                                                                    },
+                                                                    {
+                                                                        name: 'preventOverflow',
+                                                                        options: {
+                                                                            boundary: 'viewport',
+                                                                        },
+                                                                    },
+                                                                ],
+                                                            }}
+                                                            style={{ zIndex: 1100 }}
+                                                        >
+                                                            <Dropdown.Item onClick={() => handleShowEdit(user)}>Edit User</Dropdown.Item>
+                                                            <Dropdown.Item onClick={() => handleDisableUser(user.id)}>Disable User</Dropdown.Item>
+                                                            <Dropdown.Divider />
+                                                            <Dropdown.Item className="text-danger" onClick={() => handleDeleteUser(user.id)}>Delete User</Dropdown.Item>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
+                                                </div>
+                                            </td>
 
-                                            </tr>
-                                            {index < users.length - 1 && <tr className="table-row-gap"><td colSpan="5" /></tr>}
-                                        </React.Fragment>
-                                    ))
-                                )}
-                            </tbody>
-                        </Table>
+                                        </tr>
+                                        {index < users.length - 1 && <tr className="table-row-gap"><td colSpan="6" /></tr>}
+                                    </React.Fragment>
+                                ))
+                            )}
+                        </tbody>
+                    </Table>
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <div className="p-3 d-flex justify-content-end">
+                        <Pagination>
+                            <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
+                            {[...Array(totalPages)].map((_, i) => (
+                                <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => handlePageChange(i + 1)}>
+                                    {i + 1}
+                                </Pagination.Item>
+                            ))}
+                            <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
+                        </Pagination>
                     </div>
+                )}
 
-                    {/* Pagination */}
-                    {totalPages > 1 && (
-                        <div className="p-3 d-flex justify-content-end">
-                            <Pagination>
-                                <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
-                                {[...Array(totalPages)].map((_, i) => (
-                                    <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => handlePageChange(i + 1)}>
-                                        {i + 1}
-                                    </Pagination.Item>
-                                ))}
-                                <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
-                            </Pagination>
-                        </div>
-                    )}
+                {/* Modals */}
+                <Modal show={showModal} onHide={handleClose} centered className={classNames({ "modal-faded": showGroupModal })}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>{currentUser ? 'Edit User' : 'Add New User'}</Modal.Title>
+                    </Modal.Header>
+                    <Form onSubmit={handleSubmit}>
+                        <Modal.Body>
+                            <Row className="g-3">
+                                <Col md={12}>
+                                    <Form.Group>
+                                        <Form.Label>Full Name</Form.Label>
+                                        <AIFormControl
+                                            type="text"
+                                            placeholder="Enter full name"
+                                            value={formData.full_name}
+                                            onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                                            required
+                                            fieldName="Full Name"
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={12}>
+                                    <Form.Group>
+                                        <Form.Label>Email Address</Form.Label>
+                                        <AIFormControl
+                                            type="email"
+                                            placeholder="user@example.com"
+                                            value={formData.email}
+                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                            required
+                                            fieldName="Email Address"
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={12}>
+                                    <Form.Group>
+                                        <div className="d-flex justify-content-between align-items-center">
+                                            <Form.Label>Assign Group</Form.Label>
+                                            <Button variant="link" size="sm" className="p-0" onClick={() => setShowGroupModal(true)}>+ New Group</Button>
+                                        </div>
+                                        <Form.Select
+                                            value={formData.group_id}
+                                            onChange={(e) => setFormData({ ...formData, group_id: e.target.value })}
+                                        >
+                                            <option value="">Select Group</option>
+                                            {groups.map(g => (
+                                                <option key={g.id} value={g.id}>{g.name}</option>
+                                            ))}
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group>
+                                        <Form.Label>Access Level</Form.Label>
+                                        <Form.Select
+                                            value={formData.access_level}
+                                            onChange={(e) => setFormData({ ...formData, access_level: e.target.value })}
+                                        >
+                                            <option value="Administrator">Administrator</option>
+                                            <option value="Manager">Manager</option>
+                                            <option value="Employee">Employee</option>
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group>
+                                        <Form.Label>Status</Form.Label>
+                                        <Form.Select
+                                            value={formData.status}
+                                            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                                        >
+                                            <option value="Active">Active</option>
+                                            <option value="Inactive">Inactive</option>
+                                            <option value="Suspended">Suspended</option>
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={handleClose}>Cancel</Button>
+                            <Button className="btn-gradient-primary" type="submit">
+                                {currentUser ? 'Save Changes' : 'Create User'}
+                            </Button>
+                        </Modal.Footer>
+                    </Form>
+                </Modal>
 
-                    {/* Modals */}
-                    <Modal show={showModal} onHide={handleClose} centered className={classNames({ "modal-faded": showGroupModal })}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>{currentUser ? 'Edit User' : 'Add New User'}</Modal.Title>
-                        </Modal.Header>
-                        <Form onSubmit={handleSubmit}>
-                            <Modal.Body>
-                                <Row className="g-3">
-                                    <Col md={12}>
-                                        <Form.Group>
-                                            <Form.Label>Full Name</Form.Label>
-                                            <AIFormControl
-                                                type="text"
-                                                placeholder="Enter full name"
-                                                value={formData.full_name}
-                                                onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                                                required
-                                                fieldName="Full Name"
-                                            />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col md={12}>
-                                        <Form.Group>
-                                            <Form.Label>Email Address</Form.Label>
-                                            <AIFormControl
-                                                type="email"
-                                                placeholder="user@example.com"
-                                                value={formData.email}
-                                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                                required
-                                                fieldName="Email Address"
-                                            />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col md={12}>
-                                        <Form.Group>
-                                            <div className="d-flex justify-content-between align-items-center">
-                                                <Form.Label>Assign Group</Form.Label>
-                                                <Button variant="link" size="sm" className="p-0" onClick={() => setShowGroupModal(true)}>+ New Group</Button>
-                                            </div>
-                                            <Form.Select
-                                                value={formData.group_id}
-                                                onChange={(e) => setFormData({ ...formData, group_id: e.target.value })}
-                                            >
-                                                <option value="">Select Group</option>
-                                                {groups.map(g => (
-                                                    <option key={g.id} value={g.id}>{g.name}</option>
-                                                ))}
-                                            </Form.Select>
-                                        </Form.Group>
-                                    </Col>
-                                    <Col md={6}>
-                                        <Form.Group>
-                                            <Form.Label>Access Level</Form.Label>
-                                            <Form.Select
-                                                value={formData.access_level}
-                                                onChange={(e) => setFormData({ ...formData, access_level: e.target.value })}
-                                            >
-                                                <option value="Administrator">Administrator</option>
-                                                <option value="Manager">Manager</option>
-                                                <option value="Employee">Employee</option>
-                                            </Form.Select>
-                                        </Form.Group>
-                                    </Col>
-                                    <Col md={6}>
-                                        <Form.Group>
-                                            <Form.Label>Status</Form.Label>
-                                            <Form.Select
-                                                value={formData.status}
-                                                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                                            >
-                                                <option value="Active">Active</option>
-                                                <option value="Inactive">Inactive</option>
-                                                <option value="Suspended">Suspended</option>
-                                            </Form.Select>
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                            </Modal.Body>
-                            <Modal.Footer>
-                                <Button variant="secondary" onClick={handleClose}>Cancel</Button>
-                                <Button className="btn-gradient-primary" type="submit">
-                                    {currentUser ? 'Save Changes' : 'Create User'}
-                                </Button>
-                            </Modal.Footer>
-                        </Form>
-                    </Modal>
-
-                    <GroupFormModal
-                        show={showGroupModal}
-                        onHide={() => setShowGroupModal(false)}
-                        onSuccess={() => {
-                            fetchGroups();
-                            setShowGroupModal(false);
-                        }}
-                    />
-                </Card.Body>
-            </Card>
+                <GroupFormModal
+                    show={showGroupModal}
+                    onHide={() => setShowGroupModal(false)}
+                    onSuccess={() => {
+                        fetchGroups();
+                        setShowGroupModal(false);
+                    }}
+                />
+            </div>
         </>
     );
 };

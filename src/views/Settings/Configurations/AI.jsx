@@ -51,6 +51,8 @@ const AI = () => {
             if (error) throw error;
             setConfigs(data || []);
         } catch (error) {
+            // Ignore AbortError - happens during normal navigation
+            if (error?.name === 'AbortError' || error?.message?.includes('abort')) return;
             console.error('Error fetching AI configs:', error);
             toast.error('Failed to load AI configurations');
         } finally {
@@ -220,108 +222,110 @@ const AI = () => {
 
     return (
         <>
-            <Card className="card-border">
-                <Card.Body className="p-0">
-                    <div className="d-flex justify-content-between align-items-center mb-3 p-3 flex-wrap gap-2">
-                        <div className="d-flex align-items-center gap-2">
-                            <h5 className="mb-0 me-3">AI Configurations</h5>
-                            <InputGroup size="sm" style={{ width: '250px' }}>
-                                <InputGroup.Text><MagnifyingGlass weight="bold" /></InputGroup.Text>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Search configurations..."
-                                    value={searchTerm}
-                                    onChange={handleSearch}
-                                />
-                            </InputGroup>
-                        </div>
-                        <div className="d-flex gap-2">
-                            <Button className="btn-gradient-primary btn-animated" size="sm" onClick={() => handleShow()}>
-                                <Plus weight="bold" className="me-2" color="#fff" /> Add Configuration
-                            </Button>
-                        </div>
+            <div>
+                <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <div className="d-flex align-items-center gap-2">
+                        <InputGroup size="sm" style={{ width: '250px' }}>
+                            <InputGroup.Text><MagnifyingGlass weight="bold" /></InputGroup.Text>
+                            <Form.Control
+                                type="text"
+                                placeholder="Search configurations..."
+                                value={searchTerm}
+                                onChange={handleSearch}
+                            />
+                        </InputGroup>
                     </div>
+                    <div className="d-flex gap-2 align-items-center">
+                        <Button
+                            className="btn-gradient-primary btn-animated d-flex align-items-center gap-2"
+                            size="sm"
+                            onClick={() => handleShow()}
+                        >
+                            <Plus size={16} weight="bold" color="#fff" />
+                            <span>Add Configuration</span>
+                        </Button>
+                    </div>
+                </div>
 
-                    <div className="table-advance-container">
-                        <Table responsive borderless className="nowrap table-advance">
-                            <thead>
+                <div className="table-advance-container">
+                    <Table responsive borderless className="nowrap table-advance">
+                        <thead>
+                            <tr>
+                                <th>Config Name</th>
+                                <th>Provider</th>
+                                <th>Base URL</th>
+                                <th>Model ID</th>
+                                <th>Status</th>
+                                <th>Primary</th>
+                                <th />
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loading ? (
                                 <tr>
-                                    <th>Config Name</th>
-                                    <th>Provider</th>
-                                    <th>Base URL</th>
-                                    <th>Model ID</th>
-                                    <th>Status</th>
-                                    <th>Primary</th>
-                                    <th />
+                                    <td colSpan="7" className="text-center p-5">
+                                        <div className="d-flex flex-column align-items-center">
+                                            <Spinner animation="border" variant="primary" className="mb-2" />
+                                            <span className="text-muted">Fetching AI configurations...</span>
+                                        </div>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {loading ? (
-                                    <tr>
-                                        <td colSpan="7" className="text-center p-5">
-                                            <div className="d-flex flex-column align-items-center">
-                                                <Spinner animation="border" variant="primary" className="mb-2" />
-                                                <span className="text-muted">Fetching AI configurations...</span>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ) : filteredConfigs.length === 0 ? (
-                                    <tr><td colSpan="7" className="text-center p-5 text-muted">No AI configurations found.</td></tr>
-                                ) : (
-                                    filteredConfigs.map((config) => {
-                                        return (
-                                            <tr key={config.id}>
-                                                <td className="fw-bold">
-                                                    <span className="text-dark">{config.name || 'Unnamed Config'}</span>
-                                                </td>
-                                                <td>
-                                                    <div className="d-flex align-items-center">
-                                                        <div className="avatar avatar-xs avatar-soft-info avatar-rounded me-2">
-                                                            <span className="initial-wrap"><Cpu size={18} /></span>
-                                                        </div>
-                                                        {config.provider}
+                            ) : filteredConfigs.length === 0 ? (
+                                <tr><td colSpan="7" className="text-center p-5 text-muted">No AI configurations found.</td></tr>
+                            ) : (
+                                filteredConfigs.map((config) => {
+                                    return (
+                                        <tr key={config.id}>
+                                            <td className="fw-bold">
+                                                <span className="text-dark">{config.name || 'Unnamed Config'}</span>
+                                            </td>
+                                            <td>
+                                                <div className="d-flex align-items-center">
+                                                    <div className="avatar avatar-xs avatar-soft-info avatar-rounded me-2">
+                                                        <span className="initial-wrap"><Cpu size={18} /></span>
                                                     </div>
-                                                </td>
-                                                <td className="text-muted small">{config.base_url || 'Default'}</td>
-                                                <td style={{ maxWidth: '250px' }} className="text-truncate fw-medium text-primary">
-                                                    {config.models || 'Not set'}
-                                                </td>
-                                                <td>
-                                                    <div className="d-flex align-items-center">
-                                                        <span className={classNames("badge badge-indicator badge-indicator-lg", {
-                                                            "badge-success": config.status === 'Active',
-                                                            "badge-secondary": config.status === 'Inactive' || !config.status
-                                                        })} />
-                                                        <span className="ms-2 fw-medium">{config.status || 'Active'}</span>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <Form.Check
-                                                        type="switch"
-                                                        id={`primary-switch-${config.id}`}
-                                                        checked={config.is_primary || false}
-                                                        onChange={() => togglePrimary(config.id)}
-                                                    />
-                                                </td>
-                                                <td>
-                                                    <div className="d-flex justify-content-end gap-2">
-                                                        <Button variant="flush-light" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleShow(config)}>
-                                                            <span className="icon"><PencilSimple size={20} weight="bold" /></span>
-                                                        </Button>
-                                                        <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleDelete(config.id)}>
-                                                            <span className="icon"><Trash size={20} weight="bold" /></span>
-                                                        </Button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })
-                                )}
-                            </tbody>
-                        </Table>
-                    </div>
-                </Card.Body>
-            </Card >
+                                                    {config.provider}
+                                                </div>
+                                            </td>
+                                            <td className="text-muted small">{config.base_url || 'Default'}</td>
+                                            <td style={{ maxWidth: '250px' }} className="text-truncate fw-medium text-primary">
+                                                {config.models || 'Not set'}
+                                            </td>
+                                            <td>
+                                                <div className="d-flex align-items-center">
+                                                    <span className={classNames("badge badge-indicator badge-indicator-lg", {
+                                                        "badge-success": config.status === 'Active',
+                                                        "badge-secondary": config.status === 'Inactive' || !config.status
+                                                    })} />
+                                                    <span className="ms-2 fw-medium">{config.status || 'Active'}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <Form.Check
+                                                    type="switch"
+                                                    id={`primary-switch-${config.id}`}
+                                                    checked={config.is_primary || false}
+                                                    onChange={() => togglePrimary(config.id)}
+                                                />
+                                            </td>
+                                            <td>
+                                                <div className="d-flex justify-content-end gap-2">
+                                                    <Button variant="flush-light" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleShow(config)}>
+                                                        <span className="icon"><PencilSimple size={20} weight="bold" /></span>
+                                                    </Button>
+                                                    <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleDelete(config.id)}>
+                                                        <span className="icon"><Trash size={20} weight="bold" /></span>
+                                                    </Button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            )}
+                        </tbody>
+                    </Table>
+                </div>
+            </div>
 
             <Modal show={showModal} onHide={handleClose} centered size="lg">
                 <Modal.Header closeButton>

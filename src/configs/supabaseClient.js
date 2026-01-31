@@ -18,8 +18,26 @@ if (!supabaseKey) {
     )
 }
 
+// Global handler to suppress AbortError in unhandled promise rejections
+if (typeof window !== 'undefined') {
+    window.addEventListener('unhandledrejection', (event) => {
+        if (event.reason?.name === 'AbortError' ||
+            event.reason?.message?.includes('aborted') ||
+            event.reason?.message?.includes('signal')) {
+            event.preventDefault();
+        }
+    });
+}
+
 export const supabase = createClient(
     supabaseUrl || 'https://placeholder-if-missing.supabase.co',
-    supabaseKey || 'placeholder-key'
+    supabaseKey || 'placeholder-key',
+    {
+        auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true,
+            flowType: 'pkce'
+        }
+    }
 )
-

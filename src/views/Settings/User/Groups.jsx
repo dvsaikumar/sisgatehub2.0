@@ -31,6 +31,8 @@ const Groups = () => {
             if (error) throw error;
             setGroups(data || []);
         } catch (error) {
+            // Ignore AbortError - happens during normal navigation
+            if (error?.name === 'AbortError' || error?.message?.includes('abort')) return;
             console.error('Error fetching groups:', error.message);
             toast.error('Failed to load groups');
         } finally {
@@ -131,153 +133,169 @@ const Groups = () => {
 
     return (
         <>
-            <Card className="card-border">
-                <Card.Body className="p-0">
-                    <div className="d-flex justify-content-between align-items-center mb-3 p-3 flex-wrap gap-2">
-                        <div className="d-flex align-items-center gap-2">
-                            <h5 className="mb-0 me-3">Groups</h5>
-                            <InputGroup size="sm" style={{ width: '250px' }}>
-                                <InputGroup.Text><MagnifyingGlass /></InputGroup.Text>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Search groups..."
-                                    value={searchTerm}
-                                    onChange={handleSearch}
-                                />
-                            </InputGroup>
-                        </div>
-                        <div className="d-flex gap-2">
-                            <Button variant="outline-success" size="sm" onClick={handleExportExcel} title="Export to Excel">
-                                <FileXls size={18} /> Excel
-                            </Button>
-                            <Button variant="outline-danger" size="sm" onClick={handleExportPDF} title="Export to PDF">
-                                <FilePdf size={18} /> PDF
-                            </Button>
-                            <Button className="btn-gradient-primary btn-animated" size="sm" onClick={handleShowAdd}>
-                                <Plus weight="bold" className="me-2" color="#fff" /> Add Group
-                            </Button>
-                        </div>
+            <div>
+                <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <div className="d-flex align-items-center gap-2">
+                        <InputGroup size="sm" style={{ width: '250px' }}>
+                            <InputGroup.Text><MagnifyingGlass /></InputGroup.Text>
+                            <Form.Control
+                                type="text"
+                                placeholder="Search groups..."
+                                value={searchTerm}
+                                onChange={handleSearch}
+                            />
+                        </InputGroup>
                     </div>
-                    <div className="table-advance-container">
-                        <Table responsive borderless className="nowrap table-advance">
-                            <thead>
+                    <div className="d-flex gap-2 align-items-center">
+                        <Button
+                            variant="outline-success"
+                            size="sm"
+                            onClick={handleExportExcel}
+                            title="Export to Excel"
+                            className="d-flex align-items-center gap-1"
+                        >
+                            <FileXls size={16} weight="bold" />
+                            <span>Excel</span>
+                        </Button>
+                        <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={handleExportPDF}
+                            title="Export to PDF"
+                            className="d-flex align-items-center gap-1"
+                        >
+                            <FilePdf size={16} weight="bold" />
+                            <span>PDF</span>
+                        </Button>
+                        <Button
+                            className="btn-gradient-primary btn-animated d-flex align-items-center gap-2"
+                            size="sm"
+                            onClick={handleShowAdd}
+                        >
+                            <Plus size={16} weight="bold" color="#fff" />
+                            <span>Add Group</span>
+                        </Button>
+                    </div>
+                </div>
+                <div className="table-advance-container">
+                    <Table responsive borderless className="nowrap table-advance">
+                        <thead>
+                            <tr>
+                                <th className="mnw-150p">Group Name</th>
+                                <th className="mnw-200p">Description</th>
+                                <th />
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loading ? (
                                 <tr>
-                                    <th className="mnw-150p">Group Name</th>
-                                    <th className="mnw-200p">Description</th>
-                                    <th />
+                                    <td colSpan="3" className="text-center">Loading groups...</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {loading ? (
-                                    <tr>
-                                        <td colSpan="3" className="text-center">Loading groups...</td>
-                                    </tr>
-                                ) : groups.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="3" className="text-center">No groups found. Create one to get started.</td>
-                                    </tr>
-                                ) : (
-                                    currentRows.map((group, index) => (
-                                        <React.Fragment key={group.id}>
-                                            <tr>
-                                                <td className="text-truncate">
-                                                    <div className="media align-items-center">
-                                                        <div className="media-head me-3">
-                                                            <div className="avatar avatar-xs avatar-soft-primary avatar-rounded">
-                                                                <span className="initial-wrap">
-                                                                    <UsersThree size={18} weight="bold" />
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="media-body mnw-0">
-                                                            <Button variant="link" className="table-link-text text-high-em text-truncate mb-0 p-0" onClick={() => handleShowEdit(group)}>{group.name}</Button>
+                            ) : groups.length === 0 ? (
+                                <tr>
+                                    <td colSpan="3" className="text-center">No groups found. Create one to get started.</td>
+                                </tr>
+                            ) : (
+                                currentRows.map((group, index) => (
+                                    <React.Fragment key={group.id}>
+                                        <tr>
+                                            <td className="text-truncate">
+                                                <div className="media align-items-center">
+                                                    <div className="media-head me-3">
+                                                        <div className="avatar avatar-xs avatar-soft-primary avatar-rounded">
+                                                            <span className="initial-wrap">
+                                                                <UsersThree size={18} weight="bold" />
+                                                            </span>
                                                         </div>
                                                     </div>
-                                                </td>
-                                                <td className="text-truncate">{group.description || <span className="text-muted text-italic">No description</span>}</td>
-                                                <td>
-                                                    <div className="d-flex align-items-center justify-content-end">
-                                                        <HkTooltip placement="top" title="Archive" trigger="hover">
-                                                            <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover" onClick={() => toast.success("Archived (Mock)")}>
-                                                                <span className="icon">
-                                                                    <Archive size={20} />
-                                                                </span>
-                                                            </Button>
-                                                        </HkTooltip>
-                                                        <HkTooltip placement="top" title="Edit" trigger="hover">
-                                                            <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleShowEdit(group)}>
-                                                                <span className="icon">
-                                                                    <PencilSimple size={20} />
-                                                                </span>
-                                                            </Button>
-                                                        </HkTooltip>
-                                                        <Dropdown className="dropdown-inline" align="end">
-                                                            <Dropdown.Toggle variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover no-caret">
-                                                                <HkTooltip placement="top" title="More" trigger="hover">
-                                                                    <span className="icon">
-                                                                        <DotsThreeVertical size={20} weight="bold" />
-                                                                    </span>
-                                                                </HkTooltip>
-                                                            </Dropdown.Toggle>
-                                                            <Dropdown.Menu
-                                                                popperConfig={{
-                                                                    modifiers: [
-                                                                        {
-                                                                            name: 'flip',
-                                                                            options: {
-                                                                                fallbackPlacements: ['bottom-end', 'top-end'],
-                                                                                boundary: 'viewport',
-                                                                            },
-                                                                        },
-                                                                        {
-                                                                            name: 'preventOverflow',
-                                                                            options: {
-                                                                                boundary: 'viewport',
-                                                                            },
-                                                                        },
-                                                                    ],
-                                                                }}
-                                                                style={{ zIndex: 1100 }}
-                                                            >
-                                                                <Dropdown.Item onClick={() => handleShowEdit(group)}>Edit Group</Dropdown.Item>
-                                                                <Dropdown.Divider />
-                                                                <Dropdown.Item className="text-danger" onClick={() => handleDeleteGroup(group.id)}>Delete Group</Dropdown.Item>
-                                                            </Dropdown.Menu>
-                                                        </Dropdown>
+                                                    <div className="media-body mnw-0">
+                                                        <Button variant="link" className="table-link-text text-high-em text-truncate mb-0 p-0" onClick={() => handleShowEdit(group)}>{group.name}</Button>
                                                     </div>
-                                                </td>
-                                            </tr>
-                                            {index < groups.length - 1 && <tr className="table-row-gap"><td colSpan="3" /></tr>}
-                                        </React.Fragment>
-                                    ))
-                                )}
-                            </tbody>
-                        </Table>
+                                                </div>
+                                            </td>
+                                            <td className="text-truncate">{group.description || <span className="text-muted text-italic">No description</span>}</td>
+                                            <td>
+                                                <div className="d-flex align-items-center justify-content-end">
+                                                    <HkTooltip placement="top" title="Archive" trigger="hover">
+                                                        <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover" onClick={() => toast.success("Archived (Mock)")}>
+                                                            <span className="icon">
+                                                                <Archive size={20} />
+                                                            </span>
+                                                        </Button>
+                                                    </HkTooltip>
+                                                    <HkTooltip placement="top" title="Edit" trigger="hover">
+                                                        <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleShowEdit(group)}>
+                                                            <span className="icon">
+                                                                <PencilSimple size={20} />
+                                                            </span>
+                                                        </Button>
+                                                    </HkTooltip>
+                                                    <Dropdown className="dropdown-inline" align="end">
+                                                        <Dropdown.Toggle variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover no-caret">
+                                                            <HkTooltip placement="top" title="More" trigger="hover">
+                                                                <span className="icon">
+                                                                    <DotsThreeVertical size={20} weight="bold" />
+                                                                </span>
+                                                            </HkTooltip>
+                                                        </Dropdown.Toggle>
+                                                        <Dropdown.Menu
+                                                            popperConfig={{
+                                                                modifiers: [
+                                                                    {
+                                                                        name: 'flip',
+                                                                        options: {
+                                                                            fallbackPlacements: ['bottom-end', 'top-end'],
+                                                                            boundary: 'viewport',
+                                                                        },
+                                                                    },
+                                                                    {
+                                                                        name: 'preventOverflow',
+                                                                        options: {
+                                                                            boundary: 'viewport',
+                                                                        },
+                                                                    },
+                                                                ],
+                                                            }}
+                                                            style={{ zIndex: 1100 }}
+                                                        >
+                                                            <Dropdown.Item onClick={() => handleShowEdit(group)}>Edit Group</Dropdown.Item>
+                                                            <Dropdown.Divider />
+                                                            <Dropdown.Item className="text-danger" onClick={() => handleDeleteGroup(group.id)}>Delete Group</Dropdown.Item>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {index < groups.length - 1 && <tr className="table-row-gap"><td colSpan="3" /></tr>}
+                                    </React.Fragment>
+                                ))
+                            )}
+                        </tbody>
+                    </Table>
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <div className="d-flex justify-content-end">
+                        <Pagination>
+                            <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
+                            {[...Array(totalPages)].map((_, i) => (
+                                <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => handlePageChange(i + 1)}>
+                                    {i + 1}
+                                </Pagination.Item>
+                            ))}
+                            <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
+                        </Pagination>
                     </div>
+                )}
 
-                    {/* Pagination */}
-                    {totalPages > 1 && (
-                        <div className="p-3 d-flex justify-content-end">
-                            <Pagination>
-                                <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
-                                {[...Array(totalPages)].map((_, i) => (
-                                    <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => handlePageChange(i + 1)}>
-                                        {i + 1}
-                                    </Pagination.Item>
-                                ))}
-                                <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
-                            </Pagination>
-                        </div>
-                    )}
-
-                    <GroupFormModal
-                        show={showModal}
-                        onHide={handleClose}
-                        onSuccess={handleSuccess}
-                        initialGroup={currentGroup}
-                    />
-                </Card.Body>
-            </Card>
+                <GroupFormModal
+                    show={showModal}
+                    onHide={handleClose}
+                    onSuccess={handleSuccess}
+                    initialGroup={currentGroup}
+                />
+            </div>
         </>
     );
 };

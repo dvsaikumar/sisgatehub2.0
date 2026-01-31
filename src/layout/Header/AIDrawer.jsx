@@ -15,38 +15,55 @@ const AIDrawer = ({ show, onHide }) => {
     const [selectedField, setSelectedField] = useState("");
 
     useEffect(() => {
+        let isMounted = true;
+
+        const fetchApplicationFields = async () => {
+            try {
+                // Fetch templates names
+                const { data: templates } = await supabase.from('app_templates').select('id, name').order('name');
+                if (!isMounted) return;
+
+                // Fetch library documents names
+                const { data: documents } = await supabase.from('app_documents').select('id, name').order('name');
+                if (!isMounted) return;
+
+                const combined = [
+                    ...(templates || []).map(t => ({ id: t.id, name: t.name, type: 'Template' })),
+                    ...(documents || []).map(d => ({ id: d.id, name: d.name, type: 'Library Doc' }))
+                ];
+                setAppFields(combined);
+            } catch (error) {
+                if (error?.name !== 'AbortError') {
+                    console.error('Error fetching fields:', error);
+                }
+            }
+        };
+
+        const fetchPrimaryConfig = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('app_ai_configs')
+                    .select('*')
+                    .eq('is_primary', true)
+                    .single();
+
+                if (isMounted && data) setActiveConfig(data);
+            } catch (error) {
+                if (error?.name !== 'AbortError') {
+                    console.error('Error fetching AI config:', error);
+                }
+            }
+        };
+
         if (show) {
             fetchPrimaryConfig();
             fetchApplicationFields();
         }
+
+        return () => {
+            isMounted = false;
+        };
     }, [show]);
-
-    const fetchApplicationFields = async () => {
-        try {
-            // Fetch templates names
-            const { data: templates } = await supabase.from('app_templates').select('id, name').order('name');
-            // Fetch library documents names
-            const { data: documents } = await supabase.from('app_documents').select('id, name').order('name');
-
-            const combined = [
-                ...(templates || []).map(t => ({ id: t.id, name: t.name, type: 'Template' })),
-                ...(documents || []).map(d => ({ id: d.id, name: d.name, type: 'Library Doc' }))
-            ];
-            setAppFields(combined);
-        } catch (error) {
-            console.error('Error fetching fields:', error);
-        }
-    };
-
-    const fetchPrimaryConfig = async () => {
-        const { data, error } = await supabase
-            .from('app_ai_configs')
-            .select('*')
-            .eq('is_primary', true)
-            .single();
-
-        if (data) setActiveConfig(data);
-    };
 
     const handleGenerate = async () => {
         if (!prompt) {

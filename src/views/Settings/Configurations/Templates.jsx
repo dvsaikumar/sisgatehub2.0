@@ -54,6 +54,8 @@ const Templates = () => {
             if (error) throw error;
             setTemplates(data || []);
         } catch (error) {
+            // Ignore AbortError - happens during normal navigation
+            if (error?.name === 'AbortError' || error?.message?.includes('abort')) return;
             console.error('Error fetching templates:', error);
             toast.error('Failed to load templates');
         } finally {
@@ -181,89 +183,91 @@ const Templates = () => {
 
     return (
         <>
-            <Card className="card-border">
-                <Card.Body className="p-0">
-                    <div className="d-flex justify-content-between align-items-center mb-3 p-3 flex-wrap gap-2">
-                        <div className="d-flex align-items-center gap-2">
-                            <h5 className="mb-0 me-3">Templates</h5>
-                            <InputGroup size="sm" style={{ width: '250px' }}>
-                                <InputGroup.Text><MagnifyingGlass weight="bold" /></InputGroup.Text>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Search templates..."
-                                    value={searchTerm}
-                                    onChange={handleSearch}
-                                />
-                            </InputGroup>
-                        </div>
-                        <div className="d-flex gap-2">
-                            <Button className="btn-gradient-primary btn-animated" size="sm" onClick={() => handleShow()}>
-                                <Plus weight="bold" className="me-2" color="#fff" /> Add Template
-                            </Button>
-                        </div>
+            <div>
+                <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <div className="d-flex align-items-center gap-2">
+                        <InputGroup size="sm" style={{ width: '250px' }}>
+                            <InputGroup.Text><MagnifyingGlass weight="bold" /></InputGroup.Text>
+                            <Form.Control
+                                type="text"
+                                placeholder="Search templates..."
+                                value={searchTerm}
+                                onChange={handleSearch}
+                            />
+                        </InputGroup>
                     </div>
+                    <div className="d-flex gap-2 align-items-center">
+                        <Button
+                            className="btn-gradient-primary btn-animated d-flex align-items-center gap-2"
+                            size="sm"
+                            onClick={() => handleShow()}
+                        >
+                            <Plus size={16} weight="bold" color="#fff" />
+                            <span>Add Template</span>
+                        </Button>
+                    </div>
+                </div>
 
-                    <div className="table-advance-container">
-                        <Table responsive borderless className="nowrap table-advance">
-                            <thead>
-                                <tr>
-                                    <th className="mnw-200p">Template Name</th>
-                                    <th>Type</th>
-                                    <th>Category</th>
-                                    <th>Status</th>
-                                    <th>Last Updated</th>
-                                    <th />
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {loading ? (
-                                    <tr><td colSpan="6" className="text-center">Loading templates...</td></tr>
-                                ) : filteredTemplates.length === 0 ? (
-                                    <tr><td colSpan="6" className="text-center">No templates found.</td></tr>
-                                ) : (
-                                    filteredTemplates.map((tpl) => (
-                                        <tr key={tpl.id}>
-                                            <td>
-                                                <div className="d-flex align-items-center">
-                                                    <div className="avatar avatar-xs avatar-soft-primary avatar-rounded me-3">
-                                                        <span className="initial-wrap">
-                                                            <FileText size={18} weight="bold" />
-                                                        </span>
-                                                    </div>
-                                                    <span className="text-high-em fw-bold">{tpl.name}</span>
+                <div className="table-advance-container">
+                    <Table responsive borderless className="nowrap table-advance">
+                        <thead>
+                            <tr>
+                                <th className="mnw-200p">Template Name</th>
+                                <th>Type</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Last Updated</th>
+                                <th />
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loading ? (
+                                <tr><td colSpan="6" className="text-center">Loading templates...</td></tr>
+                            ) : filteredTemplates.length === 0 ? (
+                                <tr><td colSpan="6" className="text-center">No templates found.</td></tr>
+                            ) : (
+                                filteredTemplates.map((tpl) => (
+                                    <tr key={tpl.id}>
+                                        <td>
+                                            <div className="d-flex align-items-center">
+                                                <div className="avatar avatar-xs avatar-soft-primary avatar-rounded me-3">
+                                                    <span className="initial-wrap">
+                                                        <FileText size={18} weight="bold" />
+                                                    </span>
                                                 </div>
-                                            </td>
-                                            <td>
-                                                <span className="badge badge-soft-secondary py-1 px-2">{tpl.type || 'Email'}</span>
-                                            </td>
-                                            <td>{tpl.category || 'Uncategorized'}</td>
-                                            <td>
-                                                <span className={`badge ${tpl.status === 'Active' ? 'badge-soft-success' : 'badge-soft-secondary'}`}>
-                                                    {tpl.status}
-                                                </span>
-                                            </td>
-                                            <td>{dayjs(tpl.updated_at || tpl.created_at).format('DD-MM-YYYY')}</td>
-                                            <td>
-                                                <div className="d-flex justify-content-end gap-2">
-                                                    <Button variant="flush-light" className="btn-icon btn-rounded flush-soft-hover" title="Duplicate" onClick={() => handleDuplicate(tpl)}>
-                                                        <span className="icon"><Copy size={18} weight="bold" /></span>
-                                                    </Button>
-                                                    <Button variant="flush-light" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleShow(tpl)}>
-                                                        <span className="icon"><PencilSimple size={20} weight="bold" /></span>
-                                                    </Button>
-                                                    <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleDelete(tpl.id)}>
-                                                        <span className="icon"><Trash size={20} weight="bold" /></span>
-                                                    </Button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </Table>
-                    </div>
-                </Card.Body>
-            </Card>
+                                                <span className="text-high-em fw-bold">{tpl.name}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span className="badge badge-soft-secondary py-1 px-2">{tpl.type || 'Email'}</span>
+                                        </td>
+                                        <td>{tpl.category || 'Uncategorized'}</td>
+                                        <td>
+                                            <span className={`badge ${tpl.status === 'Active' ? 'badge-soft-success' : 'badge-soft-secondary'}`}>
+                                                {tpl.status}
+                                            </span>
+                                        </td>
+                                        <td>{dayjs(tpl.updated_at || tpl.created_at).format('DD-MM-YYYY')}</td>
+                                        <td>
+                                            <div className="d-flex justify-content-end gap-2">
+                                                <Button variant="flush-light" className="btn-icon btn-rounded flush-soft-hover" title="Duplicate" onClick={() => handleDuplicate(tpl)}>
+                                                    <span className="icon"><Copy size={18} weight="bold" /></span>
+                                                </Button>
+                                                <Button variant="flush-light" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleShow(tpl)}>
+                                                    <span className="icon"><PencilSimple size={20} weight="bold" /></span>
+                                                </Button>
+                                                <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleDelete(tpl.id)}>
+                                                    <span className="icon"><Trash size={20} weight="bold" /></span>
+                                                </Button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </Table>
+                </div>
+            </div>
 
             <Modal show={showModal} onHide={handleClose} centered size="xl">
                 <Modal.Header closeButton>

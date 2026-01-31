@@ -87,8 +87,8 @@ export const routes = [
     { path: 'apps/integrations/integrations-detail', exact: true, component: IntegrationsDetail },
     { path: 'apps/integrations/integration', exact: true, component: Integration },
     //Pages
-    { path: 'pages/profile', exact: true, component: Profile },
-    { path: 'pages/edit-profile', exact: true, component: EditProfile },
+    { path: 'profile', exact: true, component: Profile },
+    { path: 'edit-profile', exact: true, component: EditProfile },
     { path: 'pages/account', exact: true, component: Account },
     //Error
     { path: 'error-404', exact: true, component: Error404 },

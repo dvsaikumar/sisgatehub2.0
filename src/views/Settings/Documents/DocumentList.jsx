@@ -164,6 +164,8 @@ const DocumentList = () => {
             if (error) throw error;
             setDocuments(data || []);
         } catch (error) {
+            // Ignore AbortError - happens during normal navigation
+            if (error?.name === 'AbortError' || error?.message?.includes('abort')) return;
             console.error('Error fetching documents:', error);
             toast.error('Failed to load documents');
         } finally {
@@ -184,6 +186,8 @@ const DocumentList = () => {
             // Filter out only main categories (no parent)
             setMainCategories(data.filter(c => !c.parent_id) || []);
         } catch (error) {
+            // Ignore AbortError - happens during normal navigation
+            if (error?.name === 'AbortError' || error?.message?.includes('abort')) return;
             console.error('Error fetching categories:', error);
         }
     };
@@ -372,326 +376,342 @@ const DocumentList = () => {
 
     return (
         <>
-            <Card className="card-border">
-                <Card.Body className="p-0">
-                    <div className="d-flex justify-content-between align-items-center mb-3 p-3 flex-wrap gap-2">
-                        <div className="d-flex align-items-center gap-2">
-                            <h5 className="mb-0 me-3">Documents</h5>
-                            <InputGroup size="sm" style={{ width: '250px' }}>
-                                <InputGroup.Text><MagnifyingGlass /></InputGroup.Text>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Search documents..."
-                                    value={searchTerm}
-                                    onChange={handleSearch}
-                                />
-                            </InputGroup>
-                        </div>
-                        <div className="d-flex gap-2">
-                            <Button variant="outline-success" size="sm" onClick={handleExportExcel} title="Export to Excel">
-                                <FileXls size={18} /> Excel
-                            </Button>
-                            <Button variant="outline-danger" size="sm" onClick={handleExportPDF} title="Export to PDF">
-                                <FilePdf size={18} /> PDF
-                            </Button>
-                            <Button className="btn-gradient-primary btn-animated" size="sm" onClick={() => handleShow(null)}>
-                                <Plus weight="bold" className="me-2" color="#fff" /> Add Document
-                            </Button>
-                        </div>
+            <div>
+                <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <div className="d-flex align-items-center gap-2">
+                        <InputGroup size="sm" style={{ width: '250px' }}>
+                            <InputGroup.Text><MagnifyingGlass /></InputGroup.Text>
+                            <Form.Control
+                                type="text"
+                                placeholder="Search documents..."
+                                value={searchTerm}
+                                onChange={handleSearch}
+                            />
+                        </InputGroup>
                     </div>
+                    <div className="d-flex gap-2 align-items-center">
+                        <Button
+                            variant="outline-success"
+                            size="sm"
+                            onClick={handleExportExcel}
+                            title="Export to Excel"
+                            className="d-flex align-items-center gap-1"
+                        >
+                            <FileXls size={16} weight="bold" />
+                            <span>Excel</span>
+                        </Button>
+                        <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={handleExportPDF}
+                            title="Export to PDF"
+                            className="d-flex align-items-center gap-1"
+                        >
+                            <FilePdf size={16} weight="bold" />
+                            <span>PDF</span>
+                        </Button>
+                        <Button
+                            className="btn-gradient-primary btn-animated d-flex align-items-center gap-2"
+                            size="sm"
+                            onClick={() => handleShow(null)}
+                        >
+                            <Plus size={16} weight="bold" color="#fff" />
+                            <span>Add Document</span>
+                        </Button>
+                    </div>
+                </div>
 
-                    <div className="table-advance-container">
-                        <Table borderless className="nowrap table-advance">
-                            <thead>
+                <div className="table-advance-container">
+                    <Table borderless className="nowrap table-advance">
+                        <thead>
+                            <tr>
+                                <th className="mnw-200p">Name</th>
+                                <th>Type</th>
+                                <th>Category</th>
+                                <th />
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {currentRows.length === 0 ? (
                                 <tr>
-                                    <th className="mnw-200p">Name</th>
-                                    <th>Type</th>
-                                    <th>Category</th>
-                                    <th />
+                                    <td colSpan="4" className="text-center">No documents found.</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {currentRows.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="4" className="text-center">No documents found.</td>
-                                    </tr>
-                                ) : (
-                                    currentRows.map((doc) => (
-                                        <tr key={doc.id}>
-                                            <td>
-                                                <div className="d-flex align-items-center">
-                                                    <div className="avatar avatar-xs avatar-soft-primary avatar-rounded me-3">
-                                                        <span className="initial-wrap">
-                                                            <FileText size={18} weight={doc.file_path ? "fill" : "regular"} />
-                                                        </span>
-                                                    </div>
-                                                    <span className="text-high-em">{doc.name}</span>
+                            ) : (
+                                currentRows.map((doc) => (
+                                    <tr key={doc.id}>
+                                        <td>
+                                            <div className="d-flex align-items-center">
+                                                <div className="avatar avatar-xs avatar-soft-primary avatar-rounded me-3">
+                                                    <span className="initial-wrap">
+                                                        <FileText size={18} weight={doc.file_path ? "fill" : "regular"} />
+                                                    </span>
                                                 </div>
-                                            </td>
-                                            <td>
-                                                <span className={`badge badge-sm badge-outline badge-${doc.type === 'Guides' ? 'primary' : doc.type === 'Templates' ? 'success' : doc.type === 'Checklist' ? 'danger' : 'secondary'}`}>
-                                                    {doc.type || 'Guides'}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                {getCategoryDisplayName(doc)}
-                                            </td>
-                                            <td>
-                                                <div className="d-flex justify-content-end gap-2">
-                                                    {doc.file_path && (
-                                                        <Button variant="flush-light" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handlePreview(doc.file_path, doc.name)}>
-                                                            <span className="icon"><Eye size={20} /></span>
-                                                        </Button>
-                                                    )}
-                                                    <Button variant="flush-light" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleShow(doc)}>
-                                                        <span className="icon"><PencilSimple size={20} /></span>
-                                                    </Button>
-                                                    <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleDelete(doc.id)}>
-                                                        <span className="icon"><Trash size={20} /></span>
-                                                    </Button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </Table>
-                    </div>
-
-                    {/* Pagination */}
-                    {totalPages > 1 && (
-                        <div className="p-3 d-flex justify-content-end">
-                            <Pagination>
-                                <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
-                                {[...Array(totalPages)].map((_, i) => (
-                                    <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => handlePageChange(i + 1)}>
-                                        {i + 1}
-                                    </Pagination.Item>
-                                ))}
-                                <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
-                            </Pagination>
-                        </div>
-                    )}
-
-                    <Modal show={showModal} onHide={handleClose} size="lg" centered>
-                        <Modal.Header closeButton>
-                            <Modal.Title>{editingId ? 'Edit Document' : 'Add Document'}</Modal.Title>
-                        </Modal.Header>
-                        <Form onSubmit={handleSubmit}>
-                            <Modal.Body>
-                                <Row className="g-3">
-                                    <Col md={6}>
-                                        <Form.Group>
-                                            <Form.Label>Document Type</Form.Label>
-                                            <Form.Select
-                                                value={formData.type}
-                                                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                                            >
-                                                {docTypes.map(type => (
-                                                    <option key={type} value={type}>{type}</option>
-                                                ))}
-                                            </Form.Select>
-                                        </Form.Group>
-                                    </Col>
-                                    <Col md={6}>
-                                        <Form.Group>
-                                            <Form.Label>Main Category</Form.Label>
-                                            <Form.Select
-                                                value={selectedMainId}
-                                                onChange={handleMainCategoryChange}
-                                            >
-                                                <option value="">Select Category</option>
-                                                {mainCategories.map(cat => (
-                                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                                ))}
-                                            </Form.Select>
-                                        </Form.Group>
-                                    </Col>
-                                    {subCategories.length > 0 && (
-                                        <Col md={12}>
-                                            <Form.Group>
-                                                <Form.Label>Sub Category</Form.Label>
-                                                <Form.Select
-                                                    value={formData.category_id === selectedMainId ? '' : formData.category_id}
-                                                    onChange={handleSubCategoryChange}
-                                                >
-                                                    <option value="">-- No Sub Category (Use Main) --</option>
-                                                    {subCategories.map(sub => (
-                                                        <option key={sub.id} value={sub.id}>{sub.name}</option>
-                                                    ))}
-                                                </Form.Select>
-                                            </Form.Group>
-                                        </Col>
-                                    )}
-                                    <Col md={12}>
-                                        <Form.Group>
-                                            <Form.Label>Document Name</Form.Label>
-                                            <AIFormControl
-                                                type="text"
-                                                value={formData.name}
-                                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                                required
-                                                fieldName="Document Name"
-                                            />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col md={12}>
-                                        <Form.Group>
-                                            <Form.Label>Content</Form.Label>
-                                            <AITextEnhancer
-                                                value={formData.content}
-                                                onUpdate={(newContent) => setFormData({ ...formData, content: newContent })}
-                                                fieldName="Document Content"
-                                                noInputGroup={true}
-                                            >
-                                                <ReactQuill
-                                                    theme="snow"
-                                                    value={formData.content}
-                                                    onChange={(value) => setFormData({ ...formData, content: value })}
-                                                    style={{ height: '200px', marginBottom: '50px' }}
-                                                />
-                                            </AITextEnhancer>
-                                        </Form.Group>
-                                    </Col>
-                                    <Col md={12}>
-                                        <Form.Group>
-                                            <Form.Label>
-                                                {editingId ? 'Replace Document (Optional)' : 'Upload Document'}
-                                            </Form.Label>
-                                            <Form.Control
-                                                type="file"
-                                                onChange={(e) => setFormData({ ...formData, file: e.target.files[0] })}
-                                            />
-                                            {editingId && formData.file_path && (
-                                                <Form.Text className="text-muted d-block mt-1">
-                                                    Current file: <a href={formData.file_path} target="_blank" rel="noopener noreferrer">View</a>
-                                                </Form.Text>
-                                            )}
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                            </Modal.Body>
-                            <Modal.Footer>
-                                <Button variant="secondary" onClick={handleClose}>Cancel</Button>
-                                <Button className="btn-gradient-primary" type="submit" disabled={uploading}>
-                                    {uploading ? 'Uploading...' : (editingId ? 'Update Document' : 'Save Document')}
-                                </Button>
-                            </Modal.Footer>
-                        </Form>
-                    </Modal>
-
-                    {/* Document Preview Modal */}
-                    {/* Document Preview Modal */}
-                    <Modal show={showPreviewModal} onHide={() => setShowPreviewModal(false)} size="xl" centered style={{ zIndex: 1060 }}>
-                        <Modal.Header closeButton className="border-bottom py-3 px-4">
-                            <div className="d-flex align-items-center justify-content-between w-100 me-4">
-                                <Modal.Title className="h6 mb-0 fw-bold text-truncate" style={{ maxWidth: '60%' }}>
-                                    Preview: {previewDocName}
-                                </Modal.Title>
-                                <div className="d-flex gap-2">
-                                    <Button
-                                        variant="light"
-                                        size="sm"
-                                        href={previewUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="d-flex align-items-center gap-2 fw-medium text-dark bg-white border"
-                                    >
-                                        <ArrowSquareOut size={16} weight="bold" />
-                                        <span className="d-none d-sm-inline">Open New Tab</span>
-                                    </Button>
-                                    <Button
-                                        variant="primary"
-                                        size="sm"
-                                        href={previewUrl}
-                                        download
-                                        className="d-flex align-items-center gap-2 fw-medium"
-                                    >
-                                        <DownloadSimple size={16} weight="bold" />
-                                        <span className="d-none d-sm-inline">Download</span>
-                                    </Button>
-                                </div>
-                            </div>
-                        </Modal.Header>
-                        <Modal.Body className="p-0 position-relative" style={{ height: '85vh', backgroundColor: '#f3f4f6' }}>
-                            {previewUrl && (() => {
-                                const getFileExtension = (url) => {
-                                    if (!url) return '';
-                                    // Remove query params
-                                    const cleanUrl = url.split('?')[0].split('#')[0];
-                                    // Get extension
-                                    return cleanUrl.split('.').pop().trim().toLowerCase();
-                                };
-
-                                const fileExt = getFileExtension(previewUrl);
-                                const officeExtensions = ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'];
-                                const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'];
-                                const pdfExtensions = ['pdf'];
-
-                                if (imageExtensions.includes(fileExt)) {
-                                    return (
-                                        <div className="d-flex align-items-center justify-content-center h-100 bg-dark">
-                                            <img
-                                                src={previewUrl}
-                                                alt="Preview"
-                                                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-                                            />
-                                        </div>
-                                    );
-                                } else if (pdfExtensions.includes(fileExt)) {
-                                    return (
-                                        <object
-                                            data={previewUrl}
-                                            type="application/pdf"
-                                            width="100%"
-                                            height="100%"
-                                        >
-                                            <iframe
-                                                src={previewUrl}
-                                                title="PDF Preview"
-                                                style={{ width: '100%', height: '100%', border: 'none' }}
-                                            />
-                                        </object>
-                                    );
-                                } else if (officeExtensions.includes(fileExt)) {
-                                    // Use Microsoft Office Online Viewer - often more robust for Office files
-                                    const officeViewerUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(previewUrl)}`;
-                                    return (
-                                        <iframe
-                                            src={officeViewerUrl}
-                                            title="Office Document Preview"
-                                            style={{ width: '100%', height: '100%', border: 'none' }}
-                                            loading="lazy"
-                                        />
-                                    );
-                                } else {
-                                    // Fallback for unsupported types
-                                    return (
-                                        <div className="d-flex flex-column align-items-center justify-content-center h-100">
-                                            <div className="mb-4 text-center">
-                                                <div className="avatar avatar-xl avatar-soft-primary avatar-rounded mb-3 mx-auto">
-                                                    <Paperclip size={32} weight="bold" />
-                                                </div>
-                                                <h5 className="fw-bold mb-1">Preview Unavailable</h5>
-                                                <p className="text-muted mb-0">This file type cannot be previewed directly.</p>
+                                                <span className="text-high-em">{doc.name}</span>
                                             </div>
-                                            <Button
-                                                href={previewUrl}
-                                                target="_blank"
-                                                variant="primary"
-                                                className="btn-lg px-5 btn-rounded shadow-sm"
-                                            >
-                                                Download File
-                                            </Button>
-                                        </div>
-                                    );
-                                }
-                            })()}
-                        </Modal.Body>
-                    </Modal>
+                                        </td>
+                                        <td>
+                                            <span className={`badge badge-sm badge-outline badge-${doc.type === 'Guides' ? 'primary' : doc.type === 'Templates' ? 'success' : doc.type === 'Checklist' ? 'danger' : 'secondary'}`}>
+                                                {doc.type || 'Guides'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {getCategoryDisplayName(doc)}
+                                        </td>
+                                        <td>
+                                            <div className="d-flex justify-content-end gap-2">
+                                                {doc.file_path && (
+                                                    <Button variant="flush-light" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handlePreview(doc.file_path, doc.name)}>
+                                                        <span className="icon"><Eye size={20} /></span>
+                                                    </Button>
+                                                )}
+                                                <Button variant="flush-light" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleShow(doc)}>
+                                                    <span className="icon"><PencilSimple size={20} /></span>
+                                                </Button>
+                                                <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleDelete(doc.id)}>
+                                                    <span className="icon"><Trash size={20} /></span>
+                                                </Button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </Table>
+                </div>
 
-                </Card.Body>
-            </Card>
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <div className="p-3 d-flex justify-content-end">
+                        <Pagination>
+                            <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
+                            {[...Array(totalPages)].map((_, i) => (
+                                <Pagination.Item key={i + 1} active={i + 1 === currentPage} onClick={() => handlePageChange(i + 1)}>
+                                    {i + 1}
+                                </Pagination.Item>
+                            ))}
+                            <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
+                        </Pagination>
+                    </div>
+                )}
+
+                <Modal show={showModal} onHide={handleClose} size="lg" centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title>{editingId ? 'Edit Document' : 'Add Document'}</Modal.Title>
+                    </Modal.Header>
+                    <Form onSubmit={handleSubmit}>
+                        <Modal.Body>
+                            <Row className="g-3">
+                                <Col md={6}>
+                                    <Form.Group>
+                                        <Form.Label>Document Type</Form.Label>
+                                        <Form.Select
+                                            value={formData.type}
+                                            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                                        >
+                                            {docTypes.map(type => (
+                                                <option key={type} value={type}>{type}</option>
+                                            ))}
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group>
+                                        <Form.Label>Main Category</Form.Label>
+                                        <Form.Select
+                                            value={selectedMainId}
+                                            onChange={handleMainCategoryChange}
+                                        >
+                                            <option value="">Select Category</option>
+                                            {mainCategories.map(cat => (
+                                                <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                            ))}
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Col>
+                                {subCategories.length > 0 && (
+                                    <Col md={12}>
+                                        <Form.Group>
+                                            <Form.Label>Sub Category</Form.Label>
+                                            <Form.Select
+                                                value={formData.category_id === selectedMainId ? '' : formData.category_id}
+                                                onChange={handleSubCategoryChange}
+                                            >
+                                                <option value="">-- No Sub Category (Use Main) --</option>
+                                                {subCategories.map(sub => (
+                                                    <option key={sub.id} value={sub.id}>{sub.name}</option>
+                                                ))}
+                                            </Form.Select>
+                                        </Form.Group>
+                                    </Col>
+                                )}
+                                <Col md={12}>
+                                    <Form.Group>
+                                        <Form.Label>Document Name</Form.Label>
+                                        <AIFormControl
+                                            type="text"
+                                            value={formData.name}
+                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                            required
+                                            fieldName="Document Name"
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={12}>
+                                    <Form.Group>
+                                        <Form.Label>Content</Form.Label>
+                                        <AITextEnhancer
+                                            value={formData.content}
+                                            onUpdate={(newContent) => setFormData({ ...formData, content: newContent })}
+                                            fieldName="Document Content"
+                                            noInputGroup={true}
+                                        >
+                                            <ReactQuill
+                                                theme="snow"
+                                                value={formData.content}
+                                                onChange={(value) => setFormData({ ...formData, content: value })}
+                                                style={{ height: '200px', marginBottom: '50px' }}
+                                            />
+                                        </AITextEnhancer>
+                                    </Form.Group>
+                                </Col>
+                                <Col md={12}>
+                                    <Form.Group>
+                                        <Form.Label>
+                                            {editingId ? 'Replace Document (Optional)' : 'Upload Document'}
+                                        </Form.Label>
+                                        <Form.Control
+                                            type="file"
+                                            onChange={(e) => setFormData({ ...formData, file: e.target.files[0] })}
+                                        />
+                                        {editingId && formData.file_path && (
+                                            <Form.Text className="text-muted d-block mt-1">
+                                                Current file: <a href={formData.file_path} target="_blank" rel="noopener noreferrer">View</a>
+                                            </Form.Text>
+                                        )}
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={handleClose}>Cancel</Button>
+                            <Button className="btn-gradient-primary" type="submit" disabled={uploading}>
+                                {uploading ? 'Uploading...' : (editingId ? 'Update Document' : 'Save Document')}
+                            </Button>
+                        </Modal.Footer>
+                    </Form>
+                </Modal>
+
+                {/* Document Preview Modal */}
+                {/* Document Preview Modal */}
+                <Modal show={showPreviewModal} onHide={() => setShowPreviewModal(false)} size="xl" centered style={{ zIndex: 1060 }}>
+                    <Modal.Header closeButton className="border-bottom py-3 px-4">
+                        <div className="d-flex align-items-center justify-content-between w-100 me-4">
+                            <Modal.Title className="h6 mb-0 fw-bold text-truncate" style={{ maxWidth: '60%' }}>
+                                Preview: {previewDocName}
+                            </Modal.Title>
+                            <div className="d-flex gap-2">
+                                <Button
+                                    variant="light"
+                                    size="sm"
+                                    href={previewUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="d-flex align-items-center gap-2 fw-medium text-dark bg-white border"
+                                >
+                                    <ArrowSquareOut size={16} weight="bold" />
+                                    <span className="d-none d-sm-inline">Open New Tab</span>
+                                </Button>
+                                <Button
+                                    variant="primary"
+                                    size="sm"
+                                    href={previewUrl}
+                                    download
+                                    className="d-flex align-items-center gap-2 fw-medium"
+                                >
+                                    <DownloadSimple size={16} weight="bold" />
+                                    <span className="d-none d-sm-inline">Download</span>
+                                </Button>
+                            </div>
+                        </div>
+                    </Modal.Header>
+                    <Modal.Body className="p-0 position-relative" style={{ height: '85vh', backgroundColor: '#f3f4f6' }}>
+                        {previewUrl && (() => {
+                            const getFileExtension = (url) => {
+                                if (!url) return '';
+                                // Remove query params
+                                const cleanUrl = url.split('?')[0].split('#')[0];
+                                // Get extension
+                                return cleanUrl.split('.').pop().trim().toLowerCase();
+                            };
+
+                            const fileExt = getFileExtension(previewUrl);
+                            const officeExtensions = ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'];
+                            const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'];
+                            const pdfExtensions = ['pdf'];
+
+                            if (imageExtensions.includes(fileExt)) {
+                                return (
+                                    <div className="d-flex align-items-center justify-content-center h-100 bg-dark">
+                                        <img
+                                            src={previewUrl}
+                                            alt="Preview"
+                                            style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                                        />
+                                    </div>
+                                );
+                            } else if (pdfExtensions.includes(fileExt)) {
+                                return (
+                                    <object
+                                        data={previewUrl}
+                                        type="application/pdf"
+                                        width="100%"
+                                        height="100%"
+                                    >
+                                        <iframe
+                                            src={previewUrl}
+                                            title="PDF Preview"
+                                            style={{ width: '100%', height: '100%', border: 'none' }}
+                                        />
+                                    </object>
+                                );
+                            } else if (officeExtensions.includes(fileExt)) {
+                                // Use Microsoft Office Online Viewer - often more robust for Office files
+                                const officeViewerUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(previewUrl)}`;
+                                return (
+                                    <iframe
+                                        src={officeViewerUrl}
+                                        title="Office Document Preview"
+                                        style={{ width: '100%', height: '100%', border: 'none' }}
+                                        loading="lazy"
+                                    />
+                                );
+                            } else {
+                                // Fallback for unsupported types
+                                return (
+                                    <div className="d-flex flex-column align-items-center justify-content-center h-100">
+                                        <div className="mb-4 text-center">
+                                            <div className="avatar avatar-xl avatar-soft-primary avatar-rounded mb-3 mx-auto">
+                                                <Paperclip size={32} weight="bold" />
+                                            </div>
+                                            <h5 className="fw-bold mb-1">Preview Unavailable</h5>
+                                            <p className="text-muted mb-0">This file type cannot be previewed directly.</p>
+                                        </div>
+                                        <Button
+                                            href={previewUrl}
+                                            target="_blank"
+                                            variant="primary"
+                                            className="btn-lg px-5 btn-rounded shadow-sm"
+                                        >
+                                            Download File
+                                        </Button>
+                                    </div>
+                                );
+                            }
+                        })()}
+                    </Modal.Body>
+                </Modal>
+
+            </div>
         </>
     );
 };

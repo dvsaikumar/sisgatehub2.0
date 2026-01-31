@@ -37,6 +37,8 @@ const Mail = () => {
             if (error) throw error;
             setConfigs(data || []);
         } catch (error) {
+            // Ignore AbortError - happens during normal navigation
+            if (error?.name === 'AbortError' || error?.message?.includes('abort')) return;
             console.error('Error fetching mail configs:', error);
             toast.error('Failed to load configurations');
         } finally {
@@ -173,88 +175,90 @@ const Mail = () => {
 
     return (
         <>
-            <Card className="card-border">
-                <Card.Body className="p-0">
-                    <div className="d-flex justify-content-between align-items-center mb-3 p-3 flex-wrap gap-2">
-                        <div className="d-flex align-items-center gap-2">
-                            <h5 className="mb-0 me-3">Mail Configurations</h5>
-                            <InputGroup size="sm" style={{ width: '250px' }}>
-                                <InputGroup.Text><MagnifyingGlass weight="bold" /></InputGroup.Text>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Search configurations..."
-                                    value={searchTerm}
-                                    onChange={handleSearch}
-                                />
-                            </InputGroup>
-                        </div>
-                        <div className="d-flex gap-2">
-                            <Button className="btn-gradient-primary btn-animated" size="sm" onClick={() => handleShow()}>
-                                <Plus weight="bold" className="me-2" color="#fff" /> Add Configuration
-                            </Button>
-                        </div>
+            <div>
+                <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <div className="d-flex align-items-center gap-2">
+                        <InputGroup size="sm" style={{ width: '250px' }}>
+                            <InputGroup.Text><MagnifyingGlass weight="bold" /></InputGroup.Text>
+                            <Form.Control
+                                type="text"
+                                placeholder="Search configurations..."
+                                value={searchTerm}
+                                onChange={handleSearch}
+                            />
+                        </InputGroup>
                     </div>
+                    <div className="d-flex gap-2 align-items-center">
+                        <Button
+                            className="btn-gradient-primary btn-animated d-flex align-items-center gap-2"
+                            size="sm"
+                            onClick={() => handleShow()}
+                        >
+                            <Plus size={16} weight="bold" color="#fff" />
+                            <span>Add Configuration</span>
+                        </Button>
+                    </div>
+                </div>
 
-                    <div className="table-advance-container">
-                        <Table responsive borderless className="nowrap table-advance">
-                            <thead>
-                                <tr>
-                                    <th className="mnw-200p">Config Name</th>
-                                    <th>Host</th>
-                                    <th>Port</th>
-                                    <th>User</th>
-                                    <th>Usage</th>
-                                    <th>Status</th>
-                                    <th />
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {loading ? (
-                                    <tr><td colSpan="7" className="text-center">Loading...</td></tr>
-                                ) : filteredConfigs.length === 0 ? (
-                                    <tr><td colSpan="7" className="text-center">No configurations found.</td></tr>
-                                ) : (
-                                    filteredConfigs.map((config) => (
-                                        <tr key={config.id}>
-                                            <td>
-                                                <div className="d-flex align-items-center">
-                                                    <div className="avatar avatar-xs avatar-soft-primary avatar-rounded me-3">
-                                                        <span className="initial-wrap">
-                                                            <Envelope size={18} weight="bold" />
-                                                        </span>
-                                                    </div>
-                                                    <span className="text-high-em fw-bold">{config.name}</span>
+                <div className="table-advance-container">
+                    <Table responsive borderless className="nowrap table-advance">
+                        <thead>
+                            <tr>
+                                <th className="mnw-200p">Config Name</th>
+                                <th>Host</th>
+                                <th>Port</th>
+                                <th>User</th>
+                                <th>Usage</th>
+                                <th>Status</th>
+                                <th />
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loading ? (
+                                <tr><td colSpan="7" className="text-center">Loading...</td></tr>
+                            ) : filteredConfigs.length === 0 ? (
+                                <tr><td colSpan="7" className="text-center">No configurations found.</td></tr>
+                            ) : (
+                                filteredConfigs.map((config) => (
+                                    <tr key={config.id}>
+                                        <td>
+                                            <div className="d-flex align-items-center">
+                                                <div className="avatar avatar-xs avatar-soft-primary avatar-rounded me-3">
+                                                    <span className="initial-wrap">
+                                                        <Envelope size={18} weight="bold" />
+                                                    </span>
                                                 </div>
-                                            </td>
-                                            <td>{config.host}</td>
-                                            <td>{config.port}</td>
-                                            <td>{config.username}</td>
-                                            <td>
-                                                <span className="badge badge-soft-info">{config.usage_type || 'Info'}</span>
-                                            </td>
-                                            <td>
-                                                <span className={`badge ${config.status === 'Active' ? 'badge-soft-success' : 'badge-soft-secondary'}`}>
-                                                    {config.status}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div className="d-flex justify-content-end gap-2">
-                                                    <Button variant="flush-light" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleShow(config)}>
-                                                        <span className="icon"><PencilSimple size={20} weight="bold" /></span>
-                                                    </Button>
-                                                    <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleDelete(config.id)}>
-                                                        <span className="icon"><Trash size={20} weight="bold" /></span>
-                                                    </Button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </Table>
-                    </div>
-                </Card.Body>
-            </Card>
+                                                <span className="text-high-em fw-bold">{config.name}</span>
+                                            </div>
+                                        </td>
+                                        <td>{config.host}</td>
+                                        <td>{config.port}</td>
+                                        <td>{config.username}</td>
+                                        <td>
+                                            <span className="badge badge-soft-info">{config.usage_type || 'Info'}</span>
+                                        </td>
+                                        <td>
+                                            <span className={`badge ${config.status === 'Active' ? 'badge-soft-success' : 'badge-soft-secondary'}`}>
+                                                {config.status}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div className="d-flex justify-content-end gap-2">
+                                                <Button variant="flush-light" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleShow(config)}>
+                                                    <span className="icon"><PencilSimple size={20} weight="bold" /></span>
+                                                </Button>
+                                                <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleDelete(config.id)}>
+                                                    <span className="icon"><Trash size={20} weight="bold" /></span>
+                                                </Button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </Table>
+                </div>
+            </div>
 
             <Modal show={showModal} onHide={handleClose} centered>
                 <Modal.Header closeButton>

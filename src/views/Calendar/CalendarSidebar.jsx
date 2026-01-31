@@ -1,46 +1,76 @@
-import React, { useState } from 'react';
-import SimpleBar from 'simplebar-react';
-import DatePicker from 'react-datepicker';
-import { Archive, Bell, Book, Calendar, Plus, Settings } from 'react-feather';
-import { Badge, Button, Dropdown, Form, Nav } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Bell, Plus, MoreVertical, ChevronDown, ChevronUp } from 'react-feather';
+import { Button, Dropdown, Form } from 'react-bootstrap';
 import AddCategory from './AddCategory';
 import SetReminder from './SetReminder';
 import "react-datepicker/dist/react-datepicker.css";
-//Custom Components
-import HkTooltip from '../../components/@hk-tooltip/HkTooltip';
-import { Plus as PlusPhos } from '@phosphor-icons/react';
+import { Plus as PlusPhos, CalendarBlank } from '@phosphor-icons/react';
 import dayjs from '../../lib/dayjs';
 import { useCategories } from '../../hooks/useCategories';
 
 
-const CalendarSidebar = ({ showSidebar, toggleSidebar, createNewEvent, refreshEvents, upcomingEvents = [] }) => {
+const CalendarSidebar = ({ showSidebar, toggleSidebar, createNewEvent, refreshEvents, upcomingEvents = [], onCategoryFilterChange }) => {
     const [addCategory, setAddCategory] = useState(false);
     const [reminder, setReminder] = useState(false);
-    const [startDate, setStartDate] = useState(new Date());
+    const [categoriesOpen, setCategoriesOpen] = useState(false); // Collapsed by default
 
     // Use categories hook for dynamic categories
     const { categories, loading: categoriesLoading, createCategory, updateCategory, deleteCategory } = useCategories();
 
-    // Internal fetch removed to fix crash. 
-    // Data is now passed from parent.
+    // Track which categories are selected (all selected by default)
+    const [selectedCategories, setSelectedCategories] = useState({});
 
-    const onChange = (dates) => {
-        const [start] = dates;
-        setStartDate(start);
+    // Initialize all categories as selected when they load
+    useEffect(() => {
+        if (categories.length > 0) {
+            const initialSelection = {};
+            categories.forEach(cat => {
+                initialSelection[cat.name] = true;
+            });
+            setSelectedCategories(initialSelection);
+        }
+    }, [categories]);
+
+    // Handle category checkbox toggle
+    const handleCategoryToggle = (categoryName) => {
+        const newSelection = {
+            ...selectedCategories,
+            [categoryName]: !selectedCategories[categoryName]
+        };
+        setSelectedCategories(newSelection);
+
+        // Notify parent component of filter change
+        if (onCategoryFilterChange) {
+            const activeCategories = Object.keys(newSelection).filter(key => newSelection[key]);
+            onCategoryFilterChange(activeCategories);
+        }
     };
+
+    // Event card color mapping based on background_color or category
+    const getEventColor = (event) => {
+        if (event.background_color) return event.background_color;
+        switch (event.category) {
+            case 'Important': return '#F59E0B';
+            case 'Work': return '#3B82F6';
+            case 'Personal': return '#10B981';
+            default: return '#3B82F6';
+        }
+    };
+
     return (
         <>
-            <nav className="calendarapp-sidebar" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                {/* Main Content - No Scroll */}
-                <div className="menu-content-wrap" style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+            <nav className="calendarapp-sidebar" style={{ display: 'flex', flexDirection: 'column' }}>
+                {/* Scrollable Content */}
+                <div className="menu-content-wrap" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
+                    {/* Create Button - Dropdown */}
                     <Dropdown className="w-100">
                         <Dropdown.Toggle className="btn-gradient-primary btn-animated w-100 d-flex align-items-center justify-content-center gap-2">
                             <PlusPhos weight="bold" size={18} color="#fff" />
-                            <span>Create</span>
+                            <span>Create / Set</span>
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
                             <Dropdown.Item onClick={createNewEvent} className="d-flex align-items-center gap-2">
-                                <Calendar size={18} />
+                                <CalendarBlank size={18} />
                                 <span>Create an Event</span>
                             </Dropdown.Item>
                             <Dropdown.Item onClick={() => setReminder(!reminder)} className="d-flex align-items-center gap-2">
@@ -49,118 +79,95 @@ const CalendarSidebar = ({ showSidebar, toggleSidebar, createNewEvent, refreshEv
                             </Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
-                    <div className="text-center mt-4">
-                        <div id="inline_calendar" className="d-inline-block">
-                            <DatePicker
-                                selected={startDate}
-                                onChange={onChange}
-                                dateFormatCalendar={"MMM yyyy"}
-                                selectsRange
-                                inline
-                            />
-                        </div>
-                    </div>
-                    <div className="separator separator-light" />
-                    <div className="title-sm text-primary">Upcoming Events</div>
-                    <div className="upcoming-event-wrap">
-                        <Nav as="ul" className="nav-light navbar-nav flex-column">
-                            {upcomingEvents.length === 0 && (
-                                <Nav.Item as="li">
-                                    <div className="text-muted fs-7 ms-2">No upcoming events.</div>
-                                </Nav.Item>
-                            )}
-                            {upcomingEvents.map((event) => (
-                                <Nav.Item as="li" key={event.id}>
-                                    <Nav.Link>
-                                        <div className="d-flex align-items-center">
-                                            <Badge bg={event.category === 'Important' ? 'danger' : 'primary'} className="badge-indicator badge-indicator-lg me-2" style={{ backgroundColor: event.background_color }} />
-                                            <span className="event-time">
-                                                {dayjs(event.start_date).calendar(null, {
-                                                    sameDay: '[Today], h:mm A',
-                                                    nextDay: '[Tomorrow], h:mm A',
-                                                    nextWeek: 'MMM DD, h:mm A',
-                                                    lastDay: '[Yesterday], h:mm A',
-                                                    lastWeek: '[Last] dddd, h:mm A',
-                                                    sameElse: 'MMM DD, h:mm A'
-                                                })}
-                                            </span>
-                                        </div>
-                                        <div className="event-name">{event.title}</div>
-                                    </Nav.Link>
-                                </Nav.Item>
-                            ))}
-                        </Nav>
-                    </div>
-                    <div className="separator separator-light" />
-                    <div className="d-flex align-items-center justify-content-between mb-2">
-                        <div className="title-sm text-primary mb-0">Categories</div>
-                        <Button size="xs" variant="light" className="btn-icon btn-rounded" onClick={() => setAddCategory(!addCategory)} >
-                            <HkTooltip id="tt1" placement="top" title="Add Category" >
-                                <span className="feather-icon">
-                                    <Plus />
-                                </span>
-                            </HkTooltip>
-                        </Button>
-                    </div>
-                    <div className="categories-wrap">
-                        {categoriesLoading ? (
-                            <div className="text-muted small">Loading...</div>
-                        ) : categories.length === 0 ? (
-                            <div className="text-muted small">No categories</div>
+
+                    {/* Events List */}
+                    <div className="events-list-container mt-4">
+                        {upcomingEvents.length === 0 ? (
+                            <div className="text-muted fs-7 text-center py-4">No upcoming events.</div>
                         ) : (
-                            categories.map((cat, idx) => (
-                                <Form.Check
-                                    key={cat.id}
-                                    id={`customChecksc${idx + 1}`}
-                                    type="checkbox"
-                                    label={cat.name}
-                                    defaultChecked={true}
-                                    style={{ '--bs-form-check-bg': cat.color }}
-                                />
+                            upcomingEvents.map((event) => (
+                                <div
+                                    key={event.id}
+                                    className="event-card"
+                                    style={{ '--event-color': getEventColor(event) }}
+                                >
+                                    <div className="event-indicator" style={{ backgroundColor: getEventColor(event) }} />
+                                    <div className="event-content">
+                                        <div className="event-time">
+                                            {dayjs(event.start_date).calendar(null, {
+                                                sameDay: '[Today], h:mm A - ',
+                                                nextDay: '[Tomorrow], h:mm A - ',
+                                                nextWeek: 'MMM DD, h:mm A - ',
+                                                lastDay: '[Yesterday], h:mm A - ',
+                                                lastWeek: '[Last] dddd, h:mm A - ',
+                                                sameElse: 'MMM DD, h:mm A - '
+                                            })}
+                                            {event.end_date && dayjs(event.end_date).format('h:mm A')}
+                                        </div>
+                                        <div className="event-title">{event.title}</div>
+                                    </div>
+                                    <Dropdown className="event-menu">
+                                        <Dropdown.Toggle as="button" className="btn btn-icon btn-flush">
+                                            <MoreVertical size={16} />
+                                        </Dropdown.Toggle>
+                                        <Dropdown.Menu align="end">
+                                            <Dropdown.Item>Edit</Dropdown.Item>
+                                            <Dropdown.Item className="text-danger">Delete</Dropdown.Item>
+                                        </Dropdown.Menu>
+                                    </Dropdown>
+                                </div>
                             ))
                         )}
                     </div>
                 </div>
 
-                {/*Sidebar Fixed Footer - Icons above fixed footer */}
-                <div className="calendarapp-fixednav" style={{ marginTop: 'auto', paddingBottom: '125px' }}>
-                    <div className="hk-toolbar">
-                        <Nav className="nav-light">
-                            <Nav.Item className="nav-link">
-                                <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover">
-                                    <HkTooltip id="tooltip2" placement="top" title="Settings" >
-                                        <span className="icon">
-                                            <span className="feather-icon">
-                                                <Settings />
-                                            </span>
-                                        </span>
-                                    </HkTooltip>
-                                </Button>
-                            </Nav.Item>
-                            <Nav.Item className="nav-link">
-                                <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover">
-                                    <HkTooltip id="tooltip3" placement="top" title="Archive" >
-                                        <span className="icon">
-                                            <span className="feather-icon">
-                                                <Archive />
-                                            </span>
-                                        </span>
-                                    </HkTooltip>
-                                </Button>
-                            </Nav.Item>
-                            <Nav.Item className="nav-link">
-                                <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover">
-                                    <HkTooltip id="tooltip2" placement="top" title="Help" >
-                                        <span className="icon">
-                                            <span className="feather-icon">
-                                                <Book />
-                                            </span>
-                                        </span>
-                                    </HkTooltip>
-                                </Button>
-                            </Nav.Item>
-                        </Nav>
+                {/* Categories Section - Fixed at Bottom */}
+                <div
+                    className="categories-footer"
+                    onMouseEnter={() => setCategoriesOpen(true)}
+                    onMouseLeave={() => setCategoriesOpen(false)}
+                >
+                    <div
+                        className="categories-header clickable"
+                        onClick={() => setCategoriesOpen(!categoriesOpen)}
+                    >
+                        <span className="categories-title">Categories</span>
+                        <div className="categories-actions">
+                            <Button
+                                variant="light"
+                                className="btn-icon btn-rounded add-category-btn"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setAddCategory(!addCategory);
+                                }}
+                            >
+                                <Plus size={14} />
+                            </Button>
+                        </div>
                     </div>
+                    {categoriesOpen && (
+                        <div className="categories-list">
+                            {categoriesLoading ? (
+                                <div className="text-muted small py-2">Loading...</div>
+                            ) : categories.length === 0 ? (
+                                <div className="text-muted small py-2">No categories</div>
+                            ) : (
+                                categories.map((cat) => (
+                                    <div key={cat.id} className="category-item">
+                                        <Form.Check
+                                            type="checkbox"
+                                            id={`category-${cat.id}`}
+                                            label={cat.name}
+                                            checked={selectedCategories[cat.name] ?? true}
+                                            onChange={() => handleCategoryToggle(cat.name)}
+                                            className="category-checkbox"
+                                            style={{ '--category-color': cat.color || '#0d9488' }}
+                                        />
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    )}
                 </div>
             </nav>
 

@@ -335,54 +335,70 @@ const AccessLevels = () => {
 
     return (
         <>
-            <Card className="card-border">
-                <Card.Body className="p-0">
-                    {/* Header */}
-                    <div className="d-flex justify-content-between align-items-center mb-3 p-3 flex-wrap gap-2">
-                        <div className="d-flex align-items-center gap-2 flex-wrap">
-                            <h5 className="mb-0 me-3">Access Levels</h5>
-                            <InputGroup size="sm" style={{ width: '250px', minWidth: '180px' }}>
-                                <InputGroup.Text><MagnifyingGlass /></InputGroup.Text>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Search levels..."
-                                    value={searchTerm}
-                                    onChange={handleSearch}
-                                />
-                            </InputGroup>
-                        </div>
-                        <div className="d-flex gap-2 flex-wrap">
-                            <Button variant="outline-success" size="sm" onClick={handleExportExcel} title="Export to Excel">
-                                <FileXls size={18} /> <span className="d-none d-sm-inline">Excel</span>
-                            </Button>
-                            <Button variant="outline-danger" size="sm" onClick={handleExportPDF} title="Export to PDF">
-                                <FilePdf size={18} /> <span className="d-none d-sm-inline">PDF</span>
-                            </Button>
-                            <Button className="btn-gradient-primary btn-animated" size="sm" onClick={() => toast.success("Feature coming soon!")}>
-                                <Plus weight="bold" className="me-1" /> <span className="d-none d-sm-inline">Add Level</span>
-                            </Button>
-                        </div>
+            <div>
+                {/* Header */}
+                <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <div className="d-flex align-items-center gap-2 flex-wrap">
+                        <InputGroup size="sm" style={{ width: '250px', minWidth: '180px' }}>
+                            <InputGroup.Text><MagnifyingGlass /></InputGroup.Text>
+                            <Form.Control
+                                type="text"
+                                placeholder="Search levels..."
+                                value={searchTerm}
+                                onChange={handleSearch}
+                            />
+                        </InputGroup>
                     </div>
+                    <div className="d-flex gap-2 flex-wrap align-items-center">
+                        <Button
+                            variant="outline-success"
+                            size="sm"
+                            onClick={handleExportExcel}
+                            title="Export to Excel"
+                            className="d-flex align-items-center gap-1"
+                        >
+                            <FileXls size={16} weight="bold" />
+                            <span className="d-none d-sm-inline">Excel</span>
+                        </Button>
+                        <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={handleExportPDF}
+                            title="Export to PDF"
+                            className="d-flex align-items-center gap-1"
+                        >
+                            <FilePdf size={16} weight="bold" />
+                            <span className="d-none d-sm-inline">PDF</span>
+                        </Button>
+                        <Button
+                            className="btn-gradient-primary btn-animated d-flex align-items-center gap-2"
+                            size="sm"
+                            onClick={() => toast.success("Feature coming soon!")}
+                        >
+                            <Plus size={16} weight="bold" color="#fff" />
+                            <span className="d-none d-sm-inline">Add Level</span>
+                        </Button>
+                    </div>
+                </div>
 
-                    {/* Responsive Data View */}
-                    <div className="p-3 pt-0">
-                        <ResponsiveDataView
-                            data={filteredLevels}
-                            columns={columns}
-                            renderCard={renderCard}
-                            renderTableRow={renderTableRow}
-                            keyField="id"
-                            itemsPerPage={10}
-                            emptyState={{
-                                icon: <Shield size={48} weight="light" />,
-                                title: 'No access levels found',
-                                description: 'Create access levels to manage user permissions'
-                            }}
-                            allowViewToggle={true}
-                        />
-                    </div>
-                </Card.Body>
-            </Card>
+                {/* Responsive Data View */}
+                <div className="p-3 pt-0">
+                    <ResponsiveDataView
+                        data={filteredLevels}
+                        columns={columns}
+                        renderCard={renderCard}
+                        renderTableRow={renderTableRow}
+                        keyField="id"
+                        itemsPerPage={10}
+                        emptyState={{
+                            icon: <Shield size={48} weight="light" />,
+                            title: 'No access levels found',
+                            description: 'Create access levels to manage user permissions'
+                        }}
+                        allowViewToggle={true}
+                    />
+                </div>
+            </div>
         </>
     );
 };

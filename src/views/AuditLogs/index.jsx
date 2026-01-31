@@ -21,24 +21,41 @@ const AuditLogs = () => {
     const logsPerPage = 50;
 
     useEffect(() => {
+        let isMounted = true;
+
+        const checkAdminStatus = async () => {
+            try {
+                // Note: Admin check disabled since user_profiles doesn't have a role column
+                // To enable admin access, add a 'role' column to user_profiles first
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!isMounted) return;
+
+                if (user) {
+                    const { data: profile } = await supabase
+                        .from('user_profiles')
+                        .select('role')
+                        .eq('id', user.id)
+                        .single();
+                    if (isMounted) {
+                        setIsAdmin(profile?.role === 'admin');
+                    }
+                } else if (isMounted) {
+                    setIsAdmin(false);
+                }
+            } catch (error) {
+                if (error?.name !== 'AbortError') {
+                    console.error('Error checking admin status:', error);
+                }
+            }
+        };
+
         checkAdminStatus();
         loadAuditLogs();
-    }, [filters]);
 
-    const checkAdminStatus = async () => {
-        // Note: Admin check disabled since user_profiles doesn't have a role column
-        // To enable admin access, add a 'role' column to user_profiles first
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-            const { data: profile } = await supabase
-                .from('user_profiles')
-                .select('role')
-                .eq('id', user.id)
-                .single();
-            setIsAdmin(profile?.role === 'admin');
-        }
-        setIsAdmin(false); // Default to false until role column is added
-    };
+        return () => {
+            isMounted = false;
+        };
+    }, [filters]);
 
     const loadAuditLogs = async () => {
         setLoading(true);

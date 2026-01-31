@@ -15,20 +15,31 @@ const ChatBody = ({ sentMsg, msg, avatar, userName }) => {
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
-        const fetchMessages = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            const { data } = await supabase
-                .from('messages')
-                .select('*')
-                .order('created_at', { ascending: true });
+        let isMounted = true;
 
-            if (data) {
-                const formatted = data.map(m => ({
-                    text: m.content,
-                    time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    types: m.sender_id === user?.id ? 'sent' : 'received'
-                }));
-                setMessages(formatted);
+        const fetchMessages = async () => {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!isMounted) return;
+
+                const { data } = await supabase
+                    .from('messages')
+                    .select('*')
+                    .order('created_at', { ascending: true });
+
+                if (!isMounted) return;
+                if (data) {
+                    const formatted = data.map(m => ({
+                        text: m.content,
+                        time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        types: m.sender_id === user?.id ? 'sent' : 'received'
+                    }));
+                    setMessages(formatted);
+                }
+            } catch (error) {
+                if (error?.name !== 'AbortError') {
+                    console.error('Error fetching messages:', error);
+                }
             }
         };
 
@@ -36,18 +47,27 @@ const ChatBody = ({ sentMsg, msg, avatar, userName }) => {
 
         const channel = supabase.channel('public:messages')
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, async (payload) => {
-                const { data: { user } } = await supabase.auth.getUser();
-                const m = payload.new;
-                const newMsg = {
-                    text: m.content,
-                    time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    types: m.sender_id === user?.id ? 'sent' : 'received'
-                };
-                setMessages(prev => [...prev, newMsg]);
+                if (!isMounted) return;
+                try {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (!isMounted) return;
+                    const m = payload.new;
+                    const newMsg = {
+                        text: m.content,
+                        time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        types: m.sender_id === user?.id ? 'sent' : 'received'
+                    };
+                    setMessages(prev => [...prev, newMsg]);
+                } catch (error) {
+                    if (error?.name !== 'AbortError') {
+                        console.error('Error handling message:', error);
+                    }
+                }
             })
             .subscribe();
 
         return () => {
+            isMounted = false;
             supabase.removeChannel(channel);
         };
     }, []);

@@ -19,7 +19,6 @@ import { toggleTopNav, toggleCollapsedNav } from '../../redux/action/Theme';
 //Icons
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { ChevronDown, ChevronUp } from 'react-feather';
 import { supabase } from '../../configs/supabaseClient';
 import useReminderPoller from './useReminderPoller';
 import '../../styles/css/calendar-fixes.css';
@@ -51,7 +50,9 @@ const Calendar = ({ topNavCollapsed, toggleTopNav }) => {
     const [date, setDate] = useState(dayjs().format('YYYY-MM-DD')); // Changed to dynamic today
     const [currentView, setCurrentView] = useState("month");
     const [events, setEvents] = useState([]);
+    const [allEvents, setAllEvents] = useState([]); // Store all events for filtering
     const [upcomingEvents, setUpcomingEvents] = useState([]);
+    const [categoryFilter, setCategoryFilter] = useState(null); // null means show all
 
     const fetchEvents = useCallback(async () => {
         try {
@@ -67,7 +68,7 @@ const Calendar = ({ topNavCollapsed, toggleTopNav }) => {
                 const upcoming = data
                     .filter(evt => evt.start_date >= now)
                     .sort((a, b) => new Date(a.start_date) - new Date(b.start_date))
-                    .slice(0, 3);
+                    .slice(0, 5);
                 setUpcomingEvents(upcoming);
 
                 // Map for FullCalendar
@@ -89,6 +90,7 @@ const Calendar = ({ topNavCollapsed, toggleTopNav }) => {
                         updated_at: evt.updated_at // Assuming this exists or will be null
                     }
                 }));
+                setAllEvents(mappedEvents);
                 setEvents(mappedEvents);
             }
         } catch (error) {
@@ -137,6 +139,21 @@ const Calendar = ({ topNavCollapsed, toggleTopNav }) => {
         setShowSidebar(!showSidebar);
     };
 
+    // Handle category filter changes from sidebar
+    const handleCategoryFilterChange = (activeCategories) => {
+        if (activeCategories.length === 0) {
+            // No categories selected, show nothing
+            setEvents([]);
+        } else {
+            // Filter events by selected categories
+            const filtered = allEvents.filter(event =>
+                activeCategories.includes(event.extendedProps.category) ||
+                !event.extendedProps.category // Show events without category
+            );
+            setEvents(filtered);
+        }
+    };
+
     const renderEventContent = (eventInfo) => {
         const isReminder = eventInfo.event.extendedProps.location === 'REMINDER';
         return (
@@ -160,42 +177,69 @@ const Calendar = ({ topNavCollapsed, toggleTopNav }) => {
                         createNewEvent={() => setCreateEvent(!createEvent)}
                         refreshEvents={fetchEvents}
                         upcomingEvents={upcomingEvents}
+                        onCategoryFilterChange={handleCategoryFilterChange}
                     />
                     <div className="calendarapp-content">
                         <div id="calendar" className="w-100">
 
-                            <header className="cd-header">
-                                <div className="d-flex flex-1 justify-content-start">
-                                    <Button variant="outline-light me-3" onClick={() => handleChange("today")} >Today</Button>
-                                    <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleChange("prev")} >
-                                        <span className="icon">
-                                            <FontAwesomeIcon icon={faChevronLeft} size="sm" />
-                                        </span>
-                                    </Button>
-                                    <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover" onClick={() => handleChange("next")} >
-                                        <span className="icon">
-                                            <FontAwesomeIcon icon={faChevronRight} size="sm" />
-                                        </span>
-                                    </Button>
+                            {/* Redesigned Header */}
+                            <header className="cd-header redesigned-header">
+                                {/* Left: Month/Year Title */}
+                                <div className="cd-header-left">
+                                    <h4 className="cd-month-title">{dayjs(date).format('MMMM YYYY')}</h4>
                                 </div>
-                                <div className="d-flex flex-1 justify-content-center">
-                                    <h4 className="mb-0">{dayjs(date).format('MMMM' + ' ' + 'YYYY')}</h4>
-                                </div>
-                                <div className="cd-options-wrap d-flex flex-1 justify-content-end">
-                                    <ButtonGroup className="d-none d-md-flex">
-                                        <Button variant="outline-light" onClick={() => handleView("month")} active={currentView === "month"} >month</Button>
-                                        <Button variant="outline-light" onClick={() => handleView("week")} active={currentView === "week"}>week</Button>
-                                        <Button variant="outline-light" onClick={() => handleView("day")} active={currentView === "day"}>day</Button>
-                                        <Button variant="outline-light" onClick={() => handleView("list")} active={currentView === "list"}>list</Button>
+
+                                {/* Center: View Toggle Buttons */}
+                                <div className="cd-header-center">
+                                    <ButtonGroup className="view-toggle-group">
+                                        <Button
+                                            variant={currentView === "day" ? "primary" : "outline-secondary"}
+                                            onClick={() => handleView("day")}
+                                            className="view-toggle-btn"
+                                        >
+                                            day
+                                        </Button>
+                                        <Button
+                                            variant={currentView === "week" ? "primary" : "outline-secondary"}
+                                            onClick={() => handleView("week")}
+                                            className="view-toggle-btn"
+                                        >
+                                            week
+                                        </Button>
+                                        <Button
+                                            variant={currentView === "month" ? "primary" : "outline-secondary"}
+                                            onClick={() => handleView("month")}
+                                            className="view-toggle-btn"
+                                        >
+                                            month
+                                        </Button>
                                     </ButtonGroup>
-                                    <Button as="a" variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover hk-navbar-togglable" onClick={() => toggleTopNav(!topNavCollapsed)} >
-                                        <span className="icon">
-                                            <span className="feather-icon">
-                                                {
-                                                    topNavCollapsed ? <ChevronDown /> : <ChevronUp />
-                                                }
-                                            </span>
-                                        </span>
+                                </div>
+
+                                {/* Right: Navigation Controls */}
+                                <div className="cd-header-right">
+                                    <ButtonGroup className="nav-button-group">
+                                        <Button
+                                            variant="outline-secondary"
+                                            className="nav-btn"
+                                            onClick={() => handleChange("prev")}
+                                        >
+                                            <FontAwesomeIcon icon={faChevronLeft} size="sm" />
+                                        </Button>
+                                        <Button
+                                            variant="outline-secondary"
+                                            className="nav-btn"
+                                            onClick={() => handleChange("next")}
+                                        >
+                                            <FontAwesomeIcon icon={faChevronRight} size="sm" />
+                                        </Button>
+                                    </ButtonGroup>
+                                    <Button
+                                        variant="outline-secondary"
+                                        className="today-btn ms-2"
+                                        onClick={() => handleChange("today")}
+                                    >
+                                        today
                                     </Button>
                                 </div>
 

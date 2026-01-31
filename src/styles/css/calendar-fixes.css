@@ -1,4 +1,8 @@
-/* Reminders Page - Independent scrolling for sidebar and calendar */
+/* Reminders Page - Modern Calendar Redesign */
+
+/* ============================================
+   Layout & Container Fixes
+   ============================================ */
 
 /* Remove bottom padding from pg-wrapper on reminders page */
 [data-footer="simple"].hk-wrapper .hk-pg-wrapper,
@@ -6,8 +10,9 @@
     padding-bottom: 0 !important;
 }
 
-/* Ensure wrapper doesn't create extra height */
-.hk-pg-wrapper {
+/* Ensure wrapper doesn't create extra height - ONLY for calendar pages */
+.calendarapp-wrap .hk-pg-wrapper,
+.hk-pg-wrapper:has(.calendarapp-wrap) {
     overflow: hidden !important;
     height: 100vh;
 }
@@ -23,7 +28,13 @@
 .calendarapp-sidebar {
     overflow-y: auto !important;
     overflow-x: hidden;
-    height: 100%;
+    height: calc(100vh - 65px) !important;
+    /* Account for footer */
+    max-height: calc(100vh - 65px) !important;
+    background: #fff;
+    border-right: 1px solid #e5e7eb;
+    width: 350px !important;
+    position: relative;
 }
 
 /* Calendar content - independent scrolling */
@@ -32,4 +43,748 @@
     overflow-y: auto !important;
     overflow-x: hidden;
     height: 100%;
+    background: #f8fafc;
+    padding-left: 350px !important;
+}
+
+/* ============================================
+   Button Icon Centering Fix
+   ============================================ */
+
+.btn-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.5rem !important;
+    line-height: 1 !important;
+}
+
+.btn-icon svg {
+    display: block !important;
+    margin: 0 auto !important;
+}
+
+/* ============================================
+   Sidebar - Event Cards Redesign
+   ============================================ */
+
+.events-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.event-card {
+    display: flex;
+    align-items: flex-start;
+    padding: 16px 12px;
+    background: #fff;
+    border-bottom: 1px solid #f1f5f9;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.event-card:hover {
+    background: #f8fafc;
+}
+
+.event-card:last-child {
+    border-bottom: none;
+}
+
+.event-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 12px;
+    margin-top: 4px;
+    flex-shrink: 0;
+}
+
+.event-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.event-time {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.5;
+    margin-bottom: 4px;
+    font-weight: 400;
+}
+
+.event-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    line-height: 1.4;
+}
+
+.event-menu {
+    flex-shrink: 0;
+    margin-left: 8px;
+    align-self: center;
+}
+
+.event-menu .btn-flush {
+    background: transparent;
+    border: none;
+    padding: 4px;
+    color: #9ca3af;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+}
+
+.event-menu .btn-flush:hover {
+    background: #f1f5f9;
+    color: #374151;
+}
+
+.event-menu .dropdown-toggle::after {
+    display: none;
+}
+
+/* ============================================
+   Sidebar Separator
+   ============================================ */
+
+.sidebar-separator {
+    height: 1px;
+    background: #e5e7eb;
+    margin: 24px 0;
+}
+
+/* ============================================
+   Categories Section
+   ============================================ */
+
+/* ============================================
+   Categories Footer (Fixed at Bottom)
+   ============================================ */
+
+.categories-footer {
+    flex-shrink: 0;
+    border-top: 1px solid #e5e7eb;
+    padding: 16px;
+    background: #fff;
+    padding-bottom: 64px;
+}
+
+.categories-section {
+    padding: 0;
+}
+
+.categories-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding: 8px 0;
+}
+
+.categories-header.clickable {
+    cursor: pointer;
+    border-radius: 8px;
+    margin: 0 -8px;
+    padding: 8px;
+    transition: background 0.15s ease;
+}
+
+.categories-header.clickable:hover {
+    background: #f9fafb;
+}
+
+.categories-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0d9488;
+    text-transform: capitalize;
+}
+
+.categories-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.collapse-icon {
+    display: flex;
+    align-items: center;
+    color: #374151;
+    font-weight: 600;
+}
+
+.add-category-btn {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    padding: 0;
+    border-radius: 50%;
+    background: #f3f4f6 !important;
+    border: none !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    transition: all 0.15s ease;
+    line-height: 1;
+}
+
+.add-category-btn svg {
+    width: 14px;
+    height: 14px;
+    display: block;
+    margin: 0 auto;
+}
+
+.add-category-btn:hover {
+    background: #e5e7eb !important;
+    color: #374151;
+}
+
+.categories-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 8px;
+    overflow: visible;
+}
+
+/* Ensure Collapse content is visible */
+.categories-section .collapse,
+.categories-section .collapsing {
+    overflow: visible;
+}
+
+.category-item {
+    padding: 6px 0;
+}
+
+.category-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.category-checkbox .form-check-input {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 2px solid var(--category-color, #0d9488);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.category-checkbox .form-check-input:checked {
+    background-color: var(--category-color, #0d9488);
+    border-color: var(--category-color, #0d9488);
+}
+
+.category-checkbox .form-check-input:focus {
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+    border-color: #0d9488;
+}
+
+.category-checkbox .form-check-label {
+    font-size: 15px;
+    font-weight: 500;
+    color: #1f2937;
+    cursor: pointer;
+    margin-left: 4px;
+}
+
+/* ============================================
+   Header Redesign
+   ============================================ */
+
+.cd-header.redesigned-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 65px;
+    padding: 0 24px;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.cd-header-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.cd-month-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.cd-header-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.view-toggle-group {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.view-toggle-group .view-toggle-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 0;
+    text-transform: lowercase;
+    transition: all 0.15s ease;
+}
+
+.view-toggle-group .view-toggle-btn:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.view-toggle-group .view-toggle-btn:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.view-toggle-group .btn-outline-secondary {
+    background: #fff;
+    border-color: #d1d5db;
+    color: #6b7280;
+}
+
+.view-toggle-group .btn-outline-secondary:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+    color: #374151;
+}
+
+.view-toggle-group .btn-primary {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: #fff;
+}
+
+.view-toggle-group .btn-primary:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+.cd-header-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.nav-button-group {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.nav-button-group .nav-btn {
+    padding: 8px 12px;
+    background: #fff;
+    border-color: #d1d5db;
+    color: #6b7280;
+    transition: all 0.15s ease;
+}
+
+.nav-button-group .nav-btn:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.nav-button-group .nav-btn:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-left: none;
+}
+
+.nav-button-group .nav-btn:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+    color: #374151;
+}
+
+.today-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    background: #fff;
+    border-color: #d1d5db;
+    color: #6b7280;
+    border-radius: 8px;
+    text-transform: lowercase;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.today-btn:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+    color: #374151;
+}
+
+/* ============================================
+   FullCalendar Grid Styling
+   ============================================ */
+
+.calendarapp-content .fc {
+    background: #fff;
+    border-radius: 0;
+}
+
+.calendarapp-content .fc-scrollgrid {
+    border: none !important;
+}
+
+.calendarapp-content .fc-scrollgrid-section>td {
+    border: none !important;
+}
+
+.calendarapp-content .fc-col-header {
+    background: #f8fafc;
+}
+
+.calendarapp-content .fc-col-header-cell {
+    padding: 12px 0;
+    border: 1px solid #e5e7eb !important;
+    border-top: none !important;
+}
+
+.calendarapp-content .fc-col-header-cell-cushion {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #6b7280;
+    letter-spacing: 0.05em;
+}
+
+.calendarapp-content .fc-daygrid-day {
+    border: 1px solid #e5e7eb !important;
+    min-height: 100px;
+    transition: background 0.15s ease;
+}
+
+.calendarapp-content .fc-daygrid-day:hover {
+    background: #f8fafc;
+}
+
+.calendarapp-content .fc-daygrid-day-frame {
+    min-height: 100%;
+}
+
+.calendarapp-content .fc-daygrid-day-top {
+    justify-content: flex-end;
+    padding: 8px;
+}
+
+.calendarapp-content .fc-daygrid-day-number {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    padding: 0;
+}
+
+/* Previous/Next month days - greyed out */
+.calendarapp-content .fc-day-other .fc-daygrid-day-number {
+    color: #d1d5db;
+}
+
+.calendarapp-content .fc-day-other {
+    background: #fafafa;
+}
+
+/* Today's date - blue circle */
+.calendarapp-content .fc-day-today {
+    background: transparent !important;
+}
+
+.calendarapp-content .fc-day-today .fc-daygrid-day-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: #3b82f6;
+    color: #fff;
+    border-radius: 50%;
+    font-weight: 600;
+}
+
+/* Event styling in calendar cells */
+.calendarapp-content .fc-event {
+    border-radius: 4px;
+    padding: 2px 6px;
+    margin: 1px 4px;
+    font-size: 12px;
+    font-weight: 500;
+    border: none !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.calendarapp-content .fc-event:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.calendarapp-content .fc-daygrid-event-harness {
+    margin: 0;
+}
+
+.calendarapp-content .fc-daygrid-event-dot {
+    display: none;
+}
+
+.calendarapp-content .fc-daygrid-day-events {
+    padding: 0 4px 4px;
+}
+
+/* More events link */
+.calendarapp-content .fc-daygrid-more-link {
+    font-size: 11px;
+    font-weight: 600;
+    color: #3b82f6;
+    padding: 2px 4px;
+}
+
+.calendarapp-content .fc-daygrid-more-link:hover {
+    background: #eff6ff;
+    border-radius: 4px;
+}
+
+/* ============================================
+   Sidebar Toggle Button
+   ============================================ */
+
+.hk-sidebar-togglable {
+    position: absolute;
+    left: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.hk-sidebar-togglable::before {
+    content: '‹';
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1;
+}
+
+.hk-sidebar-togglable:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+.hk-sidebar-togglable.active::before {
+    content: '›';
+}
+
+/* ============================================
+   Responsive Styles
+   ============================================ */
+
+@media (max-width: 768px) {
+    .cd-header.redesigned-header {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 12px 16px;
+        gap: 12px;
+    }
+
+    .cd-header-left {
+        order: 1;
+        flex: 0 0 100%;
+        justify-content: center;
+    }
+
+    .cd-month-title {
+        font-size: 1.25rem;
+    }
+
+    .cd-header-center {
+        order: 2;
+        flex: 1;
+    }
+
+    .cd-header-right {
+        order: 3;
+        flex: 0;
+    }
+
+    .view-toggle-group .view-toggle-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .calendarapp-content .fc-daygrid-day-number {
+        font-size: 12px;
+    }
+
+    .calendarapp-content .fc-day-today .fc-daygrid-day-number {
+        width: 26px;
+        height: 26px;
+    }
+}
+
+/* ============================================
+   Header Redesign
+   ============================================ */
+
+/* Header Breadcrumb */
+.header-breadcrumb {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    background: none;
+}
+
+.header-breadcrumb .breadcrumb-item {
+    display: inline-flex;
+    align-items: center;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.header-breadcrumb .breadcrumb-item.active {
+    color: var(--bs-emphasis-color);
+}
+
+/* Navbar Brand Logo */
+.navbar-brand {
+    display: flex !important;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+
+.navbar-brand-logo {
+    height: 32px;
+    width: auto;
+}
+
+/* Show appropriate logo based on theme */
+[data-bs-theme="light"] .navbar-brand-logo[data-theme="light"] {
+    display: block !important;
+}
+
+[data-bs-theme="light"] .navbar-brand-logo:not([data-theme="light"]) {
+    display: none !important;
+}
+
+[data-bs-theme="dark"] .navbar-brand-logo[data-theme="light"] {
+    display: none !important;
+}
+
+[data-bs-theme="dark"] .navbar-brand-logo:not([data-theme="light"]) {
+    display: block !important;
+}
+
+/* Cursor pointer class */
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* Header toggle button styling */
+.navbar-toggle {
+    transition: all 0.2s ease;
+}
+
+.navbar-toggle:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+[data-bs-theme="dark"] .navbar-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Navbar adjustments */
+.hk-navbar {
+    height: 65px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.hk-navbar .container-fluid {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.hk-navbar .nav-start-wrap {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.hk-navbar .nav-end-wrap {
+    display: flex;
+    align-items: center;
+}
+
+/* Avatar styling */
+.avatar-sm {
+    width: 36px;
+    height: 36px;
+}
+
+/* Responsive adjustments for header */
+@media (max-width: 575.98px) {
+    .header-breadcrumb {
+        display: none !important;
+    }
+
+    .navbar-brand-logo {
+        height: 28px;
+    }
+
+    .ai-search-btn {
+        padding: 6px 12px !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .ai-search-text {
+        display: none !important;
+    }
+
+    .ai-search-shortcut {
+        display: none !important;
+    }
+}
+
+/* Dark mode adjustments for header */
+[data-bs-theme="dark"] .hk-navbar {
+    background: var(--bs-body-bg);
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .header-breadcrumb .breadcrumb-item.active {
+    color: var(--bs-light);
 }

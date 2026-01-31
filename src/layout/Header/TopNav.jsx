@@ -1,510 +1,504 @@
-import React, { useState } from 'react';
-import SimpleBar from 'simplebar-react';
-import { AlignLeft, Bell, Calendar, CheckSquare, Clock, CreditCard, Inbox, Plus, Search, Settings, Tag } from 'react-feather';
-import { Button, Container, Dropdown, Form, InputGroup, Nav, Navbar } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Container, Dropdown, Nav, Navbar } from 'react-bootstrap';
 import { toggleCollapsedNav } from '../../redux/action/Theme';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
-// import CustomInput from './CustomInput';
-import classNames from 'classnames';
-import { motion } from 'framer-motion';
-import HkBadge from '../../components/@hk-badge/@hk-badge';
-import { Cpu } from '@phosphor-icons/react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { MagnifyingGlass, Sparkle } from '@phosphor-icons/react';
+import { supabase } from '../../configs/supabaseClient';
 
-//Images
-import avatar2 from '../../assets/img/avatar2.jpg';
-import avatar3 from '../../assets/img/avatar3.jpg';
-import avatar4 from '../../assets/img/avatar4.jpg';
-import avatar10 from '../../assets/img/avatar10.jpg';
+// Images
 import avatar12 from '../../assets/img/avatar12.jpg';
 import { ThemeSwitcher } from '../../utils/theme-provider/theme-switcher';
 import AIDrawer from './AIDrawer';
 
-
-
-const TopNav = ({ navCollapsed, toggleCollapsedNav }) => {
-
-    const [showDropdown, setShowDropdown] = useState(false);
-    const [searchValue, setSearchValue] = useState("");
-    const [showAIDrawer, setShowAIDrawer] = useState(false);
-
-    const CloseSearchInput = () => {
-        setSearchValue("");
-        setShowDropdown(false);
-    }
-
-    const pageVariants = {
-        initial: {
-            opacity: 0,
-            y: 10
-        },
-        open: {
-            opacity: 1,
-            y: 0
-        },
-        close: {
-            opacity: 0,
-            y: 10
-        }
+// Get page label from path
+const getPageLabel = (pathname) => {
+    const pathMap = {
+        '/': 'Dashboard',
+        '/dashboard': 'Dashboard',
+        '/reminders': 'Calendar',
+        '/library': 'Library',
+        '/ai-create-doc': 'AI Create Doc',
+        '/email': 'Email',
+        '/settings': 'Settings',
     };
 
+    // Check for exact match or partial match
+    for (const [path, label] of Object.entries(pathMap)) {
+        if (pathname === path || pathname.startsWith(path + '/')) {
+            return label;
+        }
+    }
 
+    // Fallback: capitalize the first part of the path
+    const parts = pathname.split('/').filter(Boolean);
+    if (parts.length > 0) {
+        return parts[0].charAt(0).toUpperCase() + parts[0].slice(1).replace(/-/g, ' ');
+    }
+
+    return 'Dashboard';
+};
+
+const TopNav = ({ navCollapsed, toggleCollapsedNav }) => {
+    const [showAIDrawer, setShowAIDrawer] = useState(false);
+    const [searchValue, setSearchValue] = useState("");
+    const [showSearch, setShowSearch] = useState(false);
+    const [user, setUser] = useState(null);
+    const location = useLocation();
+    const navigate = useNavigate();
+    const searchInputRef = React.useRef(null);
+
+    const currentPage = getPageLabel(location.pathname);
+
+    // Keyboard shortcuts: "/" for search, Cmd/Ctrl+K for AI drawer
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            // Check if user is typing in an input, textarea, or contenteditable
+            const isTyping = ['INPUT', 'TEXTAREA'].includes(e.target.tagName) ||
+                e.target.isContentEditable;
+
+            // "/" for search (only when not typing)
+            if (e.key === '/' && !isTyping) {
+                e.preventDefault();
+                searchInputRef.current?.focus();
+            }
+
+            // Cmd+K (Mac) or Ctrl+K (Windows) for AI drawer
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                setShowAIDrawer(true);
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, []);
+
+    // Fetch user data on mount
+    useEffect(() => {
+        let isMounted = true;
+
+        const getUser = async () => {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!isMounted) return;
+                setUser(user);
+
+                // Also fetch from user_profiles table for full_name
+                if (user?.id) {
+                    const { data: profile } = await supabase
+                        .from('user_profiles')
+                        .select('full_name, email, avatar_url, role')
+                        .eq('id', user.id)
+                        .single();
+                    if (isMounted && profile) {
+                        setUser(prev => ({ ...prev, profile }));
+                    }
+                }
+            } catch (error) {
+                // Ignore AbortError (happens on unmount)
+                if (error?.name !== 'AbortError') {
+                    console.error('Error fetching user:', error);
+                }
+            }
+        };
+        getUser();
+
+        // Listen for auth changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+            if (!isMounted) return;
+            const authUser = session?.user ?? null;
+            setUser(authUser);
+
+            // Fetch profile on auth change too
+            if (authUser?.id) {
+                try {
+                    const { data: profile } = await supabase
+                        .from('user_profiles')
+                        .select('full_name, email, avatar_url, role')
+                        .eq('id', authUser.id)
+                        .single();
+                    if (isMounted && profile) {
+                        setUser(prev => ({ ...prev, profile }));
+                    }
+                } catch (error) {
+                    if (error?.name !== 'AbortError') {
+                        console.error('Error fetching profile:', error);
+                    }
+                }
+            }
+        });
+
+        return () => {
+            isMounted = false;
+            subscription.unsubscribe();
+        };
+    }, []);
+
+    // Handle sign out
+    const handleSignOut = async () => {
+        await supabase.auth.signOut();
+        navigate('/auth/login');
+    };
+
+    // Get user display name and email
+    const getFullName = () => {
+        // First priority: full_name from user_profiles table
+        if (user?.profile?.full_name) {
+            return user.profile.full_name;
+        }
+        // Fallback to auth metadata
+        const meta = user?.user_metadata;
+        if (meta?.first_name && meta?.last_name) {
+            return `${meta.first_name} ${meta.last_name}`;
+        }
+        if (meta?.first_name) return meta.first_name;
+        if (meta?.full_name) return meta.full_name;
+        if (meta?.name) return meta.name;
+        if (user?.email) return user.email.split('@')[0];
+        return 'User';
+    };
+    const userName = getFullName();
+    const userEmail = user?.email || 'No email';
 
     return (
-        <Navbar expand="xl" className="hk-navbar navbar-light fixed-top" >
-            <Container fluid>
-                {/* Start Nav */}
-                <div className="nav-start-wrap">
-                    <Button variant="flush-dark" onClick={() => toggleCollapsedNav(!navCollapsed)} className="btn-icon btn-rounded flush-soft-hover navbar-toggle d-xl-none">
-                        <span className="icon">
-                            <span className="feather-icon"><AlignLeft /></span>
-                        </span>
-                    </Button>
-                    {/* Search */}
-                    <Dropdown as={Form} className="navbar-search" show={showDropdown} autoClose={() => setShowDropdown(!showDropdown)} >
-                        <Dropdown.Toggle as="div" className="no-caret bg-transparent">
-                            <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover  d-xl-none" onClick={() => setShowDropdown(!showDropdown)} >
-                                <span className="icon">
-                                    <span className="feather-icon"><Search /></span>
-                                </span>
-                            </Button>
-                            <InputGroup className="d-xl-flex d-none">
-                                <span className="input-affix-wrapper input-search affix-border">
-                                    <Form.Control type="text" className="bg-transparent" data-navbar-search-close="false" placeholder="Search..." aria-label="Search" onFocus={() => setShowDropdown(true)} onBlur={() => setShowDropdown(false)} value={searchValue} onChange={e => setSearchValue(e.target.value)} />
-                                    <span className="input-suffix" onClick={() => setSearchValue("")} >
-                                        <span>/</span>
-                                        <span className="btn-input-clear">
-                                            <i className="bi bi-x-circle-fill" />
-                                        </span>
-                                        <span className="spinner-border spinner-border-sm input-loader text-primary" role="status">
-                                            <span className="sr-only">Loading...</span>
-                                        </span>
-                                    </span>
-                                </span>
-                            </InputGroup>
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu as={motion.div}
-                            initial="initial"
-                            animate={showDropdown ? "open" : "close"}
-                            variants={pageVariants}
-                            transition={{ duration: 0.3 }}
-                            className={classNames("p-0")}
-                        >
-                            {/* Mobile Search */}
-                            <Dropdown.Item className="d-xl-none bg-transparent">
-                                <InputGroup className="mobile-search">
-                                    <span className="input-affix-wrapper input-search">
-                                        <Form.Control type="text" placeholder="Search..." aria-label="Search" value={searchValue} onChange={e => setSearchValue(e.target.value)} onFocus={() => setShowDropdown(true)} autoFocus />
-                                        <span className="input-suffix" onClick={CloseSearchInput} >
-                                            <span className="btn-input-clear">
-                                                <i className="bi bi-x-circle-fill" />
-                                            </span>
-                                            <span className="spinner-border spinner-border-sm input-loader text-primary" role="status">
-                                                <span className="sr-only">Loading...</span>
-                                            </span>
-                                        </span>
-                                    </span>
-                                </InputGroup>
-                            </Dropdown.Item>
-                            {/*/ Mobile Search */}
-                            <SimpleBar className="dropdown-body p-2">
-                                <Dropdown.Header>Recent Search</Dropdown.Header>
-                                <Dropdown.Item className="bg-transparent">
-                                    <HkBadge bg="secondary" soft pill className="me-1" >React</HkBadge>
-                                    <HkBadge bg="secondary" soft pill className="me-1" >Node JS</HkBadge>
-                                    <HkBadge bg="secondary" soft pill>SCSS</HkBadge>
-                                </Dropdown.Item>
-                                <Dropdown.Divider as="div" />
-                                <Dropdown.Header>Help</Dropdown.Header>
-                                <Dropdown.Item as={Link} to="#">
-                                    <div className="media align-items-center">
-                                        <div className="media-head me-2">
-                                            <div className="avatar avatar-icon avatar-xs avatar-soft-light avatar-rounded">
-                                                <span className="initial-wrap">
-                                                    <span className="svg-icon">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-corner-down-right" width={24} height={24} viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                            <path d="M6 6v6a3 3 0 0 0 3 3h10l-4 -4m0 8l4 -4" />
-                                                        </svg>
-                                                    </span>
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div className="media-body">
-                                            How to setup theme?
-                                        </div>
-                                    </div>
-                                </Dropdown.Item>
-                                <Dropdown.Item as={Link} to="#">
-                                    <div className="media align-items-center">
-                                        <div className="media-head me-2">
-                                            <div className="avatar avatar-icon avatar-xs avatar-soft-light avatar-rounded">
-                                                <span className="initial-wrap">
-                                                    <span className="svg-icon">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-corner-down-right" width={24} height={24} viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                            <path d="M6 6v6a3 3 0 0 0 3 3h10l-4 -4m0 8l4 -4" />
-                                                        </svg>
-                                                    </span>
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div className="media-body">
-                                            View detail documentation
-                                        </div>
-                                    </div>
-                                </Dropdown.Item>
-                                <Dropdown.Divider as="div" />
-                                <Dropdown.Header>Users</Dropdown.Header>
-                                <Dropdown.Item as={Link} to="#">
-                                    <div className="media align-items-center">
-                                        <div className="media-head me-2">
-                                            <div className="avatar avatar-xs avatar-rounded">
-                                                <img src={avatar3} alt="user" className="avatar-img" />
-                                            </div>
-                                        </div>
-                                        <div className="media-body">
-                                            Sarah Jone
-                                        </div>
-                                    </div>
-                                </Dropdown.Item>
-                                <Dropdown.Item as={Link} to="#">
-                                    <div className="media align-items-center">
-                                        <div className="media-head me-2">
-                                            <div className="avatar avatar-xs avatar-soft-primary avatar-rounded">
-                                                <span className="initial-wrap">J</span>
-                                            </div>
-                                        </div>
-                                        <div className="media-body">
-                                            Joe Jackson
-                                        </div>
-                                    </div>
-                                </Dropdown.Item>
-                                <Dropdown.Item as={Link} to="#">
-                                    <div className="media align-items-center">
-                                        <div className="media-head me-2">
-                                            <div className="avatar avatar-xs avatar-rounded">
-                                                <img src={avatar4} alt="user" className="avatar-img" />
-                                            </div>
-                                        </div>
-                                        <div className="media-body">
-                                            Maria Richard
-                                        </div>
-                                    </div>
-                                </Dropdown.Item>
-                            </SimpleBar>
-                            <div className="dropdown-footer d-xl-flex d-none">
-                                <Link to="#">
-                                    <u>Search all</u>
-                                </Link>
-                            </div>
-                        </Dropdown.Menu>
-                    </Dropdown>
+        <Navbar expand="xl" className="hk-navbar navbar-light fixed-top">
+            <Container fluid className="px-3">
+                {/* Left Section: Search Bar */}
+                <div className="nav-start-wrap d-flex align-items-center flex-grow-1">
+                    <div className="header-search-wrapper">
+                        <style>
+                            {`
+                            .header-search-wrapper {
+                                position: relative;
+                                width: 100%;
+                                max-width: 400px;
+                            }
+                            .header-search-input {
+                                width: 100%;
+                                padding: 10px 16px 10px 42px;
+                                border: 1px solid var(--bs-border-color);
+                                border-radius: 10px;
+                                background: var(--bs-body-bg);
+                                font-size: 14px;
+                                color: var(--bs-body-color);
+                                transition: all 0.2s ease;
+                                outline: none;
+                            }
+                            .header-search-input::placeholder {
+                                color: var(--bs-secondary-color);
+                            }
+                            .header-search-input:focus {
+                                border-color: var(--bs-primary);
+                                box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.1);
+                            }
+                            .header-search-icon {
+                                position: absolute;
+                                left: 14px;
+                                top: 50%;
+                                transform: translateY(-50%);
+                                color: var(--bs-secondary-color);
+                                pointer-events: none;
+                            }
+                            `}
+                        </style>
+                        <MagnifyingGlass size={18} className="header-search-icon" />
+                        <input
+                            ref={searchInputRef}
+                            type="text"
+                            className="header-search-input"
+                            placeholder="Search... (press /)"
+                            value={searchValue}
+                            onChange={(e) => setSearchValue(e.target.value)}
+                        />
+                    </div>
                 </div>
-                {/* /Start Nav */}
-                {/* End Nav */}
+
+                {/* Right Section: AI Search + Theme Switch + Avatar */}
                 <div className="nav-end-wrap">
-                    <Nav className="navbar-nav flex-row">
-                        <Nav.Item style={{ display: 'none' }}>
+                    <Nav className="navbar-nav flex-row align-items-center">
+                        {/* AI Search Assistant Button */}
+                        <Nav.Item className="me-2">
                             <style>
                                 {`
-                                .ai-btn-nav {
-                                    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
-                                    transition: all 0.3s ease;
+                                .ai-search-btn {
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 8px;
+                                    padding: 8px 16px;
+                                    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+                                    border-radius: 24px;
+                                    border: 1px solid rgba(139, 92, 246, 0.15);
+                                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                                    cursor: pointer;
                                 }
-                                .ai-btn-nav:hover {
-                                    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%) !important;
+                                .ai-search-btn:hover {
+                                    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+                                    border-color: rgba(139, 92, 246, 0.3);
                                     transform: translateY(-1px);
-                                    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+                                    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.15);
                                 }
-                                .ai-btn-nav:hover .ai-icon {
-                                    transform: rotate(10deg) scale(1.1);
+                                .ai-search-btn:hover .ai-search-icon {
+                                    animation: pulse-glow 1.5s ease-in-out infinite;
                                 }
-                                .ai-btn-nav:hover .ai-text {
-                                    letter-spacing: 0.5px;
+                                @keyframes pulse-glow {
+                                    0%, 100% { opacity: 1; transform: scale(1); }
+                                    50% { opacity: 0.8; transform: scale(1.1); }
+                                }
+                                .ai-search-text {
+                                    font-size: 13px;
+                                    font-weight: 500;
+                                    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                                    -webkit-background-clip: text;
+                                    -webkit-text-fill-color: transparent;
+                                    background-clip: text;
+                                }
+                                .ai-search-icon {
+                                    color: #8b5cf6;
+                                }
+                                .ai-search-shortcut {
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 2px;
+                                    margin-left: 8px;
+                                    padding: 2px 6px;
+                                    background: rgba(0, 0, 0, 0.06);
+                                    border-radius: 4px;
+                                    font-size: 11px;
+                                    color: var(--bs-secondary-color);
+                                    font-weight: 500;
+                                }
+                                [data-bs-theme="dark"] .ai-search-shortcut {
+                                    background: rgba(255, 255, 255, 0.1);
                                 }
                                 `}
                             </style>
-                            <Button
-                                variant="flush-primary"
-                                className="ai-btn-nav d-flex align-items-center px-3 py-1 rounded-pill border-0 shadow-none"
+                            <div
+                                className="ai-search-btn"
                                 onClick={() => setShowAIDrawer(true)}
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => e.key === 'Enter' && setShowAIDrawer(true)}
                             >
-                                <Cpu size={18} weight="fill" className="ai-icon me-2 transition-all" style={{ color: 'var(--bs-primary)' }} />
-                                <span className="ai-text fw-bold text-primary fs-7 px-1 transition-all">SISgate AI</span>
-                            </Button>
+                                <Sparkle size={16} weight="fill" className="ai-search-icon" />
+                                <span className="ai-search-text d-none d-lg-inline">Ask AI</span>
+                                <MagnifyingGlass size={14} className="ai-search-icon d-none d-sm-inline" />
+                                <div className="ai-search-shortcut d-none d-xl-flex">
+                                    <span>⌘</span>
+                                    <span>K</span>
+                                </div>
+                            </div>
                         </Nav.Item>
-                        <Nav.Item className='ms-2' style={{ display: 'none' }}>
+
+                        {/* Theme Switcher */}
+                        <Nav.Item className="ms-1">
                             <ThemeSwitcher />
                         </Nav.Item>
-                        <Nav.Item style={{ display: 'none' }}>
-                            <Button variant="flush-dark" as={Link} to="/apps/email" className="btn-icon btn-rounded flush-soft-hover">
-                                <span className="icon">
-                                    <span className=" position-relative">
-                                        <span className="feather-icon"><Inbox /></span>
-                                        <HkBadge bg="primary" soft pill size="sm" className="position-top-end-overflow-1" >4</HkBadge>
-                                    </span>
-                                </span>
-                            </Button>
-                        </Nav.Item>
-                        <Nav.Item style={{ display: 'none' }}>
-                            <Dropdown className="dropdown-notifications">
-                                <Dropdown.Toggle variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover no-caret">
-                                    <span className="icon">
-                                        <span className="position-relative">
-                                            <span className="feather-icon"><Bell /></span>
-                                            <HkBadge bg="success" indicator className="position-top-end-overflow-1" />
-                                        </span>
-                                    </span>
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu align="end" className="p-0">
-                                    <Dropdown.Header className="px-4 fs-6">
-                                        Notifications
-                                        <Button variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover">
-                                            <span className="icon">
-                                                <span className="feather-icon"><Settings /></span>
-                                            </span>
-                                        </Button>
-                                    </Dropdown.Header>
-                                    <SimpleBar className="dropdown-body  p-2">
-                                        <Dropdown.Item>
-                                            <div className="media">
-                                                <div className="media-head">
-                                                    <div className="avatar avatar-rounded avatar-sm">
-                                                        <img src={avatar2} alt="user" className="avatar-img" />
-                                                    </div>
-                                                </div>
-                                                <div className="media-body">
-                                                    <div>
-                                                        <div className="notifications-text">Morgan Freeman accepted your invitation to join the team</div>
-                                                        <div className="notifications-info">
-                                                            <HkBadge bg="success" soft >Collaboration</HkBadge>
-                                                            <div className="notifications-time">Today, 10:14 PM</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Dropdown.Item>
-                                        <Dropdown.Item>
-                                            <div className="media">
-                                                <div className="media-head">
-                                                    <div className="avatar  avatar-icon avatar-sm avatar-success avatar-rounded">
-                                                        <span className="initial-wrap">
-                                                            <span className="feather-icon"><Inbox /> </span>
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <div className="media-body">
-                                                    <div>
-                                                        <div className="notifications-text">New message received from Alan Rickman</div>
-                                                        <div className="notifications-info">
-                                                            <div className="notifications-time">Today, 7:51 AM</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Dropdown.Item>
-                                        <Dropdown.Item>
-                                            <div className="media">
-                                                <div className="media-head">
-                                                    <div className="avatar  avatar-icon avatar-sm avatar-pink avatar-rounded">
-                                                        <span className="initial-wrap">
-                                                            <span className="feather-icon"><Clock /></span>
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <div className="media-body">
-                                                    <div>
-                                                        <div className="notifications-text">You have a follow up with Sisgate Hub Head on Friday, Dec 19 at 9:30 am</div>
-                                                        <div className="notifications-info">
-                                                            <div className="notifications-time">Yesterday, 9:25 PM</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Dropdown.Item>
-                                        <Dropdown.Item>
-                                            <div className="media">
-                                                <div className="media-head">
-                                                    <div className="avatar avatar-sm avatar-rounded">
-                                                        <img src={avatar3} alt="user" className="avatar-img" />
-                                                    </div>
-                                                </div>
-                                                <div className="media-body">
-                                                    <div>
-                                                        <div className="notifications-text">Application of Sarah Williams is waiting for your approval</div>
-                                                        <div className="notifications-info">
-                                                            <div className="notifications-time">Today 10:14 PM</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Dropdown.Item>
-                                        <Dropdown.Item>
-                                            <div className="media">
-                                                <div className="media-head">
-                                                    <div className="avatar avatar-sm avatar-rounded">
-                                                        <img src={avatar10} alt="user" className="avatar-img" />
-                                                    </div>
-                                                </div>
-                                                <div className="media-body">
-                                                    <div>
-                                                        <div className="notifications-text">Winston Churchil shared a document with you</div>
-                                                        <div className="notifications-info">
-                                                            <HkBadge bg="violet" soft >File Manager</HkBadge>
-                                                            <div className="notifications-time">2 Oct, 2021</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Dropdown.Item>
-                                        <Dropdown.Item>
-                                            <div className="media">
-                                                <div className="media-head">
-                                                    <div className="avatar  avatar-icon avatar-sm avatar-danger avatar-rounded">
-                                                        <span className="initial-wrap">
-                                                            <span className="feather-icon"><Calendar /></span>
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <div className="media-body">
-                                                    <div>
-                                                        <div className="notifications-text">Last 2 days left for the project to be completed</div>
-                                                        <div className="notifications-info">
-                                                            <HkBadge bg="orange" soft >Updates</HkBadge>
-                                                            <div className="notifications-time">14 Sep, 2021</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Dropdown.Item>
-                                    </SimpleBar>
-                                    <div className="dropdown-footer">
-                                        <Link to="#"><u>View all notifications</u>
-                                        </Link>
-                                    </div>
-                                </Dropdown.Menu>
-                            </Dropdown>
-                        </Nav.Item>
-                        <Nav.Item style={{ display: 'none' }}>
-                            <Dropdown className="ps-2">
-                                <Dropdown.Toggle as={Link} to="#" className="no-caret">
-                                    <div className="avatar avatar-rounded avatar-xs">
-                                        <img src={avatar12} alt="user" className="avatar-img" />
+
+                        {/* User Avatar Dropdown */}
+                        <Nav.Item className="ms-2">
+                            <Dropdown align="end">
+                                <Dropdown.Toggle
+                                    as="div"
+                                    className="no-caret cursor-pointer"
+                                    role="button"
+                                >
+                                    <div
+                                        className="avatar avatar-rounded avatar-sm"
+                                        style={{
+                                            border: '0px solid var(--bs-border-color)',
+                                            padding: '0px'
+                                        }}
+                                    >
+                                        <img
+                                            src={user?.profile?.avatar_url || avatar12}
+                                            alt="user"
+                                            className="avatar-img"
+                                            style={{
+                                                borderRadius: '50%',
+                                                objectFit: 'cover',
+                                                objectPosition: 'center',
+                                                width: '100%',
+                                                height: '100%'
+                                            }}
+                                            onError={(e) => { e.target.src = avatar12; }}
+                                        />
                                     </div>
                                 </Dropdown.Toggle>
-                                <Dropdown.Menu align="end">
-                                    <div className="p-2">
-                                        <div className="media">
-                                            <div className="media-head me-2">
-                                                <div className="avatar avatar-primary avatar-sm avatar-rounded">
-                                                    <span className="initial-wrap">Hk</span>
+                                <Dropdown.Menu className="p-0 profile-dropdown-menu" style={{ minWidth: '320px', border: '1px solid var(--bs-border-color)', boxShadow: '0 4px 20px rgba(0,0,0,0.08)', borderRadius: '12px', overflow: 'hidden' }}>
+                                    {/* Header with light blue background */}
+                                    <div
+                                        className="profile-dropdown-header"
+                                        style={{
+                                            background: '#e8f4fd',
+                                            padding: '24px 24px 24px 24px',
+                                            position: 'relative'
+                                        }}
+                                    >
+                                        <div className="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <div style={{ fontSize: '24px', fontWeight: '600', color: '#1a1a1a', lineHeight: '1.2' }}>
+                                                    {userName}
+                                                </div>
+                                                <div style={{ fontSize: '16px', color: '#6b7280', marginTop: '4px' }}>
+                                                    {user?.profile?.role || 'Member'}
                                                 </div>
                                             </div>
-                                            <div className="media-body">
-                                                <Dropdown>
-                                                    <Dropdown.Toggle as={Link} to="#" className="d-block fw-medium text-dark">Hencework</Dropdown.Toggle>
-                                                    <Dropdown.Menu align="end">
-                                                        <div className="p-2">
-                                                            <div className="media align-items-center active-user mb-3">
-                                                                <div className="media-head me-2">
-                                                                    <div className="avatar avatar-primary avatar-xs avatar-rounded">
-                                                                        <span className="initial-wrap">Hk</span>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="media-body">
-                                                                    <Link to="#" className="d-flex link-dark">Hencework <i className="ri-checkbox-circle-fill fs-7 text-primary ms-1" />
-                                                                    </Link>
-                                                                    <Link to="#" className="d-block fs-8 link-secondary">
-                                                                        <u>Manage your account</u>
-                                                                    </Link>
-                                                                </div>
-                                                            </div>
-                                                            <div className="media align-items-center mb-3">
-                                                                <div className="media-head me-2">
-                                                                    <div className="avatar avatar-xs avatar-rounded">
-                                                                        <img src={avatar12} alt="user" className="avatar-img" />
-                                                                    </div>
-                                                                </div>
-                                                                <div className="media-body">
-                                                                    <Link to="#" className="d-block link-dark">Sisgate Hub Team</Link>
-                                                                    <Link to="#" className="d-block fs-8 link-secondary">contact@hencework.com</Link>
-                                                                </div>
-                                                            </div>
-                                                            <Button variant="outline-light" size="sm" className="btn-block">
-                                                                <span>
-                                                                    <span className="icon">
-                                                                        <span className="feather-icon">
-                                                                            <Plus />
-                                                                        </span>
-                                                                    </span>
-                                                                    <span>Add Account</span></span>
-                                                            </Button>
-                                                        </div>
-                                                    </Dropdown.Menu>
-                                                </Dropdown>
-                                                <div className="fs-7">contact@hencework.com</div>
-                                                <Link to="#" className="d-block fs-8 link-secondary">
-                                                    <u>Sign Out</u>
-                                                </Link>
-                                            </div>
+                                            <button
+                                                type="button"
+                                                className="btn-close"
+                                                style={{
+                                                    fontSize: '12px',
+                                                    opacity: 0.6,
+                                                    marginTop: '4px'
+                                                }}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    document.body.click();
+                                                }}
+                                            />
                                         </div>
                                     </div>
-                                    <Dropdown.Divider as="div" />
-                                    <Dropdown.Item as={Link} to="/pages/profile" >Profile</Dropdown.Item>
-                                    <Dropdown.Item>
-                                        <span className="me-2">Offers</span>
-                                        <span className="badge badge-sm badge-soft-pink">2</span>
-                                    </Dropdown.Item>
-                                    <Dropdown.Divider as="div" />
-                                    <h6 className="dropdown-header">Manage Account</h6>
-                                    <Dropdown.Item>
-                                        <span className="dropdown-icon feather-icon">
-                                            <CreditCard />
-                                        </span>
-                                        <span>Payment methods</span>
-                                    </Dropdown.Item>
-                                    <Dropdown.Item>
-                                        <span className="dropdown-icon feather-icon">
-                                            <CheckSquare />
-                                        </span>
-                                        <span>Subscriptions</span>
-                                    </Dropdown.Item>
-                                    <Dropdown.Item>
-                                        <span className="dropdown-icon feather-icon">
-                                            <Settings />
-                                        </span>
-                                        <span>Settings</span>
-                                    </Dropdown.Item>
-                                    <Dropdown.Divider as="div" />
-                                    <Dropdown.Item>
-                                        <span className="dropdown-icon feather-icon">
-                                            <Tag />
-                                        </span>
-                                        <span>Raise a ticket</span>
-                                    </Dropdown.Item>
-                                    <Dropdown.Divider as="div" />
-                                    <Dropdown.Item>
-                                        Terms &amp; Conditions
-                                    </Dropdown.Item>
-                                    <Dropdown.Item>
-                                        Help &amp; Support
-                                    </Dropdown.Item>
+
+                                    {/* Menu Items */}
+                                    <div style={{ padding: '16px 20px 20px 20px' }}>
+                                        <Dropdown.Item
+                                            as={Link}
+                                            to="/profile"
+                                            className="profile-dropdown-item"
+                                            style={{
+                                                padding: '16px 8px',
+                                                borderRadius: '8px',
+                                                fontSize: '18px',
+                                                fontWeight: '400',
+                                                color: '#1a1a1a',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '16px',
+                                                background: 'transparent'
+                                            }}
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                                <circle cx="12" cy="7" r="4" />
+                                            </svg>
+                                            My Profile
+                                        </Dropdown.Item>
+
+                                        <Dropdown.Item
+                                            as={Link}
+                                            to="/email"
+                                            className="profile-dropdown-item"
+                                            style={{
+                                                padding: '16px 8px',
+                                                borderRadius: '8px',
+                                                fontSize: '18px',
+                                                fontWeight: '400',
+                                                color: '#1a1a1a',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '16px',
+                                                background: 'transparent'
+                                            }}
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                            </svg>
+                                            Inbox
+                                        </Dropdown.Item>
+
+                                        <Dropdown.Item
+                                            as={Link}
+                                            to="/settings"
+                                            className="profile-dropdown-item"
+                                            style={{
+                                                padding: '16px 8px',
+                                                borderRadius: '8px',
+                                                fontSize: '18px',
+                                                fontWeight: '400',
+                                                color: '#1a1a1a',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '16px',
+                                                background: 'transparent'
+                                            }}
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                                                <circle cx="12" cy="12" r="3" />
+                                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                                            </svg>
+                                            Setting
+                                        </Dropdown.Item>
+
+                                        <Dropdown.Item
+                                            className="profile-dropdown-item"
+                                            onClick={handleSignOut}
+                                            style={{
+                                                padding: '16px 8px',
+                                                borderRadius: '8px',
+                                                fontSize: '18px',
+                                                fontWeight: '400',
+                                                color: '#1a1a1a',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '16px',
+                                                background: 'transparent'
+                                            }}
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                                                <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
+                                                <line x1="12" y1="2" x2="12" y2="12" />
+                                            </svg>
+                                            Log Out
+                                        </Dropdown.Item>
+                                    </div>
+
+                                    <style>
+                                        {`
+                                        .profile-dropdown-item:hover {
+                                            background-color: #f5f5f5 !important;
+                                        }
+                                        .profile-dropdown-item:active {
+                                            background-color: #ebebeb !important;
+                                            color: #1a1a1a !important;
+                                        }
+                                        [data-bs-theme="dark"] .profile-dropdown-menu {
+                                            background: var(--bs-body-bg);
+                                            border-color: var(--bs-border-color) !important;
+                                        }
+                                        [data-bs-theme="dark"] .profile-dropdown-header {
+                                            background: #1e3a5f !important;
+                                        }
+                                        [data-bs-theme="dark"] .profile-dropdown-header > div > div:first-child {
+                                            color: #ffffff !important;
+                                        }
+                                        [data-bs-theme="dark"] .profile-dropdown-header > div > div:last-child {
+                                            color: #94a3b8 !important;
+                                        }
+                                        [data-bs-theme="dark"] .profile-dropdown-item {
+                                            color: var(--bs-body-color) !important;
+                                        }
+                                        [data-bs-theme="dark"] .profile-dropdown-item:hover {
+                                            background-color: rgba(255,255,255,0.08) !important;
+                                        }
+                                        `}
+                                    </style>
                                 </Dropdown.Menu>
                             </Dropdown>
                         </Nav.Item>
                     </Nav>
                 </div>
-                {/* /End Nav */}
             </Container>
+
+            {/* AI Drawer */}
             <AIDrawer show={showAIDrawer} onHide={() => setShowAIDrawer(false)} />
         </Navbar>
-    )
-}
+    );
+};
 
 const mapStateToProps = ({ theme }) => {
     const { navCollapsed } = theme;
-    return { navCollapsed }
+    return { navCollapsed };
 };
 
 export default connect(mapStateToProps, { toggleCollapsedNav })(TopNav);

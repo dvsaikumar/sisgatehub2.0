@@ -5,10 +5,16 @@ import toast from 'react-hot-toast';
 
 const useReminderPoller = () => {
     useEffect(() => {
+        let isMounted = true;
+        let intervalId = null;
+
         const checkReminders = async () => {
+            if (!isMounted) return;
+
             try {
                 // 0. Get current user
                 const { data: { user } } = await supabase.auth.getUser();
+                if (!isMounted) return;
                 if (!user || !user.email) return;
 
                 // 1. Check if we have a valid email config for Reminders
@@ -20,6 +26,7 @@ const useReminderPoller = () => {
                     .limit(1)
                     .single();
 
+                if (!isMounted) return;
                 if (configError || !mailConfig) {
                     // console.log("No active 'Reminders' email configuration found. Skipping auto-email check.");
                     return;
@@ -35,11 +42,14 @@ const useReminderPoller = () => {
                     .eq('notified', false)
                     .lte('start_date', now);
 
+                if (!isMounted) return;
                 if (remindersError) throw remindersError;
 
                 if (dueReminders && dueReminders.length > 0) {
                     // 3. Process each reminder
                     for (const reminder of dueReminders) {
+                        if (!isMounted) return;
+
                         // Call the Edge Function to send the actual SMTP email
                         toast.promise(
                             (async () => {
@@ -87,7 +97,10 @@ const useReminderPoller = () => {
                     }
                 }
             } catch (error) {
-                console.error("Reminder Poller Error:", error);
+                // Ignore AbortError
+                if (error?.name !== 'AbortError') {
+                    console.error("Reminder Poller Error:", error);
+                }
             }
         };
 
@@ -95,9 +108,14 @@ const useReminderPoller = () => {
         checkReminders();
 
         // Run every 60 seconds
-        const intervalId = setInterval(checkReminders, 60000);
+        intervalId = setInterval(checkReminders, 60000);
 
-        return () => clearInterval(intervalId);
+        return () => {
+            isMounted = false;
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        };
     }, []);
 };
 
