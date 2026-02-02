@@ -5,14 +5,12 @@ import { Button, Card, Dropdown, Form, InputGroup } from 'react-bootstrap';
 import * as Icons from 'react-feather';
 //Redux
 import { connect } from 'react-redux';
-import { sendMsg } from '../../../redux/action/ChatPopup';
+import { sendMsg, toggleChat } from '../../../redux/action/ChatPopup';
 //Image
 import logo from '../../../assets/img/sisgate-logo.png';
 
-const ChatBotInterface = ({ show, sendMsg, msg }) => {
+const ChatBotInterface = ({ isOpen, sendMsg, msg, toggleChat }) => {
 
-    const [showChatbot, setShowChatbot] = useState(show);
-    const [showPopup, setshowPopup] = useState(true);
     const [startConversation, setStartConversation] = useState(false);
     const [typing, setTyping] = useState(true);
     const [messages, setMessages] = useState([]);
@@ -42,7 +40,7 @@ const ChatBotInterface = ({ show, sendMsg, msg }) => {
 
     return (
         <>
-            <div className={classNames("hk-chatbot-popup", { "d-md-block d-flex": showChatbot })} style={{ bottom: '100px' }}>
+            <div className={classNames("hk-chatbot-popup", { "d-md-block d-flex": isOpen })} style={{ bottom: '90px' }}>
                 <header className={classNames({ "pb-2": startConversation })} >
                     <div className="chatbot-head-top">
                         <Dropdown>
@@ -65,7 +63,7 @@ const ChatBotInterface = ({ show, sendMsg, msg }) => {
                             </Dropdown.Menu>
                         </Dropdown>
                         <span className="text-white">Chat with Us</span>
-                        <Button variant="dark" size="sm" className="btn-icon btn-rounded" onClick={() => setShowChatbot(!showChatbot)} >
+                        <Button variant="dark" size="sm" className="btn-icon btn-rounded" onClick={toggleChat} >
                             <span className="icon">
                                 <span className="feather-icon">
                                     <Icons.Minus />
@@ -157,6 +155,22 @@ const ChatBotInterface = ({ show, sendMsg, msg }) => {
                                                 <div className="msg-box">
                                                     <div>
                                                         <p>{elem.text}</p>
+                                                        <span className="chat-time">{elem.time || "Just now"}</span>
+                                                        <div className="msg-action">
+                                                            <Dropdown>
+                                                                <Dropdown.Toggle variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover dropdown-toggle no-caret">
+                                                                    <span className="icon">
+                                                                        <span className="feather-icon">
+                                                                            <Icons.MoreHorizontal />
+                                                                        </span>
+                                                                    </span>
+                                                                </Dropdown.Toggle>
+                                                                <Dropdown.Menu align="end">
+                                                                    <Dropdown.Item href="#forward">Forward</Dropdown.Item>
+                                                                    <Dropdown.Item href="#copy">Copy</Dropdown.Item>
+                                                                </Dropdown.Menu>
+                                                            </Dropdown>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -268,21 +282,13 @@ const ChatBotInterface = ({ show, sendMsg, msg }) => {
                     <div className="footer-copy-text">Powered by <a className="brand-link" href="#some"><img src={logo} alt="Sisgate Hub" /></a></div>
                 </footer>
             </div>
-            <Button variant="primary" size="lg" className="btn-icon btn-floating btn-rounded btn-popup-open" onClick={() => { setShowChatbot(!showChatbot); setshowPopup(false); }} >
-                <span className="icon">
-                    <span className="feather-icon">
-                        <Icons.MessageCircle />
-                    </span>
-                </span>
-            </Button>
-            <div className={classNames("chat-popover shadow-xl", { "d-flex": showPopup })}><p>Try Sisgate Chat for free and connect with your customers now!</p></div>
         </>
     )
 }
 
 const mapStateToProps = ({ chatPopupReducer }) => {
-    const { msg } = chatPopupReducer;
-    return { msg }
+    const { msg, isOpen } = chatPopupReducer;
+    return { msg, isOpen }
 };
 
-export default connect(mapStateToProps, { sendMsg })(ChatBotInterface);
+export default connect(mapStateToProps, { sendMsg, toggleChat })(ChatBotInterface);

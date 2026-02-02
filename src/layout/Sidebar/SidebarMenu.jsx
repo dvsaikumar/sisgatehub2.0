@@ -19,7 +19,8 @@ import {
     File,
     FileCode,
     Stack,
-    Robot
+    Robot,
+    Scroll
 } from '@phosphor-icons/react';
 import HkBadge from '../../components/@hk-badge/@hk-badge';
 
@@ -57,6 +58,16 @@ export const SidebarMenu = [
                 name: 'Create Doc',
                 icon: <Robot />,
                 path: '/apps/ai/create-doc',
+            }
+        ]
+    },
+    {
+        group: 'System',
+        contents: [
+            {
+                name: 'Audit Logs',
+                icon: <Scroll />,
+                path: '/audit-logs',
             }
         ]
     },

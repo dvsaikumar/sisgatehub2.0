@@ -10,6 +10,7 @@ import ChatGroups from "../views/Chat/Groups";
 import ContactCards from "../views/Contact/ContactCards";
 import ContactList from "../views/Contact/ContactList";
 import EditContact from "../views/Contact/EditContact";
+// Dashboard (TSX)
 import Dashboard from "../views/Dashboard";
 import Email from "../views/Email";
 import GridView from "../views/FileManager/GridView";
@@ -46,7 +47,7 @@ import Error503 from "../views/Authentication/Error503/Error503";
 import ChatPopup from "../views/ChatPopup/DirectMessage";
 import ChatBot from "../views/ChatPopup/ChatBot";
 import AuditLogs from "../views/AuditLogs";
-import CreateDoc from "../views/AI/CreateDoc";
+import CreateDoc from "../views/AI/CreateDoc/index";
 
 
 export const routes = [
@@ -54,6 +55,8 @@ export const routes = [
     { path: 'dashboard', exact: true, component: Dashboard },
     { path: 'settings', exact: true, component: Settings },
     { path: 'library', exact: true, component: Library },
+    { path: 'library/list-view', exact: true, component: Library },
+    { path: 'library/grid-view', exact: true, component: Library },
     { path: 'audit-logs', exact: true, component: AuditLogs },
     { path: 'emptypage', exact: true, component: EmptyPage },
     { path: 'apps/ai/create-doc', exact: true, component: CreateDoc },

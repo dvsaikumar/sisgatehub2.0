@@ -1,9 +1,10 @@
-import { DIRECT_MSG, SEND_MSG } from "../constants/ChatPopup";
+import { DIRECT_MSG, SEND_MSG, TOGGLE_CHAT } from "../constants/ChatPopup";
 
 const initialState = {
+    isOpen: false,
     msg: [
-        { text: "I have a plan regarding pricing", types: "sent" },
-        { text: "Welcome back! Are you looking to upgrade your existing plan?", types: "received" }
+        { text: "I have a plan regarding pricing", time: "10:30 AM", types: "sent" },
+        { text: "Welcome back! Is there anything I can help you with?", time: "10:35 AM", types: "received" }
     ],
     directMsgs: [],
 };
@@ -19,6 +20,11 @@ const ChatPopupReducer = (state = initialState, action) => {
             return {
                 ...state,
                 directMsgs: [...state.directMsgs, action.directMsgs]
+            };
+        case TOGGLE_CHAT:
+            return {
+                ...state,
+                isOpen: !state.isOpen
             };
         default:
             return state;

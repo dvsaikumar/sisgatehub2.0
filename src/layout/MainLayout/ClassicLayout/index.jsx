@@ -5,7 +5,7 @@ import { useMatch } from 'react-router-dom';
 import { toggleCollapsedNav } from '../../../redux/action/Theme';
 import PageFooter from '../../Footer/PageFooter';
 import TopNav from '../../Header/TopNav';
-import Sidebar from '../../Sidebar/Sidebar';
+import Sidebar from '../../Sidebar/Sidebar.tsx';
 import { useWindowWidth } from '@react-hook/window-size';
 import ChatBotInterface from '../../../views/ChatPopup/ChatBot/ChatBotInterface';
 import ResponsiveNavigation from '../../ResponsiveNavigation';

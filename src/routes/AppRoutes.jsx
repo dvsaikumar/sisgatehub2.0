@@ -3,6 +3,7 @@ import { Route, Routes, Navigate, useNavigate, useLocation, useParams } from 're
 import LayoutClassic from '../layout/MainLayout/ClassicLayout'
 import { routes } from './RouteList'
 import { supabase } from '../configs/supabaseClient';
+import ChatBotInterface from '../views/ChatPopup/ChatBot/ChatBotInterface';
 
 // Shim to provide v5 props (history, location, match) to components
 const LegacyRouteWrapper = ({ component: Component }) => {
@@ -72,6 +73,7 @@ const AppRoutes = () => {
                     }
                     <Route path="*" element={<Navigate to="/error-404" replace />} />
                 </Routes>
+                <ChatBotInterface show={false} />
             </LayoutClassic>
         </Suspense>
     )

@@ -511,12 +511,12 @@ Project:	Jampack
 	&.nav-sm {
 		>.nav-item .nav-link>.nav-icon-wrap {
 			margin-right: .875rem;
-			font-size: 1rem;
+			font-size: 1.25rem; // Larger icon
 		}
 
 		.nav-link {
-			padding: .25rem 0.75rem;
-			font-size: 0.875rem;
+			padding: .4rem 0.75rem; // More padding
+			font-size: 1.1rem; // Increased from 1rem
 		}
 	}
 }
@@ -570,7 +570,7 @@ Project:	Jampack
 			&.active {
 				background: transparent;
 				border-color: var(--bs-border-color) var(--bs-border-color) var(--hk-bg-primary);
-				color:var(--bs-primary);
+				color: var(--bs-primary);
 			}
 		}
 

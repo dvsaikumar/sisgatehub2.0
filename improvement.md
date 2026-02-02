@@ -1,60 +1,57 @@
 # Application Improvement Plan
 
-Based on the analysis of the current codebase (`src/views/Dashboard`, `src/routes`, and `package.json`), here is a comprehensive improvement plan focusing on UI/UX, Feature Expansion, and Technical Hygiene.
+Based on the recent refactors (Dashboard, Sidebar) and deep codebase analysis, here is the updated improvement roadmap.
 
 ## 1. UI & UX Improvements
 
-### 🎨 Modernize Dashboard Design
-**Current Status**: The Dashboard (`src/views/Dashboard/index.jsx`) uses inline styles and lists raw data.
+### 🎨 Visual Polish & Consistency
+**Current Status**: Sidebar typography has been increased. Dashboard header is refactored.
 **Recommendation**:
-- **Refactor to Tailwind CSS**: Replace the extensive `const styles = { ... }` object with Tailwind utility classes. This ensures consistency with the `tailwind.css` theme configuration.
-- **Data Visualization**: Utilize `apexcharts` (already a dependency) to replace text-based stats with visual trends (e.g., "Documents Created This Week" line chart).
-- **Bento Grid Layout**: Implement the "Bento Box" layout defined in `tailwind.css` for a more responsive and modern widget arrangement.
+- **Global Search (Cmd+K)**: Implement a command palette to quickly jump between views (AI, Library, Settings) and search documents.
+- **Unified Spacing System**: Enforce consistent padding/margins across all views using Tailwind's spacing scale (e.g., `p-6` or `p-8` as standard page padding).
+- **Mobile optimization**: verify all the pages are mobile responsive.
 
-### ⚡ Perceived Performance
-**Current Status**: Uses simple text "Loading..." or "No upcoming reminders".
+### ⚡ Dashboard Evolution
+**Current Status**: Header and Quick Actions are refactored. Grid layout is standard.
 **Recommendation**:
-- **Skeleton Loaders**: Implement skeleton screens (shimmer effect) for the dashboard widgets while data is fetching.
-- **Empty States**: Use illustrated SVGs or icons for empty states instead of just text to make the app feel more polished.
+- **Bento Grid**: Fully embrace the "Bento" layout for the stats and main content area to allow for variable-sized widgets that lock together.
+- **Empty States**: Replace simple text "No reminders" with illustrated SVG components to improve delight.
 
-### 💫 Interactivity & Motion
-**Current Status**: Static list rendering.
+## 2. Feature Expansion
+
+### � Audit Logs & Security
+**Current Status**: `src/views/AuditLogs` directory exists but appears minimal.
 **Recommendation**:
-- **Micro-animations**: Use `framer-motion` (already a dependency) to animate list items in (staggered fade-in) when the dashboard loads.
-- **Hover Effects**: Enhance cards with the `transform: translateY(-2px)` and shadow enhancements defined in your Tailwind config.
+- **Full Implementation**: Build a comprehensive Audit Log table tracking user actions (login, document creation, settings changes).
+- **Filters & Export**: Add ability to filter logs by date/user and export to CSV.
 
-## 2. Feature Implementation Proposals
-
-### 🧠 Deep AI Integration
-**Current Status**: `src/views/AI/CreateDoc` exists, but AI is isolated.
+### � AI Universality
+**Current Status**: AI is contained in `CreateDoc`.
 **Recommendation**:
-- **AI Command Menu**: Implement a "Notion-style" `/` command in the TipTap editor (`@tiptap/react` is installed) to trigger AI generation directly within documents.
-- **Global AI Assistant**: Add a floating action button (FAB) or global sidebar for a "Chat with AI" feature that is accessible from anywhere in the app (refer fencing `src/views/ChatPopup`).
+- **Global AI Chat**: Convert `src/views/ChatPopup` into a global Floating Action Button (FAB) or slide-over drawer accessible from *any* page.
+- **Context Awareness**: Allow the AI to read the current page content (e.g., summarize the open document).
 
-### 🔍 Command Palette (Cmd+K)
-**Current Status**: No obvious global search or quick navigation.
+### � Advanced Calendar
+**Current Status**: Basic Calendar view exists.
 **Recommendation**:
-- **Global Search**: Implement a `Cmd+K` / `Ctrl+K` modal to quickly jump between views (e.g., "Go to Invoices", "Create new Contact") without using the mouse. This is a standard for "Pro" apps.
+- **Two-way Sync**: Integrate with Google/Outlook Calendar APIs.
+- **Dashboard Widget**: Make the "Upcoming Reminders" on dashboard interactive (quick complete, reschedule).
 
-### 🌓 Enhanced Dark Mode
-**Current Status**: `tailwind.css` supports `.dark` class, but Dashboard has hardcoded hex colors (e.g., `#1a1a2e`).
+## 3. Technical Hygiene (High Priority)
+
+### 🛡️ TypeScript Migration (Critical)
+**Current Status**: Mixed codebase. `Dashboard` is `.tsx` but uses loose types. Many views are still `.jsx`.
 **Recommendation**:
-- **Systematic Dark Mode**: Replace hardcoded colors in JS files with Tailwind color variables (e.g., `text-gray-900 dark:text-gray-100`) to ensure 100% dark mode compatibility.
+- **Aggressive Conversion**: Convert `src/views/*` to TypeScript file-by-file.
+- **Strict Interfaces**: Define shared models in `src/models` (e.g., `User`, `Document`, `Reminder`) to avoid `any` types.
 
-## 3. Technical Improvements
-
-### 🏗️ Component Architecture
-**Current Status**: Dashboard defines widgets internally.
+### ♻️ State Management Modernization
+**Current Status**: Legacy Redux `connect()` HOC usage (seen in `Sidebar.jsx`, `Dashboard.tsx`).
 **Recommendation**:
-- **Colocation**: Extract `StatCard`, `ActionCard`, and `DashboardList` into separate components within `src/views/Dashboard/components`. This follows the "Colocation" rule in your user rules.
+- **Redux Toolkit Hooks**: Refactor components to use `useSelector` and `useDispatch` hooks. This reduces boilerplate and improves readability.
+- **React Query**: Consider `@tanstack/react-query` for server state (like fetching dashboard data) to handle caching/loading states better than local `useEffect`.
 
-### 🛡️ Type Safety
-**Current Status**: Project uses JavaScript, but `tsconfig.json` exists.
+### 🎨 Styling Consolidation
+**Current Status**: Mix of SCSS (`src/styles/scss`) and Tailwind CSS.
 **Recommendation**:
-- **Gradual TypeScript Adoption**: Rename key files (like `src/views/Dashboard/index.jsx`) to `.tsx` and add basic type interfaces for Props and State to catch errors early.
-
-## 4. Immediate Next Step
-I recommend starting with the **Dashboard Redesign**. It is the landing page of the application and high-impact.
-1. Create `src/views/Dashboard/components/StatsCard.jsx`.
-2. Refactor `Dashboard/index.jsx` to use Tailwind and the new components.
-3. Integrate `framer-motion` for entrance animations.
+- **Deprecate SCSS**: Stop adding new SCSS files. Move component-specific styles (like Sidebar overrides) into Tailwind utility classes or constrained styled-components to reduce split-brain styling.

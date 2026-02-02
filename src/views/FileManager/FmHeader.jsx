@@ -7,9 +7,8 @@ import { Link, NavLink, useMatch } from 'react-router-dom';
 import HkTooltip from '../../components/@hk-tooltip/HkTooltip';
 import { toggleTopNav } from '../../redux/action/Theme';
 
-const FmHeader = ({ topNavCollapsed, toggleTopNav, toggleSidebar, showSidebar, showInfo, toggleInfo, title, onSearch, searchValue, children }) => {
+const FmHeader = ({ topNavCollapsed, toggleTopNav, toggleSidebar, showSidebar, showInfo, toggleInfo, title, onSearch, searchValue, viewMode, setViewMode, children }) => {
 
-    const listViewRoute = useMatch("/apps/file-manager/list-view");
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
     return (
@@ -103,29 +102,37 @@ const FmHeader = ({ topNavCollapsed, toggleTopNav, toggleSidebar, showSidebar, s
                     </HkTooltip>
                 </Button>
                 <div className="v-separator d-lg-inline-block d-none" />
-                <Dropdown className="inline-block">
-                    <Dropdown.Toggle as="a" className="btn btn-icon btn-flush-dark flush-soft-hover no-caret active ms-lg-0 d-sm-inline-block d-none">
-                        <span className="icon">
-                            <span className="feather-icon">
-                                {listViewRoute ? <List /> : <SquaresFour />}
+                {setViewMode && (
+                    <Dropdown className="inline-block">
+                        <Dropdown.Toggle as="a" className="btn btn-icon btn-flush-dark flush-soft-hover no-caret active ms-lg-0 d-sm-inline-block d-none">
+                            <span className="icon">
+                                <span className="feather-icon">
+                                    {viewMode === 'list' ? <List /> : <SquaresFour />}
+                                </span>
                             </span>
-                        </span>
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu align="end" >
-                        <Dropdown.Item as={NavLink} to="list-view" activeClassName="active" >
-                            <span className="feather-icon dropdown-icon">
-                                <List />
-                            </span>
-                            <span>List View</span>
-                        </Dropdown.Item>
-                        <Dropdown.Item as={NavLink} to="grid-view" activeClassName="active">
-                            <span className="feather-icon dropdown-icon">
-                                <SquaresFour />
-                            </span>
-                            <span>Grid View</span>
-                        </Dropdown.Item>
-                    </Dropdown.Menu>
-                </Dropdown>
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu align="end">
+                            <Dropdown.Item
+                                onClick={() => setViewMode('list')}
+                                className={classNames("d-flex align-items-center gap-2", { active: viewMode === 'list' })}
+                            >
+                                <span className="feather-icon">
+                                    <List size={18} />
+                                </span>
+                                <span>List View</span>
+                            </Dropdown.Item>
+                            <Dropdown.Item
+                                onClick={() => setViewMode('grid')}
+                                className={classNames("d-flex align-items-center gap-2", { active: viewMode === 'grid' })}
+                            >
+                                <span className="feather-icon">
+                                    <SquaresFour size={18} />
+                                </span>
+                                <span>Grid View</span>
+                            </Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                )}
                 <Button as="a" href="#" variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover hk-navbar-togglable d-sm-inline-block d-none" onClick={() => toggleTopNav(!topNavCollapsed)} >
                     <HkTooltip placement={topNavCollapsed ? "bottom" : "top"} title="Collapse" >
                         <span className="icon">

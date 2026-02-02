@@ -87,8 +87,6 @@ export const logAuditAction = async ({
         // Prepare audit log entry
         const auditLog = {
             user_id: user.id,
-            user_email: user.email,
-            user_name: profile?.display_name || null,
             action_type: actionType,
             resource_type: resourceType,
             resource_id: resourceId,
@@ -99,6 +97,8 @@ export const logAuditAction = async ({
             new_values: newValues,
             metadata: {
                 ...metadata,
+                user_email: user.email,
+                user_name: profile?.display_name || null,
                 user_agent: navigator.userAgent,
                 timestamp: new Date().toISOString(),
                 url: window.location.href,
@@ -110,9 +110,7 @@ export const logAuditAction = async ({
         // Insert audit log
         const { data, error } = await supabase
             .from('audit_logs')
-            .insert([auditLog])
-            .select()
-            .single();
+            .insert([auditLog]);
 
         if (error) {
             console.error('Failed to log audit action:', error);
@@ -121,6 +119,10 @@ export const logAuditAction = async ({
 
         return { success: true, data };
     } catch (error) {
+        // Ignore AbortError as it's common during navigation/unmount
+        if (error?.name === 'AbortError' || error?.message?.includes('aborted')) {
+            return { success: false, error: 'Aborted' };
+        }
         console.error('Error in logAuditAction:', error);
         return { success: false, error: error.message };
     }

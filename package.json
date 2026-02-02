@@ -66,6 +66,7 @@
     "jspdf-autotable": "^5.0.7",
     "lightgallery": "^2.9.0",
     "mammoth": "^1.11.0",
+    "marked": "^17.0.1",
     "moment": "^2.30.1",
     "nanoid": "^5.1.6",
     "pizzip": "^3.2.0",

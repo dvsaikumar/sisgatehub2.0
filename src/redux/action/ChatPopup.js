@@ -1,4 +1,4 @@
-import { DIRECT_MSG, SEND_MSG } from "../constants/ChatPopup";
+import { DIRECT_MSG, SEND_MSG, TOGGLE_CHAT } from "../constants/ChatPopup";
 
 export function sendMsg(msg) {
     return {
@@ -11,5 +11,11 @@ export function DirectMsg(directMsgs) {
     return {
         type: DIRECT_MSG,
         directMsgs,
+    }
+}
+
+export function toggleChat() {
+    return {
+        type: TOGGLE_CHAT
     }
 }

@@ -35,9 +35,9 @@ Project:	Jampack
 			.menu-group {
 				.nav-header {
 					padding: 0 0 0.5rem 0;
-					font-size: 0.875rem;
+					font-size: 1rem; // Increased from 0.95rem
 					color: var(--hk-menu-header-text); // <-- THEMED
-					font-weight: 500;
+					font-weight: 600;
 				}
 
 				.navbar-nav {
@@ -50,9 +50,10 @@ Project:	Jampack
 							-webkit-box-align: center;
 							-ms-flex-align: center;
 							align-items: center;
-							padding: 0.5rem 1rem;
+							padding: 0.75rem 1rem; // Increased padding
 							margin: 0 -1rem;
 							white-space: nowrap;
+							font-size: 1.15rem; // Main links larger
 							color: var(--hk-menu-text); // <-- THEMED
 
 							>* {
@@ -76,7 +77,7 @@ Project:	Jampack
 									right: 1rem;
 									z-index: -1;
 									content: "\f2f9";
-									font: normal normal normal 1.125rem/1 "Material-Design-Iconic-Font";
+									font: normal normal normal 1.25rem/1 "Material-Design-Iconic-Font"; // Larger arrow
 									text-rendering: auto;
 									margin-left: auto;
 									color: var(--hk-menu-arrow-color); // <-- THEMED
@@ -134,8 +135,8 @@ Project:	Jampack
 				.nav-children {
 					.nav-item {
 						.nav-link {
-							font-size: 0.875rem;
-							padding: 0.15rem 0 0.15rem 1.4rem;
+							font-size: 1.1rem; // Increased from 1rem
+							padding: 0.4rem 0 0.4rem 1.4rem; // Adjusted padding
 							margin: 0 0 0 1rem;
 							@include transition(all 0.25s ease);
 

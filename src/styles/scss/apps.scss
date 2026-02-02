@@ -1943,6 +1943,26 @@ Project:	Jampack
 						p:first-child {
 							color: var(--hk-text-primary); // THEMED
 						}
+
+						.msg-action {
+							margin-left: 1rem;
+							opacity: 0;
+							display: -webkit-box;
+							display: -ms-flexbox;
+							display: flex;
+							padding: 0;
+							background: transparent !important;
+							position: absolute;
+							top: 0;
+							right: 0;
+							z-index: 1;
+						}
+
+						&:hover {
+							.msg-action {
+								opacity: 1;
+							}
+						}
 					}
 
 					+.msg-box {
@@ -6151,7 +6171,7 @@ header.contact-header {
 
 			.fm-body {
 				@include transition(all 0.2s ease);
-				overflow: hidden;
+				overflow: auto;
 				-ms-flex: 1;
 				flex: 1;
 				padding-left: 1.5rem;
