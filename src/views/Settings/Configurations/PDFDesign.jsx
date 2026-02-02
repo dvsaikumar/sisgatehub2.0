@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Form, Row, Col, Button, InputGroup, Spinner, Badge } from 'react-bootstrap';
+import { Card, Form, Row, Col, Button, InputGroup, Spinner, Badge, OverlayTrigger, Popover } from 'react-bootstrap';
+import { HexColorPicker } from "react-colorful";
 import { FilePdf, FloppyDisk, Palette, TextT, Layout, CornersIn, Browser, IdentificationBadge } from '@phosphor-icons/react';
 import { supabase } from '../../../configs/supabaseClient';
 import toast from 'react-hot-toast';
@@ -130,7 +131,7 @@ const PDFDesign = () => {
     }
 
     return (
-        <div className="d-flex flex-column bg-white h-100 container-fluid px-0">
+        <div className="d-flex flex-column bg-white container-fluid px-0" style={{ height: '100vh', overflow: 'hidden' }}>
             <Form onSubmit={handleSave} className="d-flex flex-column h-100">
                 {/* Fixed Header */}
                 <div className="sticky-top border-bottom py-3 px-4 d-flex justify-content-between align-items-center bg-white" style={{ zIndex: 100, top: 0 }}>
@@ -150,10 +151,10 @@ const PDFDesign = () => {
                 </div>
 
                 {/* Content Area */}
-                <div className="flex-grow-1">
-                    <Row className="g-0">
+                <div className="flex-grow-1 overflow-hidden">
+                    <Row className="g-0 h-100">
                         {/* Settings Column - Scrollable */}
-                        <Col lg={7} className="p-4" style={{ paddingBottom: '100px' }}>
+                        <Col lg={7} className="p-4 h-100 overflow-auto">
                             <Row className="g-4">
                                 {/* Page & General Layout */}
                                 <Col xl={6} className="d-flex flex-column">
@@ -313,14 +314,32 @@ const PDFDesign = () => {
                                                         <Form.Label className="fs-13px fw-bold text-muted text-uppercase tracking-wider">Text Color</Form.Label>
                                                         <div className="d-flex align-items-center gap-2">
                                                             <div style={{ width: '50px', height: '38px' }}>
-                                                                <Form.Control
-                                                                    type="color"
-                                                                    value={form.font_color || '#000000'}
-                                                                    onChange={(e) => setForm({ ...form, font_color: e.target.value })}
-                                                                    className="w-100 h-100 p-1"
-                                                                    title="Choose text color"
-                                                                    style={{ cursor: 'pointer' }}
-                                                                />
+                                                                <OverlayTrigger
+                                                                    trigger="click"
+                                                                    rootClose
+                                                                    placement="bottom"
+                                                                    overlay={
+                                                                        <Popover id="popover-font-color">
+                                                                            <Popover.Body className="p-0">
+                                                                                <HexColorPicker
+                                                                                    color={form.font_color || '#000000'}
+                                                                                    onChange={(color) => setForm({ ...form, font_color: color })}
+                                                                                />
+                                                                            </Popover.Body>
+                                                                        </Popover>
+                                                                    }
+                                                                >
+                                                                    <div
+                                                                        className="rounded border"
+                                                                        style={{
+                                                                            width: '100%',
+                                                                            height: '100%',
+                                                                            backgroundColor: form.font_color || '#000000',
+                                                                            cursor: 'pointer'
+                                                                        }}
+                                                                        title="Choose text color"
+                                                                    />
+                                                                </OverlayTrigger>
                                                             </div>
                                                             <div className="flex-grow-1">
                                                                 <Form.Control
@@ -503,16 +522,50 @@ const PDFDesign = () => {
                                                                 disabled={!form.border_enabled}
                                                             />
                                                         </Col>
-                                                        <Col md={4}>
-                                                            <Form.Label className="fs-12px text-muted">Color</Form.Label>
-                                                            <Form.Control
-                                                                type="color"
-                                                                value={form.border_color}
-                                                                onChange={(e) => setForm({ ...form, border_color: e.target.value })}
-                                                                disabled={!form.border_enabled}
-                                                                title="Choose border color"
-                                                                className="w-100 p-1"
-                                                            />
+                                                        <Col md={12}>
+                                                            <Form.Label className="fs-12px text-muted">Border Color</Form.Label>
+                                                            <div className="d-flex align-items-center gap-2">
+                                                                <div style={{ width: '50px', height: '38px' }}>
+                                                                    <OverlayTrigger
+                                                                        trigger="click"
+                                                                        rootClose
+                                                                        placement="bottom"
+                                                                        overlay={
+                                                                            <Popover id="popover-border-color">
+                                                                                <Popover.Body className="p-0">
+                                                                                    <HexColorPicker
+                                                                                        color={form.border_color || '#e0e0e0'}
+                                                                                        onChange={(color) => setForm({ ...form, border_color: color })}
+                                                                                    />
+                                                                                </Popover.Body>
+                                                                            </Popover>
+                                                                        }
+                                                                    >
+                                                                        <div
+                                                                            className={`rounded border ${!form.border_enabled ? 'opacity-50' : ''}`}
+                                                                            style={{
+                                                                                width: '100%',
+                                                                                height: '100%',
+                                                                                backgroundColor: form.border_color || '#e0e0e0',
+                                                                                cursor: form.border_enabled ? 'pointer' : 'not-allowed'
+                                                                            }}
+                                                                            title="Choose border color"
+                                                                            onClick={(e) => !form.border_enabled && e.preventDefault()}
+                                                                        />
+                                                                    </OverlayTrigger>
+                                                                </div>
+                                                                <div className="flex-grow-1">
+                                                                    <Form.Control
+                                                                        type="text"
+                                                                        value={form.border_color}
+                                                                        onChange={(e) => setForm({ ...form, border_color: e.target.value })}
+                                                                        disabled={!form.border_enabled}
+                                                                        className="rounded-3"
+                                                                        spellCheck={false}
+                                                                        placeholder="#e0e0e0"
+                                                                    />
+                                                                </div>
+                                                            </div>
                                                         </Col>
                                                         <Col md={12}>
                                                             <Form.Label className="fs-12px text-muted">Style</Form.Label>
@@ -582,13 +635,9 @@ const PDFDesign = () => {
                         <Col
                             lg={5}
                             key={`preview-${configId}-${JSON.stringify(form)}`}
-                            className="position-relative overflow-hidden border-start"
+                            className="position-relative overflow-hidden border-start h-100"
                             style={{
-                                backgroundColor: '#f0f2f5',
-                                position: 'sticky',
-                                top: '80px', // Header offset
-                                height: 'calc(100vh - 100px)', // Fill viewport
-                                overflowY: 'hidden'
+                                backgroundColor: '#f0f2f5'
                             }}
                         >
                             {/* Workspace Controls/Info */}
