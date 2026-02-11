@@ -37,7 +37,14 @@ export const supabase = createClient(
             persistSession: true,
             autoRefreshToken: true,
             detectSessionInUrl: true,
-            flowType: 'pkce'
+            flowType: 'pkce',
+            cookieOptions: {
+                name: 'sb-sisgate-auth-token',
+                lifetime: 60 * 60 * 8, // 8 hours
+                domain: window.location.hostname,
+                sameSite: 'Lax',
+                secure: window.location.protocol === 'https:',
+            }
         }
     }
 )

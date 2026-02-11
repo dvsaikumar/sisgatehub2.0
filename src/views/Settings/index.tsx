@@ -8,13 +8,16 @@ import User from './User/User';
 import Documents from './Documents/Documents';
 import Configurations from './Configurations/Configurations';
 import AuditLogs from '../AuditLogs';
+import PrivacyPolicy from './GDPR/PrivacyPolicy';
+import TermsOfService from './GDPR/TermsOfService';
+import DataProcessingAgreement from './GDPR/DataProcessingAgreement';
 import DummyList from './DummyList';
 import classNames from 'classnames';
 
 import { Nav, Tab } from 'react-bootstrap';
 import useHashTab from '../../hooks/useHashTab';
 
-type SidebarTab = 'users' | 'documents' | 'configurations' | 'pdf_design' | 'audit-logs' | 'templates';
+type SidebarTab = 'users' | 'documents' | 'configurations' | 'pdf_design' | 'audit-logs' | 'templates' | 'gdpr_policy' | 'terms_of_service' | 'dpa';
 
 interface TitleMap {
     [key: string]: string;
@@ -24,9 +27,9 @@ const Settings: React.FC = () => {
     const [showInfo, setShowInfo] = useState<boolean>(false);
     const [showSidebar, setShowSidebar] = useState<boolean>(true);
     // Sub-tab validation lists
-    const userTabs: string[] = ['groups', 'users', 'access_levels'];
+    const userTabs: string[] = ['groups', 'users', 'access_levels', 'active_sessions'];
     const docTabs: string[] = ['category', 'document', 'generate_document'];
-    const configTabs: string[] = ['mail', 'templates', 'pdf_design', 'ai'];
+    const configTabs: string[] = ['mail', 'ai'];
 
     // Sub-tab state
     const [subTab, handleSubTabSelect] = useHashTab('groups', userTabs);
@@ -39,6 +42,12 @@ const Settings: React.FC = () => {
         if (configTabs.includes(hash)) return 'configurations';
         if (docTabs.includes(hash)) return 'documents';
         if (userTabs.includes(hash)) return 'users';
+        if (hash === 'gdpr_policy') return 'gdpr_policy';
+        if (hash === 'terms_of_service') return 'terms_of_service';
+        if (hash === 'dpa') return 'dpa';
+        if (hash === 'templates') return 'templates';
+        if (hash === 'pdf_design') return 'pdf_design';
+        if (hash === 'audit-logs') return 'audit-logs';
         return 'users';
     };
 
@@ -54,6 +63,12 @@ const Settings: React.FC = () => {
             if (configTabs.includes(hash)) setActiveSidebarTab('configurations');
             else if (docTabs.includes(hash)) setActiveSidebarTab('documents');
             else if (userTabs.includes(hash)) setActiveSidebarTab('users');
+            else if (hash === 'gdpr_policy') setActiveSidebarTab('gdpr_policy');
+            else if (hash === 'terms_of_service') setActiveSidebarTab('terms_of_service');
+            else if (hash === 'dpa') setActiveSidebarTab('dpa');
+            else if (hash === 'templates') setActiveSidebarTab('templates');
+            else if (hash === 'pdf_design') setActiveSidebarTab('pdf_design');
+            else if (hash === 'audit-logs') setActiveSidebarTab('audit-logs');
         };
 
         window.addEventListener('hashchange', syncSidebar);
@@ -68,7 +83,10 @@ const Settings: React.FC = () => {
         'documents': 'Documents',
         'configurations': 'Configurations',
         'pdf_design': 'PDF Design',
-        'audit-logs': 'Audit Logs'
+        'audit-logs': 'Audit Logs',
+        'gdpr_policy': 'GDPR Policy',
+        'terms_of_service': 'Terms of Service',
+        'dpa': 'Data Processing Agreement'
     };
 
     return (
@@ -107,6 +125,9 @@ const Settings: React.FC = () => {
                                         <Nav.Item>
                                             <Nav.Link eventKey="access_levels">Access Levels</Nav.Link>
                                         </Nav.Item>
+                                        <Nav.Item>
+                                            <Nav.Link eventKey="active_sessions">Active Sessions</Nav.Link>
+                                        </Nav.Item>
                                     </Nav>
                                 )}
                                 {activeSidebarTab === 'documents' && (
@@ -128,12 +149,6 @@ const Settings: React.FC = () => {
                                             <Nav.Link eventKey="mail">Mail</Nav.Link>
                                         </Nav.Item>
                                         <Nav.Item>
-                                            <Nav.Link eventKey="templates">Templates</Nav.Link>
-                                        </Nav.Item>
-                                        <Nav.Item>
-                                            <Nav.Link eventKey="pdf_design">PDF Design</Nav.Link>
-                                        </Nav.Item>
-                                        <Nav.Item>
                                             <Nav.Link eventKey="ai">AI</Nav.Link>
                                         </Nav.Item>
                                     </Nav>
@@ -146,7 +161,10 @@ const Settings: React.FC = () => {
                             {activeSidebarTab === 'pdf_design' && <Configurations activeTab="pdf_design" />}
                             {activeSidebarTab === 'templates' && <Configurations activeTab="templates" />}
                             {activeSidebarTab === 'audit-logs' && <AuditLogs />}
-                            {activeSidebarTab !== 'users' && activeSidebarTab !== 'documents' && activeSidebarTab !== 'configurations' && activeSidebarTab !== 'pdf_design' && activeSidebarTab !== 'audit-logs' && activeSidebarTab !== 'templates' && <DummyList toggleInfo={() => setShowInfo(true)} />}
+                            {activeSidebarTab === 'gdpr_policy' && <PrivacyPolicy />}
+                            {activeSidebarTab === 'terms_of_service' && <TermsOfService />}
+                            {activeSidebarTab === 'dpa' && <DataProcessingAgreement />}
+                            {activeSidebarTab !== 'users' && activeSidebarTab !== 'documents' && activeSidebarTab !== 'configurations' && activeSidebarTab !== 'pdf_design' && activeSidebarTab !== 'audit-logs' && activeSidebarTab !== 'templates' && activeSidebarTab !== 'gdpr_policy' && activeSidebarTab !== 'terms_of_service' && activeSidebarTab !== 'dpa' && <DummyList toggleInfo={() => setShowInfo(true)} />}
 
                             <FileInfo onHide={() => setShowInfo(false)} />
                         </div>

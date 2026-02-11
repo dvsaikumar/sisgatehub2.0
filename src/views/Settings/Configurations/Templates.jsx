@@ -4,6 +4,9 @@ import { Plus, Trash, PencilSimple, MagnifyingGlass, FileText, Copy, Code, Eye, 
 import { supabase } from '../../../configs/supabaseClient';
 import toast from 'react-hot-toast';
 import dayjs from '../../../lib/dayjs';
+import { sanitizeHTML } from '../../../lib/sanitize';
+import { escapeRegExp } from '../../../lib/security';
+import { templateSchema } from '../../../lib/schemas';
 import AIFormControl from '../../../components/AIFormControl/AIFormControl';
 
 const availableVariables = [
@@ -117,14 +120,25 @@ const Templates = () => {
     const renderPreview = () => {
         let content = formData.content;
         Object.keys(sampleData).forEach(key => {
-            const regex = new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
-            content = content.replace(regex, sampleData[key]);
+            // SECURITY: Escape user-provided keys to prevent Regex injection
+            const safeKey = escapeRegExp(key);
+            const regex = new RegExp(safeKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+            content = content.replace(new RegExp(safeKey, 'g'), sampleData[key]);
         });
         return content;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // SECURITY: Validate input against Zod schema
+        const validation = templateSchema.safeParse(formData);
+        if (!validation.success) {
+            const errorMsg = validation.error.issues[0].message;
+            toast.error(errorMsg);
+            return;
+        }
+
         try {
             if (editingId) {
                 const { error } = await supabase
@@ -405,7 +419,7 @@ const Templates = () => {
                                     </div>
                                     <div
                                         className="preview-content whitespace-pre-wrap"
-                                        dangerouslySetInnerHTML={{ __html: renderPreview().replace(/\n/g, '<br/>') }}
+                                        dangerouslySetInnerHTML={{ __html: sanitizeHTML(renderPreview().replace(/\n/g, '<br/>')) }}
                                     />
                                 </div>
                             )}

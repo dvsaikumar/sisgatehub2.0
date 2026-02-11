@@ -4,6 +4,7 @@ import LayoutClassic from '../layout/MainLayout/ClassicLayout'
 import { routes } from './RouteList'
 import { supabase } from '../configs/supabaseClient';
 import ChatBotInterface from '../views/ChatPopup/ChatBot/ChatBotInterface';
+import SessionManager from '../components/Auth/SessionManager';
 
 // Shim to provide v5 props (history, location, match) to components
 const LegacyRouteWrapper = ({ component: Component }) => {
@@ -59,22 +60,24 @@ const AppRoutes = () => {
                     <div className="loader-pendulums" />
                 </div>
             }>
-            <LayoutClassic>
-                <Routes>
-                    {
-                        routes.map((obj, i) => {
-                            return (obj.component) ? (
-                                <Route
-                                    key={i}
-                                    path={obj.path}
-                                    element={<LegacyRouteWrapper component={obj.component} />}
-                                />) : (null)
-                        })
-                    }
-                    <Route path="*" element={<Navigate to="/error-404" replace />} />
-                </Routes>
-                <ChatBotInterface show={false} />
-            </LayoutClassic>
+            <SessionManager>
+                <LayoutClassic>
+                    <Routes>
+                        {
+                            routes.map((obj, i) => {
+                                return (obj.component) ? (
+                                    <Route
+                                        key={i}
+                                        path={obj.path}
+                                        element={<LegacyRouteWrapper component={obj.component} />}
+                                    />) : (null)
+                            })
+                        }
+                        <Route path="*" element={<Navigate to="/error-404" replace />} />
+                    </Routes>
+                    <ChatBotInterface show={false} />
+                </LayoutClassic>
+            </SessionManager>
         </Suspense>
     )
 }

@@ -5,6 +5,7 @@ import SimpleBar from 'simplebar-react';
 import Groups from './Groups';
 import UsersList from './UsersList';
 import AccessLevels from './AccessLevels';
+import ActiveSessions from './ActiveSessions';
 
 const User = ({ activeTab }) => {
     return (
@@ -19,6 +20,9 @@ const User = ({ activeTab }) => {
                     </Tab.Pane>
                     <Tab.Pane eventKey="access_levels">
                         <AccessLevels />
+                    </Tab.Pane>
+                    <Tab.Pane eventKey="active_sessions">
+                        <ActiveSessions />
                     </Tab.Pane>
                 </Tab.Content>
             </div>

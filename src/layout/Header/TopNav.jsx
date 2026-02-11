@@ -138,7 +138,8 @@ const TopNav = ({ navCollapsed, toggleCollapsedNav }) => {
     // Handle sign out
     const handleSignOut = async () => {
         await supabase.auth.signOut();
-        navigate('/auth/login');
+        // Force hard navigation to /logout to trigger server-side Clear-Site-Data header
+        window.location.href = '/logout';
     };
 
     // Get user display name and email

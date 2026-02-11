@@ -1,9 +1,47 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
+import toast from 'react-hot-toast';
 import HkDropZone from '../../components/@hk-drop-zone/HkDropZone';
 import HkTags from '../../components/@hk-tags/@hk-tags';
+import { contactSchema } from '../../lib/schemas';
 
 const CreateNewContact = ({ show, close }) => {
+    const [formData, setFormData] = useState({
+        firstName: '',
+        middleName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        city: '',
+        state: '',
+        country: '',
+        company: '',
+        designation: '',
+        website: '',
+        workPhone: '',
+        facebook: '',
+        twitter: '',
+        linkedin: '',
+        gmail: '',
+        biography: ''
+    });
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = () => {
+        const validation = contactSchema.safeParse(formData);
+        if (!validation.success) {
+            const errorMsg = validation.error.issues[0].message;
+            toast.error(errorMsg);
+            return;
+        }
+
+        // Proceed to save (Mock logic for now as backend integration wasn't requested)
+        toast.success('Validation passed! Contact creation logic would run here.');
+        close();
+    };
 
     const Tags = [];
 
@@ -13,17 +51,24 @@ const CreateNewContact = ({ show, close }) => {
                 <Button bsPrefix="btn-close" onClick={close}>
                     <span aria-hidden="true">×</span>
                 </Button>
-                <h5 className="mb-5">Create New Conatct</h5>
+                <h5 className="mb-5">Create New Contact</h5>
                 <Form>
                     <Row className="gx-3">
                         <Col sm={2} as={Form.Group} className="mb-3" >
                             <HkDropZone className="dropify-square">
                                 Upload Photo
                             </HkDropZone>
-                            {/* </div> */}
                         </Col>
                         <Col sm={10} as={Form.Group}>
-                            <Form.Control as="textarea" className="mnh-100p" rows={4} placeholder="Add Biography" />
+                            <Form.Control
+                                as="textarea"
+                                className="mnh-100p"
+                                rows={4}
+                                placeholder="Add Biography"
+                                name="biography"
+                                value={formData.biography}
+                                onChange={handleChange}
+                            />
                         </Col>
                     </Row>
                     <div className="title title-xs title-wth-divider text-primary text-uppercase my-4">
@@ -33,19 +78,19 @@ const CreateNewContact = ({ show, close }) => {
                         <Col sm={4}>
                             <Form.Group className="mb-3">
                                 <Form.Label>First Name</Form.Label>
-                                <Form.Control type="text" />
+                                <Form.Control type="text" name="firstName" value={formData.firstName} onChange={handleChange} />
                             </Form.Group>
                         </Col>
                         <Col sm={4}>
                             <Form.Group className="mb-3">
                                 <Form.Label>Middle Name</Form.Label>
-                                <Form.Control type="text" />
+                                <Form.Control type="text" name="middleName" value={formData.middleName} onChange={handleChange} />
                             </Form.Group>
                         </Col>
                         <Col sm={4}>
                             <Form.Group className="mb-3">
                                 <Form.Label>Last Name</Form.Label>
-                                <Form.Control type="text" />
+                                <Form.Control type="text" name="lastName" value={formData.lastName} onChange={handleChange} />
                             </Form.Group>
                         </Col>
                     </Row>
@@ -53,13 +98,13 @@ const CreateNewContact = ({ show, close }) => {
                         <div className="col-sm-6">
                             <Form.Group className="mb-3">
                                 <Form.Label>Email ID</Form.Label>
-                                <Form.Control type="text" />
+                                <Form.Control type="text" name="email" value={formData.email} onChange={handleChange} />
                             </Form.Group>
                         </div>
                         <div className="col-sm-6">
                             <Form.Group className="mb-3">
                                 <Form.Label>Phone</Form.Label>
-                                <Form.Control type="text" />
+                                <Form.Control type="text" name="phone" value={formData.phone} onChange={handleChange} />
                             </Form.Group>
                         </div>
                     </Row>
@@ -67,34 +112,19 @@ const CreateNewContact = ({ show, close }) => {
                         <Col sm={4}>
                             <Form.Group className="mb-3">
                                 <Form.Label>City</Form.Label>
-                                <select className="form-select">
-                                    <option value={0}>--</option>
-                                    <option value={1}>One</option>
-                                    <option value={2}>Two</option>
-                                    <option value={3}>Three</option>
-                                </select>
+                                <Form.Control type="text" name="city" value={formData.city} onChange={handleChange} />
                             </Form.Group>
                         </Col>
                         <Col sm={4}>
                             <Form.Group className="mb-3">
                                 <Form.Label>State</Form.Label>
-                                <select className="form-select">
-                                    <option value={0}>--</option>
-                                    <option value={1}>One</option>
-                                    <option value={2}>Two</option>
-                                    <option value={3}>Three</option>
-                                </select>
+                                <Form.Control type="text" name="state" value={formData.state} onChange={handleChange} />
                             </Form.Group>
                         </Col>
                         <Col sm={4}>
                             <Form.Group className="mb-3">
                                 <Form.Label>Country</Form.Label>
-                                <select className="form-select">
-                                    <option value={0}>--</option>
-                                    <option value={1}>One</option>
-                                    <option value={2}>Two</option>
-                                    <option value={3}>Three</option>
-                                </select>
+                                <Form.Control type="text" name="country" value={formData.country} onChange={handleChange} />
                             </Form.Group>
                         </Col>
                     </Row>
@@ -103,25 +133,25 @@ const CreateNewContact = ({ show, close }) => {
                         <Col sm={6}>
                             <Form.Group className="mb-3">
                                 <Form.Label>Company Name</Form.Label>
-                                <Form.Control type="text" />
+                                <Form.Control type="text" name="company" value={formData.company} onChange={handleChange} />
                             </Form.Group>
                         </Col>
                         <Col sm={6}>
                             <Form.Group className="mb-3">
                                 <Form.Label>Designation</Form.Label>
-                                <Form.Control type="text" />
+                                <Form.Control type="text" name="designation" value={formData.designation} onChange={handleChange} />
                             </Form.Group>
                         </Col>
                         <Col sm={6}>
                             <Form.Group className="mb-3">
                                 <Form.Label>Website</Form.Label>
-                                <Form.Control type="text" />
+                                <Form.Control type="text" name="website" value={formData.website} onChange={handleChange} />
                             </Form.Group>
                         </Col>
                         <Col sm={6}>
                             <Form.Group className="mb-3">
                                 <Form.Label>Work Phone</Form.Label>
-                                <Form.Control type="text" />
+                                <Form.Control type="text" name="workPhone" value={formData.workPhone} onChange={handleChange} />
                             </Form.Group>
                         </Col>
                     </Row>
@@ -142,22 +172,22 @@ const CreateNewContact = ({ show, close }) => {
                     <Row className="gx-3">
                         <Col sm={6}>
                             <Form.Group className="mb-3">
-                                <Form.Control type="text" placeholder="Facebook" />
+                                <Form.Control type="text" placeholder="Facebook" name="facebook" value={formData.facebook} onChange={handleChange} />
                             </Form.Group>
                         </Col>
                         <Col sm={6}>
                             <Form.Group className="mb-3">
-                                <Form.Control type="text" placeholder="Twitter" />
+                                <Form.Control type="text" placeholder="Twitter" name="twitter" value={formData.twitter} onChange={handleChange} />
                             </Form.Group>
                         </Col>
                         <Col sm={6}>
                             <Form.Group className="mb-3">
-                                <Form.Control type="text" placeholder="LinkedIn" />
+                                <Form.Control type="text" placeholder="LinkedIn" name="linkedin" value={formData.linkedin} onChange={handleChange} />
                             </Form.Group>
                         </Col>
                         <Col sm={6}>
                             <Form.Group className="mb-3">
-                                <Form.Control type="text" placeholder="Gmail" />
+                                <Form.Control type="text" placeholder="Gmail" name="gmail" value={formData.gmail} onChange={handleChange} />
                             </Form.Group>
                         </Col>
                     </Row>
@@ -165,7 +195,7 @@ const CreateNewContact = ({ show, close }) => {
             </Modal.Body>
             <Modal.Footer className="align-items-center">
                 <Button variant="secondary" onClick={close}>Discard</Button>
-                <Button variant="primary" onClick={close}>Create Contact</Button>
+                <Button variant="primary" onClick={handleSubmit}>Create Contact</Button>
             </Modal.Footer>
         </Modal>
     )

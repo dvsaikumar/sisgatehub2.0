@@ -11,6 +11,7 @@ import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import AIFormControl from '../../../components/AIFormControl/AIFormControl';
 import AITextEnhancer from '../../../components/AIEnhancer/AITextEnhancer';
+import { sanitizeHTML } from '../../../lib/sanitize';
 
 const DocumentList = () => {
     const [showModal, setShowModal] = useState(false);
@@ -568,7 +569,7 @@ const DocumentList = () => {
                                             <ReactQuill
                                                 theme="snow"
                                                 value={formData.content}
-                                                onChange={(value) => setFormData({ ...formData, content: value })}
+                                                onChange={(value) => setFormData({ ...formData, content: sanitizeHTML(value) })}
                                                 style={{ height: '200px', marginBottom: '50px' }}
                                             />
                                         </AITextEnhancer>

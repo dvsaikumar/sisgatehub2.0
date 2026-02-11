@@ -117,3 +117,54 @@ export const userProfileSchema = z.object({
 });
 
 export type UserProfileFormData = z.infer<typeof userProfileSchema>;
+
+// ============================================
+// CONTACT FORM
+// ============================================
+export const contactSchema = z.object({
+    firstName: z.string().min(1, 'First Name is required'),
+    middleName: z.string().optional(),
+    lastName: z.string().min(1, 'Last Name is required'),
+    email: z.string().email('Invalid email address').optional().or(z.literal('')),
+    phone: z.string().optional(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+    country: z.string().optional(),
+    company: z.string().optional(),
+    designation: z.string().optional(),
+    website: z.string().url('Invalid URL').optional().or(z.literal('')),
+    workPhone: z.string().optional(),
+    facebook: z.string().optional(),
+    twitter: z.string().optional(),
+    linkedin: z.string().optional(),
+    gmail: z.string().optional(),
+    biography: z.string().max(500, 'Biography must be less than 500 characters').optional(),
+});
+
+export type ContactFormData = z.infer<typeof contactSchema>;
+
+// ============================================
+// TEMPLATE FORM
+// ============================================
+export const templateSchema = z.object({
+    name: z.string().min(1, 'Template Name is required').max(100, 'Name too long'),
+    category: z.string().min(1, 'Category is required'),
+    type: z.enum(['Email', 'PDF', 'Docx']),
+    status: z.enum(['Active', 'Inactive']),
+    content: z.string().optional(),
+});
+
+export type TemplateFormData = z.infer<typeof templateSchema>;
+
+// ============================================
+// INVOICE FORM
+// ============================================
+export const invoiceSchema = z.object({
+    invoiceNo: z.string().min(1, 'Invoice No is required'),
+    invoiceDate: z.string().min(1, 'Invoice Date is required'),
+    dueDate: z.string().min(1, 'Due Date is required'),
+    customerNo: z.string().optional(),
+    note: z.string().max(1000).optional(),
+});
+
+export type InvoiceFormData = z.infer<typeof invoiceSchema>;

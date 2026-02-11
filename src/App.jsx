@@ -57,6 +57,7 @@ function App() {
           <ScrollToTop>
             <Routes>
               <Route path="/" element={<Navigate to="/auth/login" replace />} />
+              <Route path="/logout" element={<Navigate to="/auth/login" replace />} />
               {/* Auth */}
               <Route path="auth/*" element={<AuthRoutes />} />
               {/* Layouts */}

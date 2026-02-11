@@ -9,6 +9,7 @@ import {
 
 import SimpleBar from 'simplebar-react';
 import dayjs from 'dayjs';
+import { sanitizeHTML } from '../../lib/sanitize';
 import { supabase } from '../../configs/supabaseClient';
 import toast from 'react-hot-toast';
 import useAuditLog, { AuditActionType, AuditResourceType, AuditActionStatus } from '../../hooks/useAuditLog';
@@ -1372,7 +1373,7 @@ const LibraryList: React.FC<LibraryListProps> = ({ filter, searchTerm, toggleInf
                                                         lineHeight: '1.5em',
                                                         color: '#525c68'
                                                     }}
-                                                    dangerouslySetInnerHTML={{ __html: item.content || 'No description provided for this template.' }}
+                                                    dangerouslySetInnerHTML={{ __html: sanitizeHTML(item.content || 'No description provided for this template.') }}
                                                 />
                                             </Card.Body>
                                             <Card.Footer className="bg-light border-top d-flex justify-content-between align-items-center py-2 px-4" style={{ minHeight: '50px' }}>
@@ -1470,7 +1471,7 @@ const LibraryList: React.FC<LibraryListProps> = ({ filter, searchTerm, toggleInf
                                     {selectedItem?.content ? (
                                         <div
                                             className="preview-text"
-                                            dangerouslySetInnerHTML={{ __html: selectedItem?.content }}
+                                            dangerouslySetInnerHTML={{ __html: sanitizeHTML(selectedItem?.content) }}
                                         />
                                     ) : (
                                         <div className="preview-loading">

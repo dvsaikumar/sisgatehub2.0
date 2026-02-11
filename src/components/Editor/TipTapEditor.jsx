@@ -35,6 +35,7 @@ const ToolbarButton = ({ onClick, isActive, children, title }) => (
 );
 
 import { marked } from 'marked';
+import { sanitizeHTML } from '../../lib/sanitize';
 
 const TipTapEditor = ({ content, onChange }) => {
     // Parse content if it's markdown string to ensure TipTap renders it
@@ -52,7 +53,7 @@ const TipTapEditor = ({ content, onChange }) => {
             },
         },
         onUpdate: ({ editor }) => {
-            onChange(editor.getHTML());
+            onChange(sanitizeHTML(editor.getHTML()));
         },
     });
 

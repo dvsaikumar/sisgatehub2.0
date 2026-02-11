@@ -2,6 +2,7 @@ import { Editor } from '@tinymce/tinymce-react';
 import React, { useRef, useState, useEffect } from 'react';
 import { useTheme } from '../../utils/theme-provider/theme-provider';
 import AITextEnhancer from '../AIEnhancer/AITextEnhancer';
+import { sanitizeHTML } from '../../lib/sanitize';
 
 
 const TinymceEditor = ({ initialvalue, value, onChange }) => {
@@ -15,8 +16,9 @@ const TinymceEditor = ({ initialvalue, value, onChange }) => {
     }, [value]);
 
     const handleEditorChange = (content) => {
-        setCurrentValue(content);
-        if (onChange) onChange(content);
+        const cleanContent = sanitizeHTML(content);
+        setCurrentValue(cleanContent);
+        if (onChange) onChange(cleanContent);
     };
 
     const handleAIUpdate = (newContent) => {
