@@ -386,27 +386,7 @@ const TopNav = ({ navCollapsed, toggleCollapsedNav }) => {
                                             My Profile
                                         </Dropdown.Item>
 
-                                        <Dropdown.Item
-                                            as={Link}
-                                            to="/email"
-                                            className="profile-dropdown-item"
-                                            style={{
-                                                padding: '16px 8px',
-                                                borderRadius: '8px',
-                                                fontSize: '18px',
-                                                fontWeight: '400',
-                                                color: '#1a1a1a',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '16px',
-                                                background: 'transparent'
-                                            }}
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                                            </svg>
-                                            Inbox
-                                        </Dropdown.Item>
+
 
                                         <Dropdown.Item
                                             as={Link}

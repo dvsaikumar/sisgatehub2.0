@@ -54,14 +54,14 @@ const AppRoutes = () => {
     }
 
     return (
-        <Suspense
-            fallback={
-                <div className="preloader-it">
-                    <div className="loader-pendulums" />
-                </div>
-            }>
-            <SessionManager>
-                <LayoutClassic>
+        <SessionManager>
+            <LayoutClassic>
+                <Suspense
+                    fallback={
+                        <div className="preloader-it">
+                            <div className="loader-pendulums" />
+                        </div>
+                    }>
                     <Routes>
                         {
                             routes.map((obj, i) => {
@@ -75,10 +75,10 @@ const AppRoutes = () => {
                         }
                         <Route path="*" element={<Navigate to="/error-404" replace />} />
                     </Routes>
-                    <ChatBotInterface show={false} />
-                </LayoutClassic>
-            </SessionManager>
-        </Suspense>
+                </Suspense>
+                <ChatBotInterface show={false} />
+            </LayoutClassic>
+        </SessionManager>
     )
 }
 

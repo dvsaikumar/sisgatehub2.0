@@ -68,46 +68,12 @@ const FmHeader = ({ topNavCollapsed, toggleTopNav, toggleSidebar, showSidebar, s
                 )}
             </div>
             <div className="fm-options-wrap">
-                <Link to="#" className="btn btn-icon btn-flush-dark btn-rounded flush-soft-hover disabled d-xl-inline-block d-none">
-                    <span className="icon">
-                        <span className="feather-icon">
-                            <UserPlus />
-                        </span>
-                    </span>
-                </Link>
-                <Button as="a" variant="flush-dark" className={classNames("btn-icon btn-rounded flush-soft-hover fmapp-info-toggle", { "active": showInfo })} onClick={toggleInfo} >
-                    <span className="icon">
-                        <span className="feather-icon">
-                            <Info />
-                        </span>
-                    </span>
-                </Button>
-                <div className="v-separator d-xl-inline-block d-none" />
-                <Button as="a" variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover ms-0 d-xl-inline-block d-none">
-                    <HkTooltip placement="top" title="Add New Folder">
-                        <span className="icon">
-                            <span className="feather-icon">
-                                <FolderPlus />
-                            </span>
-                        </span>
-                    </HkTooltip>
-                </Button>
-                <Button as="a" variant="flush-dark" className="btn-icon btn-rounded btn-file flush-soft-hover  d-md-inline-block d-none">
-                    <HkTooltip placement="top" title="Upload">
-                        <span className="icon">
-                            <span className="feather-icon">
-                                <CloudArrowUp />
-                            </span>
-                        </span>
-                    </HkTooltip>
-                </Button>
-                <div className="v-separator d-lg-inline-block d-none" />
                 {setViewMode && (
                     <Dropdown className="inline-block">
-                        <Dropdown.Toggle as="a" className="btn btn-icon btn-flush-dark flush-soft-hover no-caret active ms-lg-0 d-sm-inline-block d-none">
+                        <Dropdown.Toggle as="a" className="btn btn-icon btn-flush-dark flush-soft-hover no-caret active ms-lg-0 d-sm-inline-block d-none p-3">
                             <span className="icon">
                                 <span className="feather-icon">
-                                    {viewMode === 'list' ? <List /> : <SquaresFour />}
+                                    {viewMode === 'list' ? <List size={24} /> : <SquaresFour size={24} />}
                                 </span>
                             </span>
                         </Dropdown.Toggle>
@@ -133,20 +99,9 @@ const FmHeader = ({ topNavCollapsed, toggleTopNav, toggleSidebar, showSidebar, s
                         </Dropdown.Menu>
                     </Dropdown>
                 )}
-                <Button as="a" href="#" variant="flush-dark" className="btn-icon btn-rounded flush-soft-hover hk-navbar-togglable d-sm-inline-block d-none" onClick={() => toggleTopNav(!topNavCollapsed)} >
-                    <HkTooltip placement={topNavCollapsed ? "bottom" : "top"} title="Collapse" >
-                        <span className="icon">
-                            <span className="feather-icon">
-                                {
-                                    topNavCollapsed ? <CaretDown /> : <CaretUp />
-                                }
-                            </span>
-                        </span>
-                    </HkTooltip>
-                </Button>
             </div>
             <div className={classNames("hk-sidebar-togglable", { "active": !showSidebar })} onClick={toggleSidebar} />
-        </header>
+        </header >
     )
 }
 

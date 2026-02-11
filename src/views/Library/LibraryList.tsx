@@ -627,8 +627,8 @@ const LibraryList: React.FC<LibraryListProps> = ({ filter, searchTerm, toggleInf
                     border-color: rgba(0, 125, 136, 0.3) !important;
                 }
                 .card-icon-wrap {
-                    width: 36px;
-                    height: 36px;
+                    width: 50px;
+                    height: 50px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -1317,8 +1317,8 @@ const LibraryList: React.FC<LibraryListProps> = ({ filter, searchTerm, toggleInf
                                             <tr key={item.id} onClick={() => handlePreview(item)} style={{ cursor: 'pointer' }} className="group">
                                                 <td className="ps-4">
                                                     <div className="d-flex align-items-center">
-                                                        <div className="d-flex align-items-center justify-content-center rounded bg-soft-primary me-3" style={{ width: '32px', height: '32px', color: '#007D88' }}>
-                                                            <IconComponent size={18} weight="bold" />
+                                                        <div className="d-flex align-items-center justify-content-center rounded bg-soft-primary me-3" style={{ width: '42px', height: '42px', color: '#007D88' }}>
+                                                            <IconComponent size={26} weight="bold" />
                                                         </div>
                                                         <span className="fw-semibold text-dark">{item.name}</span>
                                                     </div>
@@ -1356,7 +1356,7 @@ const LibraryList: React.FC<LibraryListProps> = ({ filter, searchTerm, toggleInf
                                         <Card className="h-100 library-card shadow-sm border" onClick={() => handlePreview(item)} style={{ cursor: 'pointer' }}>
                                             <Card.Header className="bg-light border-bottom d-flex align-items-center py-2 px-4" style={{ minHeight: '50px' }}>
                                                 <div className="card-icon-wrap transition-all">
-                                                    <IconComponent size={20} weight="bold" />
+                                                    <IconComponent size={28} weight="bold" />
                                                 </div>
                                                 <h6 className="mb-0 text-truncate fw-bold flex-1" style={{ color: '#1a1a1a', fontSize: '16px' }} title={item.name}>{item.name}</h6>
                                             </Card.Header>
