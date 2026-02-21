@@ -3,10 +3,13 @@ import { MoreVertical } from 'react-feather';
 import { Button, Dropdown, Form } from 'react-bootstrap';
 import AddCategory from './AddCategory';
 import SetReminder from './SetReminder';
+import CalendarManager from './CalendarManager';
+import CalendarShareModal from './CalendarShareModal';
 import "react-datepicker/dist/react-datepicker.css";
-import { Plus as PlusPhos, CalendarBlank, Bell, Plus } from '@phosphor-icons/react';
+import { Plus as PlusPhos, CalendarBlank, Bell, Plus, GearSix } from '@phosphor-icons/react';
 import dayjs from '../../lib/dayjs';
 import { useCategories } from '../../hooks/useCategories';
+import { useCalendars } from '../../hooks/useCalendars';
 
 interface CalendarSidebarProps {
     showSidebar: boolean;
@@ -20,10 +23,27 @@ interface CalendarSidebarProps {
 const CalendarSidebar: React.FC<CalendarSidebarProps> = ({ showSidebar, toggleSidebar, createNewEvent, refreshEvents, upcomingEvents = [], onCategoryFilterChange }) => {
     const [addCategory, setAddCategory] = useState<boolean>(false);
     const [reminder, setReminder] = useState<boolean>(false);
-    const [categoriesOpen, setCategoriesOpen] = useState<boolean>(false); // Collapsed by default
+    const [categoriesOpen, setCategoriesOpen] = useState<boolean>(false);
+    const [calendarsOpen, setCalendarsOpen] = useState<boolean>(true);
+    const [showCalendarManager, setShowCalendarManager] = useState<boolean>(false);
+    const [showShareModal, setShowShareModal] = useState<boolean>(false);
+    const [shareTarget, setShareTarget] = useState<any>(null);
 
     // Use categories hook for dynamic categories
     const { categories, loading: categoriesLoading, createCategory, updateCategory, deleteCategory } = useCategories();
+
+    // Use calendars hook
+    const {
+        calendars,
+        sharedCalendars,
+        loading: calendarsLoading,
+        createCalendar,
+        updateCalendar,
+        deleteCalendar,
+        toggleVisibility,
+        setDefault,
+        fetchCalendars,
+    } = useCalendars();
 
     // Track which categories are selected (all selected by default)
     const [selectedCategories, setSelectedCategories] = useState<Record<string, boolean>>({});
@@ -129,6 +149,71 @@ const CalendarSidebar: React.FC<CalendarSidebarProps> = ({ showSidebar, toggleSi
                     </div>
                 </div>
 
+                {/* Calendars Section */}
+                <div className="categories-footer" style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+                    <div
+                        className="categories-header clickable"
+                        onClick={() => setCalendarsOpen(!calendarsOpen)}
+                    >
+                        <span className="categories-title">My Calendars</span>
+                        <div className="categories-actions">
+                            <Button
+                                variant="light"
+                                className="btn-icon btn-rounded add-category-btn"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowCalendarManager(true);
+                                }}
+                                title="Manage Calendars"
+                            >
+                                <GearSix size={14} />
+                            </Button>
+                        </div>
+                    </div>
+                    {calendarsOpen && (
+                        <div className="categories-list">
+                            {calendarsLoading ? (
+                                <div className="text-muted small py-2">Loading...</div>
+                            ) : calendars.length === 0 ? (
+                                <div className="text-muted small py-2">No calendars yet</div>
+                            ) : (
+                                calendars.map((cal: any) => (
+                                    <div key={cal.id} className="category-item d-flex align-items-center justify-content-between">
+                                        <Form.Check
+                                            type="checkbox"
+                                            id={`calendar-${cal.id}`}
+                                            label={cal.name}
+                                            checked={cal.is_visible ?? true}
+                                            onChange={() => toggleVisibility(cal.id)}
+                                            className="category-checkbox"
+                                            style={{ '--category-color': cal.color || '#009B84' } as any}
+                                        />
+                                    </div>
+                                ))
+                            )}
+                            {/* Show shared calendars */}
+                            {sharedCalendars.length > 0 && (
+                                <>
+                                    <div className="text-muted small fw-bold mt-2 mb-1" style={{ fontSize: '0.65rem', letterSpacing: '0.5px' }}>SHARED WITH ME</div>
+                                    {sharedCalendars.map((share: any) => (
+                                        <div key={share.id} className="category-item">
+                                            <Form.Check
+                                                type="checkbox"
+                                                id={`shared-cal-${share.id}`}
+                                                label={share.calendar?.name || 'Shared Calendar'}
+                                                checked={true}
+                                                readOnly
+                                                className="category-checkbox"
+                                                style={{ '--category-color': share.calendar?.color || '#6B7280' } as any}
+                                            />
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </div>
+                    )}
+                </div>
+
                 {/* Categories Section - Fixed at Bottom */}
                 <div
                     className="categories-footer"
@@ -193,6 +278,34 @@ const CalendarSidebar: React.FC<CalendarSidebarProps> = ({ showSidebar, toggleSi
             {/* New Event */}
             {/* @ts-ignore */}
             <SetReminder show={reminder} hide={() => setReminder(!reminder)} refreshEvents={refreshEvents} />
+
+            {/* Calendar Manager Modal */}
+            {/* @ts-ignore */}
+            <CalendarManager
+                show={showCalendarManager}
+                hide={() => setShowCalendarManager(false)}
+                calendars={calendars}
+                loading={calendarsLoading}
+                onCreate={createCalendar}
+                onUpdate={updateCalendar}
+                onDelete={deleteCalendar}
+                onToggleVisibility={toggleVisibility}
+                onSetDefault={setDefault}
+                onShare={(cal: any) => {
+                    setShareTarget(cal);
+                    setShowShareModal(true);
+                }}
+            />
+
+            {/* Calendar Share Modal */}
+            {/* @ts-ignore */}
+            <CalendarShareModal
+                show={showShareModal}
+                hide={() => { setShowShareModal(false); setShareTarget(null); }}
+                calendar={shareTarget}
+                onShareAdded={fetchCalendars}
+                onShareRemoved={fetchCalendars}
+            />
         </>
     )
 }

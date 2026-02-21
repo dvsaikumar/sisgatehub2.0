@@ -50,6 +50,7 @@ const ChatPopup = React.lazy(() => import("../views/ChatPopup/DirectMessage"));
 const ChatBot = React.lazy(() => import("../views/ChatPopup/ChatBot"));
 const AuditLogs = React.lazy(() => import("../views/AuditLogs"));
 const CreateDoc = React.lazy(() => import("../views/AI/CreateDoc/index"));
+const ExploreFeatures = React.lazy(() => import("../views/ExploreFeatures"));
 
 
 export const routes = [
@@ -61,6 +62,7 @@ export const routes = [
     { path: 'library/grid-view', exact: true, component: Library },
     { path: 'audit-logs', exact: true, component: AuditLogs },
     { path: 'emptypage', exact: true, component: EmptyPage },
+    { path: 'explore-features', exact: true, component: ExploreFeatures },
     { path: 'apps/ai/create-doc', exact: true, component: CreateDoc },
     //Apps
     { path: 'apps/chat/chats', exact: true, component: Chats },

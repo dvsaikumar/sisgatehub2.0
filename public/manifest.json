@@ -1,0 +1,23 @@
+{
+    "name": "Sisgate Hub",
+    "short_name": "Sisgate",
+    "description": "Empower Business Owners — Modern SaaS Management Hub",
+    "start_url": "/dashboard",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "any",
+    "theme_color": "#007D88",
+    "background_color": "#f8fafc",
+    "categories": [
+        "business",
+        "productivity"
+    ],
+    "icons": [
+        {
+            "src": "/favicon.png",
+            "sizes": "138x136",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}

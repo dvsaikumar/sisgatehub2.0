@@ -19,6 +19,9 @@ import { toggleCollapsedNav } from '../../redux/action/Theme';
 import { SidebarMenu } from '../Sidebar/SidebarMenu';
 import { ThemeSwitcher } from '../../utils/theme-provider/theme-switcher';
 import SimpleBar from 'simplebar-react';
+import { useSwipeBack } from '../../hooks/useSwipeBack';
+import { usePullToRefresh } from '../../hooks/usePullToRefresh';
+import InstallBanner from '../../components/InstallBanner';
 
 // User avatar
 import avatar12 from '../../assets/img/avatar12.jpg';
@@ -28,6 +31,16 @@ const ResponsiveNavigation = ({ navCollapsed, toggleCollapsedNav, children }) =>
     const [searchOpen, setSearchOpen] = useState(false);
     const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
     const location = useLocation();
+
+    // Gesture hooks
+    useSwipeBack();
+    const { pulling, pullDistance, refreshing, threshold } = usePullToRefresh();
+
+    // Device breakpoints
+    const isDesktop = windowWidth >= 1024;
+    const isTablet = windowWidth >= 768 && windowWidth < 1024;
+    const isPhone = windowWidth < 768;
+    const isLandscape = typeof window !== 'undefined' && window.innerHeight < window.innerWidth;
 
     // Update window width on resize
     useEffect(() => {
@@ -62,8 +75,6 @@ const ResponsiveNavigation = ({ navCollapsed, toggleCollapsedNav, children }) =>
         }
         return () => { document.body.style.overflow = ''; };
     }, [mobileMenuOpen]);
-
-    const isDesktop = windowWidth >= 1024;
 
     // Quick navigation items for the header
     const quickNavItems = [
@@ -200,6 +211,58 @@ const ResponsiveNavigation = ({ navCollapsed, toggleCollapsedNav, children }) =>
                 .drawer-nav-link:not(.active):hover {
                     background-color: ${brandColors.surfaceHover};
                     color: ${brandColors.textPrimary};
+                }
+
+                /* Pull-to-refresh indicator */
+                .pull-indicator {
+                    position: fixed;
+                    top: 0;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    z-index: 1060;
+                    pointer-events: none;
+                }
+                .pull-spinner {
+                    width: 32px;
+                    height: 32px;
+                    border: 3px solid ${brandColors.primaryLight};
+                    border-top-color: ${brandColors.primary};
+                    border-radius: 50%;
+                    animation: spin 0.8s linear infinite;
+                }
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+
+                /* Tablet specific */
+                @media (min-width: 768px) and (max-width: 1023px) {
+                    .responsive-content-area {
+                        padding-bottom: 0 !important;
+                    }
+                }
+                @media (min-width: 768px) and (max-width: 1023px) and (orientation: landscape) {
+                    .responsive-content-area {
+                        padding-left: 1.5rem;
+                        padding-right: 1.5rem;
+                    }
+                }
+
+                /* iPad safe areas */
+                @supports (padding: env(safe-area-inset-bottom)) {
+                    .responsive-layout-wrapper {
+                        padding-left: env(safe-area-inset-left);
+                        padding-right: env(safe-area-inset-right);
+                    }
+                }
+
+                /* Tablet hover states — suppress on touch */
+                @media (hover: none) {
+                    .drawer-nav-link:not(.active):hover {
+                        background-color: transparent;
+                    }
+                    .nav-link-inactive:hover {
+                        background-color: transparent;
+                    }
                 }
             `}</style>
 
@@ -447,7 +510,7 @@ const ResponsiveNavigation = ({ navCollapsed, toggleCollapsedNav, children }) =>
                             }}
                         />
 
-                        {/* Drawer */}
+                        {/* Drawer — wider on tablet */}
                         <motion.aside
                             initial={{ x: '-100%' }}
                             animate={{ x: 0 }}
@@ -457,7 +520,7 @@ const ResponsiveNavigation = ({ navCollapsed, toggleCollapsedNav, children }) =>
                                 position: 'fixed',
                                 top: 0,
                                 left: 0,
-                                width: 'min(320px, 85vw)',
+                                width: isTablet ? 'min(380px, 55vw)' : 'min(320px, 85vw)',
                                 height: '100%',
                                 backgroundColor: 'var(--color-surface, #ffffff)',
                                 zIndex: 1060,
@@ -556,17 +619,55 @@ const ResponsiveNavigation = ({ navCollapsed, toggleCollapsedNav, children }) =>
                 )}
             </AnimatePresence>
 
+            {/* ===== PULL-TO-REFRESH INDICATOR ===== */}
+            {(pulling || refreshing) && !isDesktop && (
+                <div className="pull-indicator" style={{
+                    top: refreshing ? '12px' : `${Math.min(pullDistance, threshold * 1.5) - 40}px`,
+                    opacity: refreshing ? 1 : Math.min(pullDistance / threshold, 1),
+                    transition: refreshing ? 'top 0.3s ease' : 'none',
+                }}>
+                    {refreshing ? (
+                        <div className="pull-spinner" />
+                    ) : (
+                        <div style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: '50%',
+                            background: pullDistance >= threshold
+                                ? brandColors.primary
+                                : brandColors.primaryLight,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'background 0.2s',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                        }}>
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                style={{
+                                    transform: `rotate(${pullDistance >= threshold ? 180 : 0}deg)`,
+                                    transition: 'transform 0.2s',
+                                }}
+                            >
+                                <path d="M8 3v10M4 9l4 4 4-4" stroke={pullDistance >= threshold ? '#fff' : brandColors.primary}
+                                    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        </div>
+                    )}
+                </div>
+            )}
+
             {/* ===== MAIN CONTENT ===== */}
-            <main style={{
+            <main className="responsive-content-area" style={{
                 paddingTop: isDesktop ? '4rem' : '3.5rem',
+                paddingBottom: isPhone ? '4.5rem' : 0, /* space for bottom nav on phone only */
                 minHeight: '100vh',
-                transition: 'all 0.3s'
+                transition: 'all 0.3s',
             }}>
                 {children}
             </main>
 
-            {/* ===== MOBILE BOTTOM BAR ===== */}
-            {!isDesktop && (
+            {/* ===== MOBILE BOTTOM BAR (phone only, hidden on tablet) ===== */}
+            {isPhone && (
                 <nav style={{
                     position: 'fixed',
                     bottom: 0,
@@ -600,6 +701,9 @@ const ResponsiveNavigation = ({ navCollapsed, toggleCollapsedNav, children }) =>
                     </div>
                 </nav>
             )}
+
+            {/* ===== PWA INSTALL BANNER ===== */}
+            {!isDesktop && <InstallBanner />}
         </div>
     );
 };

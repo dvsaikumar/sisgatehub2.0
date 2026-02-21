@@ -5,6 +5,7 @@ import { routes } from './RouteList'
 import { supabase } from '../configs/supabaseClient';
 import ChatBotInterface from '../views/ChatPopup/ChatBot/ChatBotInterface';
 import SessionManager from '../components/Auth/SessionManager';
+import GDPRModal from '../components/GDPRModal';
 
 // Shim to provide v5 props (history, location, match) to components
 const LegacyRouteWrapper = ({ component: Component }) => {
@@ -55,6 +56,7 @@ const AppRoutes = () => {
 
     return (
         <SessionManager>
+            <GDPRModal />
             <LayoutClassic>
                 <Suspense
                     fallback={

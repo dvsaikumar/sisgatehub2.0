@@ -14,13 +14,13 @@ export const AuditService = {
             if (!session?.user) return;
 
             const actionUpper = action.toUpperCase();
-            const VALID_ACTIONS = ['LOGIN', 'LOGOUT', 'SIGNUP', 'CREATE', 'UPDATE', 'DELETE', 'VIEW', 'SEARCH', 'EXPORT', 'IMPORT', 'DOWNLOAD', 'UPLOAD', 'SHARE', 'UNSHARE', 'ARCHIVE', 'RESTORE', 'SEND_EMAIL', 'SEND_REMINDER', 'CHANGE_PASSWORD', 'CHANGE_SETTINGS', 'GRANT_ACCESS', 'REVOKE_ACCESS', 'OTHER'];
+            const VALID_ACTIONS = ['LOGIN', 'LOGOUT', 'SIGNUP', 'CREATE', 'READ', 'UPDATE', 'DELETE', 'EXPORT', 'IMPORT', 'DOWNLOAD', 'UPLOAD', 'SHARE', 'UNSHARE', 'ARCHIVE', 'RESTORE', 'SEND_EMAIL', 'SEND_REMINDER', 'CHANGE_PASSWORD', 'CHANGE_SETTINGS', 'GRANT_ACCESS', 'REVOKE_ACCESS', 'OTHER'];
 
             let action_type = 'OTHER';
             if (VALID_ACTIONS.includes(actionUpper)) {
                 action_type = actionUpper;
             } else if (actionUpper.includes('VIEW')) {
-                action_type = 'VIEW';
+                action_type = 'READ';
             } else if (actionUpper.includes('CREATE')) {
                 action_type = 'CREATE';
             } else if (actionUpper.includes('UPDATE')) {
@@ -35,6 +35,7 @@ export const AuditService = {
                     user_id: session.user.id,
                     user_email: session.user.email,
                     action_type,
+                    resource_type: 'page', // Required by DB schema
                     resource_name: resource,
                     action_description: action,
                     metadata: details,

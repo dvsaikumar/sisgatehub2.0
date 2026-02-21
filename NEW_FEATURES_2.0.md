@@ -565,18 +565,18 @@ This document outlines recommended UI/UX enhancements and new features to elevat
 - [ ] Theme scheduling (auto dark mode at night)
 
 ### 15.2 Layout Options
-- [ ] Sidebar position (left/right)
-- [ ] Sidebar width options
+- [x] Sidebar position (left/right)
+- [x] Sidebar width options
 - [ ] Header style options
-- [ ] Card style options (flat/elevated/bordered)
-- [ ] Font size adjustment
-- [ ] Font family selection
+- [x] Card style options (flat/elevated/bordered)
+- [x] Font size adjustment
+- [x] Font family selection
 
 ### 15.3 Personalization
-- [ ] Custom dashboard wallpaper
-- [ ] Greeting message customization
-- [ ] Widget color themes
-- [ ] Icon style preference (outlined/filled)
+- [x] Custom dashboard wallpaper
+- [x] Greeting message customization
+- [x] Widget color themes
+- [x] Icon style preference (outlined/filled)
 
 ---
 
@@ -585,24 +585,24 @@ This document outlines recommended UI/UX enhancements and new features to elevat
 ### 16.1 Mobile Optimization
 **Current State:** Responsive but not mobile-first
 **Enhancement:**
-- [ ] Bottom navigation bar for mobile
-- [ ] Gesture support (swipe to go back, pull to refresh)
-- [ ] Touch-optimized buttons (44px minimum)
-- [ ] Mobile-specific layouts for complex views
-- [ ] Offline mode with sync
+- [x] Bottom navigation bar for mobile
+- [x] Gesture support (swipe to go back, pull to refresh)
+- [x] Touch-optimized buttons (44px minimum)
+- [x] Mobile-specific layouts for complex views
+- [x] Offline mode with sync
 
 ### 16.2 PWA Features
-- [ ] Add to home screen prompt
-- [ ] Splash screen
+- [x] Add to home screen prompt
+- [x] Splash screen
 - [ ] Push notifications
-- [ ] Background sync
-- [ ] App-like experience
+- [x] Background sync
+- [x] App-like experience
 
 ### 16.3 Tablet Optimization
 - [ ] Split-view layouts
-- [ ] Sidebar as overlay on tablet
-- [ ] Landscape mode optimization
-- [ ] iPad-specific enhancements
+- [x] Sidebar as overlay on tablet
+- [x] Landscape mode optimization
+- [x] iPad-specific enhancements
 
 ---
 

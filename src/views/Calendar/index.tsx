@@ -7,6 +7,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
+import rrulePlugin from '@fullcalendar/rrule';
 import dayjs from '../../lib/dayjs';
 import { useWindowHeight } from '@react-hook/window-size';
 import CalendarSidebar from './CalendarSidebar';
@@ -44,6 +45,13 @@ interface ReminderEvent {
     notified?: boolean;
     created_at?: string;
     updated_at?: string;
+    recurrence_rule?: string;
+    recurrence_end?: string;
+    is_recurring?: boolean;
+    reminder_minutes?: number[];
+    reminder_sent_at?: string[];
+    calendar_id?: string;
+    busy_status?: string;
 }
 
 const Calendar: React.FC<CalendarProps> = ({ topNavCollapsed, toggleTopNav }) => {
@@ -95,24 +103,49 @@ const Calendar: React.FC<CalendarProps> = ({ topNavCollapsed, toggleTopNav }) =>
                 setUpcomingEvents(upcoming);
 
                 // Map for FullCalendar
-                const mappedEvents = data.map((evt: ReminderEvent) => ({
-                    id: evt.id,
-                    title: evt.title,
-                    start: evt.start_date,
-                    end: evt.end_date,
-                    backgroundColor: evt.background_color,
-                    borderColor: evt.background_color,
-                    extendedProps: {
-                        description: evt.description,
-                        location: evt.location,
-                        priority: evt.priority,
-                        category: evt.category,
-                        visibility: evt.visibility,
-                        notified: evt.notified,
-                        created_at: evt.created_at,
-                        updated_at: evt.updated_at // Assuming this exists or will be null
+                const mappedEvents = data.map((evt: ReminderEvent) => {
+                    const base: any = {
+                        id: evt.id,
+                        title: evt.title,
+                        backgroundColor: evt.background_color,
+                        borderColor: evt.background_color,
+                        extendedProps: {
+                            description: evt.description,
+                            location: evt.location,
+                            priority: evt.priority,
+                            category: evt.category,
+                            visibility: evt.visibility,
+                            notified: evt.notified,
+                            created_at: evt.created_at,
+                            updated_at: evt.updated_at,
+                            recurrence_rule: evt.recurrence_rule,
+                            is_recurring: evt.is_recurring,
+                            reminder_minutes: evt.reminder_minutes,
+                            calendar_id: evt.calendar_id,
+                            busy_status: evt.busy_status,
+                            extra_email: (evt as any).extra_email,
+                        }
+                    };
+
+                    // If recurring, use rrule plugin format
+                    if (evt.is_recurring && evt.recurrence_rule) {
+                        base.rrule = `DTSTART:${evt.start_date.replace(/[-:]/g, '').split('.')[0]}Z\nRRULE:${evt.recurrence_rule}`;
+                        if (evt.end_date) {
+                            // Duration for recurring events
+                            const startMs = new Date(evt.start_date).getTime();
+                            const endMs = new Date(evt.end_date).getTime();
+                            const durationMs = endMs - startMs;
+                            const hours = Math.floor(durationMs / 3600000);
+                            const minutes = Math.floor((durationMs % 3600000) / 60000);
+                            base.duration = { hours, minutes };
+                        }
+                    } else {
+                        base.start = evt.start_date;
+                        base.end = evt.end_date;
                     }
-                }));
+
+                    return base;
+                });
                 setAllEvents(mappedEvents);
                 setEvents(mappedEvents);
             }
@@ -276,7 +309,7 @@ const Calendar: React.FC<CalendarProps> = ({ topNavCollapsed, toggleTopNav }) =>
 
                             <FullCalendar
                                 ref={calendarRef}
-                                plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
+                                plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin, rrulePlugin]}
                                 initialView="dayGridMonth"
                                 initialDate={date as any}
                                 headerToolbar={false}

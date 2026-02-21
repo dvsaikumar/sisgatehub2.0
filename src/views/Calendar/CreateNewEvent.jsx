@@ -4,8 +4,11 @@ import { supabase } from '../../configs/supabaseClient';
 import toast from 'react-hot-toast';
 import dayjs from '../../lib/dayjs';
 import { useCategories } from '../../hooks/useCategories';
+import { useCalendars } from '../../hooks/useCalendars';
 import { Paperclip, X, File } from '@phosphor-icons/react';
 import CreatableSelect from 'react-select/creatable';
+import RecurrenceSelector from './RecurrenceSelector';
+import ReminderSelector from './ReminderSelector';
 
 // MUI Date Pickers
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -34,13 +37,28 @@ const CreateNewEvent = ({ show, hide, calendarRef, refreshEvents }) => {
     const [backgroundColor, setBackgroundColor] = useState("#009B84");
     const [loading, setLoading] = useState(false);
 
+    // Recurrence & Reminder State
+    const [recurrenceRule, setRecurrenceRule] = useState(null);
+    const [reminderMinutes, setReminderMinutes] = useState([15]);
+    const [busyStatus, setBusyStatus] = useState('busy');
+    const [selectedCalendarId, setSelectedCalendarId] = useState(null);
+
     // File Upload State
     const [attachmentFile, setAttachmentFile] = useState(null);
     const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef(null);
 
-    // Fetch categories
+    // Fetch categories & calendars
     const { categories } = useCategories();
+    const { calendars, getDefaultCalendar } = useCalendars();
+
+    // Set default calendar on load
+    useEffect(() => {
+        if (!selectedCalendarId && calendars.length > 0) {
+            const def = getDefaultCalendar();
+            if (def) setSelectedCalendarId(def.id);
+        }
+    }, [calendars]);
 
     // Fetch Users for Email Selection
     useEffect(() => {
@@ -175,16 +193,19 @@ const CreateNewEvent = ({ show, hide, calendarRef, refreshEvents }) => {
                         description,
                         start_date: finalStart,
                         end_date: finalEnd,
-                        start_date: finalStart,
-                        end_date: finalEnd,
                         location: "EVENT",
-                        category,
                         category,
                         visibility,
                         priority,
                         background_color: backgroundColor,
                         extra_email: emailString || null,
-                        attachment_path: attachmentPath
+                        attachment_path: attachmentPath,
+                        // New calendar fields
+                        recurrence_rule: recurrenceRule || null,
+                        is_recurring: !!recurrenceRule,
+                        reminder_minutes: reminderMinutes.length > 0 ? reminderMinutes : null,
+                        calendar_id: selectedCalendarId || null,
+                        busy_status: busyStatus,
                     }
                 ])
                 .select();
@@ -202,6 +223,9 @@ const CreateNewEvent = ({ show, hide, calendarRef, refreshEvents }) => {
             setSelectedEmails([]);
             setCategory("Work");
             setAttachmentFile(null);
+            setRecurrenceRule(null);
+            setReminderMinutes([15]);
+            setBusyStatus('busy');
             if (fileInputRef.current) fileInputRef.current.value = '';
 
             // Reset dates to default
@@ -368,6 +392,27 @@ const CreateNewEvent = ({ show, hide, calendarRef, refreshEvents }) => {
                         </Row>
                     </LocalizationProvider>
 
+                    {/* Recurrence Selector */}
+                    <Row className="gx-3">
+                        <Col sm={12} className="mb-3">
+                            <RecurrenceSelector
+                                value={recurrenceRule}
+                                onChange={setRecurrenceRule}
+                                eventDate={startDateTime}
+                            />
+                        </Col>
+                    </Row>
+
+                    {/* Reminder Selector */}
+                    <Row className="gx-3">
+                        <Col sm={12} className="mb-3">
+                            <ReminderSelector
+                                value={reminderMinutes}
+                                onChange={setReminderMinutes}
+                            />
+                        </Col>
+                    </Row>
+
                     <Row className="gx-3">
                         <Col sm={6} as={Form.Group} className="mb-3">
                             <Form.Label>Category</Form.Label>
@@ -378,10 +423,35 @@ const CreateNewEvent = ({ show, hide, calendarRef, refreshEvents }) => {
                             </Form.Select>
                         </Col>
                         <Col sm={6} as={Form.Group} className="mb-3">
+                            <Form.Label>Calendar</Form.Label>
+                            <Form.Select
+                                value={selectedCalendarId || ''}
+                                onChange={e => setSelectedCalendarId(e.target.value || null)}
+                            >
+                                <option value="">No calendar</option>
+                                {calendars.map(cal => (
+                                    <option key={cal.id} value={cal.id}>
+                                        {cal.name}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        </Col>
+                    </Row>
+
+                    <Row className="gx-3">
+                        <Col sm={6} as={Form.Group} className="mb-3">
                             <Form.Label>Visibility</Form.Label>
                             <Form.Select value={visibility} onChange={e => setVisibility(e.target.value)}>
                                 <option value="Public">Public</option>
                                 <option value="Private">Private</option>
+                            </Form.Select>
+                        </Col>
+                        <Col sm={6} as={Form.Group} className="mb-3">
+                            <Form.Label>Show As</Form.Label>
+                            <Form.Select value={busyStatus} onChange={e => setBusyStatus(e.target.value)}>
+                                <option value="busy">Busy</option>
+                                <option value="free">Free</option>
+                                <option value="tentative">Tentative</option>
                             </Form.Select>
                         </Col>
                     </Row>

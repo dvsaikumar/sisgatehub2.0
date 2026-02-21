@@ -6,6 +6,7 @@ import { supabase } from '../../configs/supabaseClient';
 import dayjs from '../../lib/dayjs';
 import { motion, Variants } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
+import { usePreferencesStore, WALLPAPER_MAP, WIDGET_THEME_MAP } from '../../stores/preferences-store';
 
 // Components
 import StatCard from './components/StatCard';
@@ -35,6 +36,12 @@ import { DashboardStats, Document, Reminder } from '../../models';
 const Dashboard: React.FC = () => {
     const dispatch = useDispatch();
     const [currentTime, setCurrentTime] = useState(dayjs());
+
+    // Personalization preferences
+    const dashboardWallpaper = usePreferencesStore((s) => s.dashboardWallpaper);
+    const greetingMessage = usePreferencesStore((s) => s.greetingMessage);
+    const widgetColorTheme = usePreferencesStore((s) => s.widgetColorTheme);
+    const widgetTheme = WIDGET_THEME_MAP[widgetColorTheme];
 
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(dayjs()), 1000);
@@ -120,6 +127,7 @@ const Dashboard: React.FC = () => {
 
     // Greeting Time Logic
     const getGreeting = () => {
+        if (greetingMessage) return { text: greetingMessage, icon: SunHorizon, color: 'text-amber-500' };
         const hour = dayjs().hour();
         if (hour < 12) return { text: `Good Morning, ${displayName}`, icon: SunHorizon, color: 'text-amber-500' };
         if (hour < 18) return { text: `Good Afternoon, ${displayName}`, icon: Sun, color: 'text-orange-500' };
@@ -203,7 +211,13 @@ const Dashboard: React.FC = () => {
 
     return (
         <motion.div
-            className="p-4 md:p-6 lg:p-8 max-w-[1920px] mx-auto min-h-screen font-sans bg-slate-50/30"
+            className="p-4 md:p-6 lg:p-8 max-w-[1920px] mx-auto min-h-screen font-sans"
+            style={{
+                background: dashboardWallpaper !== 'none'
+                    ? WALLPAPER_MAP[dashboardWallpaper]
+                    : undefined,
+                backgroundColor: dashboardWallpaper === 'none' ? 'rgb(248 250 252 / 0.3)' : undefined,
+            }}
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -236,7 +250,8 @@ const Dashboard: React.FC = () => {
                 {/* 1. Stats Row (Unified Strip) */}
                 <motion.div
                     variants={itemVariants}
-                    className="bg-white rounded-xl shadow-xs border border-slate-200 flex flex-col lg:flex-row"
+                    className={`${widgetTheme.bg} rounded-xl shadow-xs border border-slate-200 flex flex-col lg:flex-row`}
+                    style={{ borderColor: widgetTheme.accent + '22' }}
                 >
                     {isDataLoading ? (
                         <>

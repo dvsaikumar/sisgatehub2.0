@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AuthRoutes from './routes/AuthRoutes';
 import AppRoutes from './routes/AppRoutes'
@@ -6,19 +6,10 @@ import "bootstrap/js/src/collapse";
 import ScrollToTop from './utils/ScrollToTop';
 import { Toaster } from 'react-hot-toast';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import CommandPalette from './components/CommandPalette/CommandPalette.tsx';
 import { RouteTracker } from './views/AuditLogs/RouteTracker';
 
-// Create a client
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+const ExploreFeatures = React.lazy(() => import('./views/ExploreFeatures'));
 
 function App() {
   return (
@@ -50,22 +41,26 @@ function App() {
         }}
         gutter={8}
       />
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <RouteTracker />
-          <CommandPalette />
-          <ScrollToTop>
-            <Routes>
-              <Route path="/" element={<Navigate to="/auth/login" replace />} />
-              <Route path="/logout" element={<Navigate to="/auth/login" replace />} />
-              {/* Auth */}
-              <Route path="auth/*" element={<AuthRoutes />} />
-              {/* Layouts */}
-              <Route path="*" element={<AppRoutes />} />
-            </Routes>
-          </ScrollToTop>
-        </BrowserRouter>
-      </QueryClientProvider>
+      <BrowserRouter>
+        <RouteTracker />
+        <CommandPalette />
+        <ScrollToTop>
+          <Routes>
+            <Route path="/" element={<Navigate to="/auth/login" replace />} />
+            <Route path="/logout" element={<Navigate to="/auth/login" replace />} />
+            {/* Public — Explore Features (accessible from Login) */}
+            <Route path="/explore-features" element={
+              <Suspense fallback={<div className="preloader-it"><div className="loader-pendulums" /></div>}>
+                <ExploreFeatures />
+              </Suspense>
+            } />
+            {/* Auth */}
+            <Route path="auth/*" element={<AuthRoutes />} />
+            {/* Layouts */}
+            <Route path="*" element={<AppRoutes />} />
+          </Routes>
+        </ScrollToTop>
+      </BrowserRouter>
     </>
   );
 }

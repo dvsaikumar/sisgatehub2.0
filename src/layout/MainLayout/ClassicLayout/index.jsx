@@ -9,6 +9,7 @@ import Sidebar from '../../Sidebar/Sidebar.tsx';
 import { useWindowWidth } from '@react-hook/window-size';
 import ChatBotInterface from '../../../views/ChatPopup/ChatBot/ChatBotInterface';
 import ResponsiveNavigation from '../../ResponsiveNavigation';
+import { usePreferencesStore, FONT_FAMILY_MAP, SIDEBAR_WIDTH_MAP } from '../../../stores/preferences-store';
 
 const LayoutClassic = ({ children, navCollapsed, topNavCollapsed, toggleCollapsedNav, maximize }) => {
 
@@ -17,6 +18,13 @@ const LayoutClassic = ({ children, navCollapsed, topNavCollapsed, toggleCollapse
     const errro404Route = useMatch('/error-404');
     const dashboardRoute = useMatch("/dashboard");
     const windowWidth = useWindowWidth();
+
+    // Preferences
+    const sidebarPosition = usePreferencesStore((s) => s.sidebarPosition);
+    const fontSize = usePreferencesStore((s) => s.fontSize);
+    const fontFamily = usePreferencesStore((s) => s.fontFamily);
+    const sidebarWidth = usePreferencesStore((s) => s.sidebarWidth);
+    const cardStyle = usePreferencesStore((s) => s.cardStyle);
 
     // Use responsive navigation for mobile/tablet (< 1024px)
     const useResponsiveNav = windowWidth < 1024;
@@ -54,6 +62,14 @@ const LayoutClassic = ({ children, navCollapsed, topNavCollapsed, toggleCollapse
             data-menu="light"
             data-footer="none"
             data-hover={dataHover ? "active" : ""}
+            data-sidebar-position={sidebarPosition}
+            data-card-style={cardStyle}
+            style={{
+                fontSize: `${fontSize}px`,
+                fontFamily: FONT_FAMILY_MAP[fontFamily],
+                '--sidebar-width': SIDEBAR_WIDTH_MAP[sidebarWidth],
+                direction: sidebarPosition === 'right' ? 'rtl' : 'ltr',
+            }}
         >
             {/* Top Navbar */}
             <TopNav />
@@ -61,7 +77,7 @@ const LayoutClassic = ({ children, navCollapsed, topNavCollapsed, toggleCollapse
             <Sidebar />
             {/* Chat-bot */}
             {dashboardRoute && <ChatBotInterface show={false} />}
-            <div className={classNames("hk-pg-wrapper", { "pb-0": appRoutes })}>
+            <div className={classNames("hk-pg-wrapper", { "pb-0": appRoutes })} style={{ direction: 'ltr' }}>
                 {children}
                 {!appRoutes && <PageFooter />}
             </div>

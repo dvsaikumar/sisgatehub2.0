@@ -41,7 +41,7 @@ const FmHeader = ({ topNavCollapsed, toggleTopNav, toggleSidebar, showSidebar, s
 
             <div className={classNames("d-flex align-items-center flex-grow-1", { "d-none d-md-flex": mobileSearchOpen })}>
                 <div className="fmapp-title link-dark">
-                    <h1>{title ? title : "My Space"}</h1>
+                    <h1 className="fw-bold">{title ? title : "My Space"}</h1>
                 </div>
                 {children}
 

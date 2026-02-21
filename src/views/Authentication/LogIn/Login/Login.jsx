@@ -116,7 +116,7 @@ const Login = (props) => {
                                     <Col xxl={7} xl={8} lg={11} className="mx-auto">
                                         <h2 className="mb-4">Welcome to Sisgate PRO Hub 2.0</h2>
                                         <p>Your all-in-one productivity platform for managing documents, setting reminders, and collaborating with AI-powered tools to streamline your workflow.</p>
-                                        <Button variant="flush-primary" className="btn-uppercase mt-2">Explore Features</Button>
+                                        <Link to="/explore-features"><Button variant="flush-primary" className="btn-uppercase mt-2">Explore Features</Button></Link>
                                     </Col>
                                 </Row>
                                 <img src={logoutImg} className="img-fluid w-sm-50 mt-7" alt="login" />

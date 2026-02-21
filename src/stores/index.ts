@@ -18,3 +18,20 @@ export {
     selectActiveModal,
     selectModalData
 } from './modal-store';
+
+export {
+    usePreferencesStore,
+    selectSidebarPosition,
+    selectSidebarWidth,
+    selectCardStyle,
+    selectFontSize,
+    selectFontFamily,
+    selectDashboardWallpaper,
+    selectGreetingMessage,
+    selectWidgetColorTheme,
+    selectIconStyle,
+    WALLPAPER_MAP,
+    FONT_FAMILY_MAP,
+    SIDEBAR_WIDTH_MAP,
+    WIDGET_THEME_MAP,
+} from './preferences-store';

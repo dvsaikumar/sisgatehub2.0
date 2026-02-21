@@ -2,13 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Button, Form, Modal, Row, Col, Badge } from 'react-bootstrap';
 import dayjs from '../../lib/dayjs';
 import Swal from 'sweetalert2';
-import { Calendar, Clock, MapPin, List, Eye, Trash, Pencil, X, CheckCircle, WarningCircle, Bell } from '@phosphor-icons/react';
+import { Calendar, Clock, MapPin, List, Eye, Trash, Pencil, X, CheckCircle, WarningCircle, Bell, Repeat, CalendarBlank } from '@phosphor-icons/react';
 import '@sweetalert2/theme-bootstrap-4/bootstrap-4.css';
 import 'animate.css';
 import { supabase } from '../../configs/supabaseClient';
 import toast from 'react-hot-toast';
 import CreatableSelect from 'react-select/creatable';
 import { useCategories } from '../../hooks/useCategories';
+import { useCalendars } from '../../hooks/useCalendars';
+import RecurrenceSelector from './RecurrenceSelector';
+import ReminderSelector from './ReminderSelector';
 
 // MUI Date Pickers
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -34,13 +37,20 @@ const EventsModal = ({ show, onClose, info, event, onUpdate }) => {
     const [editVisibility, setEditVisibility] = useState('Public');
     const [eventColor, setEventColor] = useState("#009B84");
 
+    // Recurrence & Reminder edit state
+    const [editRecurrenceRule, setEditRecurrenceRule] = useState(null);
+    const [editReminderMinutes, setEditReminderMinutes] = useState([]);
+    const [editBusyStatus, setEditBusyStatus] = useState('busy');
+    const [editCalendarId, setEditCalendarId] = useState(null);
+
     // Email Handling
     const [editEmails, setEditEmails] = useState([]);
     const [emailOptions, setEmailOptions] = useState([]);
     const [emailError, setEmailError] = useState("");
 
-    // Fetch categories
+    // Fetch categories & calendars
     const { categories } = useCategories();
+    const { calendars } = useCalendars();
 
     // Fetch Users for Email Selection
     useEffect(() => {
@@ -77,6 +87,10 @@ const EventsModal = ({ show, onClose, info, event, onUpdate }) => {
         setEditPriority(eProps.priority || 'Medium');
         setEditVisibility(eProps.visibility || 'Public');
         setEventColor(event?.backgroundColor || '#009B84');
+        setEditRecurrenceRule(eProps.recurrence_rule || null);
+        setEditReminderMinutes(eProps.reminder_minutes || []);
+        setEditBusyStatus(eProps.busy_status || 'busy');
+        setEditCalendarId(eProps.calendar_id || null);
 
         if (event?.start) {
             setEditStartDateTime(dayjs(event.start));
@@ -84,7 +98,6 @@ const EventsModal = ({ show, onClose, info, event, onUpdate }) => {
         if (event?.end) {
             setEditEndDateTime(dayjs(event.end));
         } else if (event?.start) {
-            // If no end, assume start + 1 hour
             setEditEndDateTime(dayjs(event.start).add(1, 'hour'));
         }
 
@@ -97,6 +110,30 @@ const EventsModal = ({ show, onClose, info, event, onUpdate }) => {
         }
 
         setEditable(true);
+    };
+
+    // Helper: human-readable recurrence text
+    const getRecurrenceText = (rule) => {
+        if (!rule) return null;
+        if (rule.includes('FREQ=DAILY')) return 'Daily';
+        if (rule.includes('FREQ=WEEKLY')) {
+            const match = rule.match(/BYDAY=([A-Z,]+)/);
+            return match ? `Weekly on ${match[1]}` : 'Weekly';
+        }
+        if (rule.includes('FREQ=MONTHLY')) return 'Monthly';
+        if (rule.includes('FREQ=YEARLY')) return 'Yearly';
+        return 'Custom';
+    };
+
+    // Helper: reminder label
+    const getReminderLabel = (minutes) => {
+        if (minutes === 0) return 'At event time';
+        if (minutes < 60) return `${minutes} min before`;
+        if (minutes === 60) return '1 hour before';
+        if (minutes < 1440) return `${minutes / 60} hours before`;
+        if (minutes === 1440) return '1 day before';
+        if (minutes === 10080) return '1 week before';
+        return `${minutes} min before`;
     };
 
     const handleEmailInputChange = (inputValue, { action }) => {
@@ -138,16 +175,15 @@ const EventsModal = ({ show, onClose, info, event, onUpdate }) => {
                 category: editCategory,
                 background_color: eventColor,
                 extra_email: emailString || null,
-                // Only update these if not Reminder (or keep existing logic? Reminders have defaults stored)
-                // If UI hidden, we can keep current value or set defaults.
-                // EventsModal usually updates what is editable.
-                // We will update them carefully.
+                recurrence_rule: editRecurrenceRule || null,
+                is_recurring: !!editRecurrenceRule,
+                reminder_minutes: editReminderMinutes.length > 0 ? editReminderMinutes : null,
+                busy_status: editBusyStatus,
+                calendar_id: editCalendarId || null,
             };
 
             if (isReminder) {
-                // Keep default/existing for hidden fields
-                // payload.visibility = eProps.visibility; // Likely 'Private'
-                // payload.priority = eProps.priority; // Likely 'High'
+                // Keep existing priority/visibility for reminders
             } else {
                 payload.priority = editPriority;
                 payload.visibility = editVisibility;
@@ -353,6 +389,34 @@ const EventsModal = ({ show, onClose, info, event, onUpdate }) => {
                             )}
                         </div>
 
+                        {/* Recurrence Info */}
+                        {eProps.recurrence_rule && (
+                            <div className="d-flex align-items-center gap-2 mb-3 p-2 rounded-2" style={{ background: '#f0fdf4' }}>
+                                <Repeat size={16} weight="bold" className="text-success" />
+                                <span className="small fw-medium text-success">
+                                    Repeats {getRecurrenceText(eProps.recurrence_rule)}
+                                </span>
+                            </div>
+                        )}
+
+                        {/* Reminders Info */}
+                        {eProps.reminder_minutes && eProps.reminder_minutes.length > 0 && (
+                            <div className="d-flex align-items-center gap-2 mb-3 p-2 rounded-2" style={{ background: '#fffbeb' }}>
+                                <Bell size={16} weight="bold" className="text-warning" />
+                                <span className="small fw-medium text-dark">
+                                    {eProps.reminder_minutes.map(m => getReminderLabel(m)).join(', ')}
+                                </span>
+                            </div>
+                        )}
+
+                        {/* Busy Status */}
+                        {eProps.busy_status && eProps.busy_status !== 'busy' && (
+                            <div className="d-flex align-items-center gap-2 mb-3">
+                                <CalendarBlank size={14} className="text-muted" />
+                                <span className="small text-muted">Show as: <strong>{eProps.busy_status}</strong></span>
+                            </div>
+                        )}
+
                         {/* Description */}
                         {eProps.description && (
                             <div className="mb-4">
@@ -365,7 +429,7 @@ const EventsModal = ({ show, onClose, info, event, onUpdate }) => {
                             </div>
                         )}
 
-                        {/* Extra Strings (Emails) in View Mode if needed? Often handy to see who is invited */}
+                        {/* Recipients */}
                         {eProps.extra_email && (
                             <div className="mb-4">
                                 <small className="text-muted fw-bold d-block mb-1">RECIPIENTS</small>
@@ -516,8 +580,30 @@ const EventsModal = ({ show, onClose, info, event, onUpdate }) => {
                             </Row>
                         </LocalizationProvider>
 
+                        {/* Recurrence & Reminders */}
+                        {!isReminder && (
+                            <Row className="mb-3">
+                                <Col sm={12} className="mb-3">
+                                    <RecurrenceSelector
+                                        value={editRecurrenceRule}
+                                        onChange={setEditRecurrenceRule}
+                                        eventDate={editStartDateTime}
+                                    />
+                                </Col>
+                            </Row>
+                        )}
+
+                        <Row className="mb-3">
+                            <Col sm={12}>
+                                <ReminderSelector
+                                    value={editReminderMinutes}
+                                    onChange={setEditReminderMinutes}
+                                />
+                            </Col>
+                        </Row>
+
                         <Row className="mb-4">
-                            <Col sm={12} as={Form.Group} className="mb-3">
+                            <Col sm={6} as={Form.Group} className="mb-3">
                                 <Form.Label>Category</Form.Label>
                                 <Form.Select value={editCategory} onChange={(e) => setEditCategory(e.target.value)}>
                                     {categories.map((cat, idx) => (
@@ -525,11 +611,22 @@ const EventsModal = ({ show, onClose, info, event, onUpdate }) => {
                                     ))}
                                 </Form.Select>
                             </Col>
+                            <Col sm={6} as={Form.Group} className="mb-3">
+                                <Form.Label>Calendar</Form.Label>
+                                <Form.Select
+                                    value={editCalendarId || ''}
+                                    onChange={e => setEditCalendarId(e.target.value || null)}
+                                >
+                                    <option value="">No calendar</option>
+                                    {calendars.map(cal => (
+                                        <option key={cal.id} value={cal.id}>{cal.name}</option>
+                                    ))}
+                                </Form.Select>
+                            </Col>
 
-                            {/* Show Priority/Visibility only for Events */}
                             {!isReminder && (
                                 <>
-                                    <Col sm={6} as={Form.Group} className="mb-3">
+                                    <Col sm={4} as={Form.Group} className="mb-3">
                                         <Form.Label>Priority</Form.Label>
                                         <Form.Select value={editPriority} onChange={(e) => setEditPriority(e.target.value)}>
                                             <option value="Low">Low</option>
@@ -538,11 +635,19 @@ const EventsModal = ({ show, onClose, info, event, onUpdate }) => {
                                             <option value="Urgent">Urgent</option>
                                         </Form.Select>
                                     </Col>
-                                    <Col sm={6} as={Form.Group} className="mb-3">
+                                    <Col sm={4} as={Form.Group} className="mb-3">
                                         <Form.Label>Visibility</Form.Label>
                                         <Form.Select value={editVisibility} onChange={(e) => setEditVisibility(e.target.value)}>
                                             <option value="Public">Public</option>
                                             <option value="Private">Private</option>
+                                        </Form.Select>
+                                    </Col>
+                                    <Col sm={4} as={Form.Group} className="mb-3">
+                                        <Form.Label>Show As</Form.Label>
+                                        <Form.Select value={editBusyStatus} onChange={(e) => setEditBusyStatus(e.target.value)}>
+                                            <option value="busy">Busy</option>
+                                            <option value="free">Free</option>
+                                            <option value="tentative">Tentative</option>
                                         </Form.Select>
                                     </Col>
                                 </>
